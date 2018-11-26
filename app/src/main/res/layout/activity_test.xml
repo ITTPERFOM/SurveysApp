@@ -1,0 +1,51 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    tools:context="com.timetracker.surveys.TestActivity" >
+ 	
+    <ScrollView
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:background="#ffffff" >
+
+	<LinearLayout
+	      android:layout_width="fill_parent"
+	      android:layout_height="wrap_content"
+	      android:gravity="center_horizontal"
+	      android:orientation="vertical"
+	      android:layout_marginLeft="40dp"
+	      android:layout_marginStart="40dp"
+	      android:layout_marginRight="40dp"
+	      android:layout_marginEnd="40dp"> 
+
+	     <Button
+	         style="@style/button_text"
+	         android:layout_marginTop="20dp"
+	         android:background="@drawable/btn_start"
+	         android:onClick="SendData"
+	         android:text="@string/Test"
+	         android:textSize="20sp" />
+	     </LinearLayout>
+ 		</ScrollView>
+	     
+	<TableRow
+		android:id="@+id/tr_options"
+     	android:layout_width="match_parent"
+     	android:layout_height="wrap_content" 
+     	android:background="#00467f"
+		android:layout_alignParentBottom="true" 
+		android:gravity="center" >
+
+     <ImageButton
+         android:id="@+id/btnHome"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:onClick="SendHome"
+         android:contentDescription="@string/option_home"
+         android:layout_weight=".25"
+         android:background="@drawable/btn_tiles"
+         android:src="@drawable/tile_back" />
+ </TableRow>
+</RelativeLayout>

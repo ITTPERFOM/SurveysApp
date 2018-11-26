@@ -1,0 +1,203 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.timetracker.surveys.UbicheckActivity" >
+
+    <RelativeLayout
+      android:id="@+id/header"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      android:gravity="center" >
+
+        <TextView
+            android:id="@+id/txtTitle"
+            style="@style/textview_Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/option_ubicheck"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+               
+ 	</RelativeLayout>
+ 	
+ 	<ScrollView
+      android:id="@+id/scrollableContents"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/header"
+      android:layout_above="@+id/tr_options"
+      android:background="#ffffff" >
+		<LinearLayout
+	      android:layout_width="fill_parent"
+	      android:layout_height="wrap_content"
+	      android:gravity="center_horizontal"
+	      android:orientation="vertical"
+	      android:layout_marginLeft="40dp"
+	      android:layout_marginStart="40dp"
+	      android:layout_marginRight="40dp"
+	      android:layout_marginEnd="40dp">
+ 			
+		    <LinearLayout
+    			android:id="@+id/layoutRefresh"
+    			android:layout_width="fill_parent"
+       			android:layout_height="wrap_content"
+       			android:orientation="vertical" 
+       			android:paddingLeft="@dimen/activity_horizontal_margin"
+	    		android:paddingRight="@dimen/activity_horizontal_margin">
+	    		
+	 		    <Button
+	   			    android:id="@+id/btnRefresh"
+		         	style="@style/button_text"
+		         	android:layout_marginTop="43dp"
+		         	android:background="@drawable/btn_download"
+		         	android:onClick="Refresh"
+		         	android:text="@string/option_refresh"
+		         	android:textSize="18sp" />
+	 		    
+    		</LinearLayout>
+		    
+		    <LinearLayout
+    			android:id="@+id/AddNewBranch"
+    			android:layout_width="fill_parent"
+       			android:layout_height="wrap_content"
+       			android:orientation="vertical" 
+       			android:paddingLeft="@dimen/activity_horizontal_margin"
+	    		android:paddingRight="@dimen/activity_horizontal_margin">
+	    		
+	 		    <Button
+	   			    android:id="@+id/btnAddBranch"
+		         	style="@style/button_text"
+		         	android:layout_marginTop="43dp"
+		         	android:background="@drawable/btn_upload"
+		         	android:onClick="AddBranch"
+		         	android:text="@string/option_add_branch"
+		         	android:textSize="18sp" />
+	 		    
+    		</LinearLayout>
+		    
+	 		<LinearLayout
+    			android:id="@+id/Buttons"
+    			android:layout_width="fill_parent"
+       			android:layout_height="wrap_content"
+       			android:orientation="vertical" 
+       			android:paddingLeft="@dimen/activity_horizontal_margin"
+	    		android:paddingRight="@dimen/activity_horizontal_margin"
+	    		android:visibility="gone">
+	    		
+	 		    <TextView
+	            	style="@style/textview_Text"
+	            	android:layout_width="wrap_content"
+	            	android:layout_height="wrap_content"
+	            	android:text="@string/option_select_branch" />
+	 		    
+    		</LinearLayout>
+    		
+    		<LinearLayout
+    			android:id="@+id/CheckOut"
+    			android:layout_width="fill_parent"
+       			android:layout_height="wrap_content"
+       			android:orientation="vertical" 
+       			android:paddingLeft="@dimen/activity_horizontal_margin"
+	    		android:paddingRight="@dimen/activity_horizontal_margin"
+	    		android:visibility="gone">
+
+	   			<TextView
+	   			    android:id="@+id/CheckOutMessage"
+	            	style="@style/textview_Text"
+	            	android:layout_width="wrap_content"
+	            	android:layout_height="wrap_content"/>
+
+	   			<Button
+	   			    android:id="@+id/btnCheckOut"
+		         	style="@style/button_text"
+		         	android:background="@drawable/btn_checkin"
+		         	android:onClick="CheckOut"
+		         	android:text="@string/CheckOut"
+		         	android:textSize="18sp" />
+
+				
+    		</LinearLayout>
+ 		
+    		<LinearLayout
+    			android:id="@+id/ActivityCheckOut"
+    			android:layout_width="fill_parent"
+       			android:layout_height="wrap_content"
+       			android:orientation="vertical" 
+       			android:paddingLeft="@dimen/activity_horizontal_margin"
+	    		android:paddingRight="@dimen/activity_horizontal_margin"
+	    		android:visibility="gone">
+
+	   			<TextView
+	   			    android:id="@+id/ActivityCheckOutMessage"
+	            	style="@style/textview_Text"
+	            	android:layout_width="wrap_content"
+	            	android:layout_height="wrap_content"/>
+
+	   			<Button
+	   			    android:id="@+id/btnActivityCheckOut"
+		         	style="@style/button_text"
+		         	android:background="@drawable/btn_activity_checkout"
+		         	android:onClick="ActivityCheckOut"
+		         	android:text="@string/ActivityCheckOut" />
+
+				
+    		</LinearLayout>
+    		
+    		<LinearLayout
+    			android:id="@+id/ActivityCheckIn"
+    			android:layout_width="fill_parent"
+       			android:layout_height="wrap_content"
+       			android:orientation="vertical" 
+       			android:paddingLeft="@dimen/activity_horizontal_margin"
+	    		android:paddingRight="@dimen/activity_horizontal_margin"
+	    		android:layout_marginTop="20dip"
+	    		android:visibility="gone">
+	   			
+    		    <TextView
+	            	style="@style/textview_Text"
+	            	android:layout_width="wrap_content"
+	            	android:layout_height="wrap_content"
+	            	android:text="@string/ActivitySelection"/>
+    		    
+				<Spinner
+			        android:id="@+id/ActivityCheckInSpinner"
+			        android:background="@drawable/spinner_gray"
+			        android:layout_width="fill_parent"
+			        android:layout_height="wrap_content"
+			        android:prompt="@string/CheckOut"/>
+	   			<Button
+	   			    android:id="@+id/btnActivityCheckIn"
+	   			    android:layout_marginTop="20dp"
+		         	style="@style/button_text"
+		         	android:background="@drawable/btn_activity_checkin"
+		         	android:onClick="ActivityCheckIn"
+		         	android:text="@string/ActivityCheckIn" />
+
+				
+    		</LinearLayout>
+ 	    </LinearLayout>
+ 	    
+    </ScrollView>
+    
+ 	<TableRow
+		android:id="@+id/tr_options"
+     	android:layout_width="match_parent"
+     	android:layout_height="wrap_content" 
+     	android:background="#00467f"
+		android:layout_alignParentBottom="true" 
+		android:gravity="center" >
+
+     <ImageButton
+         android:id="@+id/btnHome"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:onClick="SendHome"
+         android:contentDescription="@string/option_home"
+         android:layout_weight=".25"
+         android:background="@drawable/btn_tiles"
+         android:src="@drawable/tile_back" />
+
+ </TableRow>
+
+</RelativeLayout>

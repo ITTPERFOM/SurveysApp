@@ -1,0 +1,132 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f3f3f3"
+    android:gravity="center"
+    android:orientation="horizontal"
+    tools:context=".PreviewActivity" >
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:gravity="center" >
+
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ittperformance_logo" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/connection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header"
+        android:background="#ffffff"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/txtConnection"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="5dp" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/scrollableContents"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/connection"
+        android:background="#ffffff" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="30dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginStart="40dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/editTextEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Enter UserID"
+                android:inputType="textEmailAddress" 
+                android:visibility="gone">
+
+                <requestFocus />
+            </EditText>
+
+            <Button
+                android:id="@+id/btnStartSurvey"
+                style="@style/button_text"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/btn_start"
+                android:hint="Enroll"
+                android:onClick="registerUser"
+                android:text="Registrar Biométricos"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btnSelectSurvey"
+                style="@style/button_text"
+                android:layout_marginTop="13dp"
+                android:background="@drawable/btn_start"
+                android:hint="Validate"
+                android:onClick="authenticateUser"
+                android:text="Enviar Ubicacion"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </ScrollView>
+	<TableRow
+        android:id="@+id/tr_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#00467f"
+        android:gravity="center" >
+
+        <ImageButton
+            android:id="@+id/btnHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".25"
+            android:background="@drawable/btn_tiles"
+            android:contentDescription="@string/option_home"
+            android:onClick="SendHome"
+            android:src="@drawable/tile_home" />
+		
+        <ImageButton
+            android:id="@+id/btnRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight=".25"
+            android:background="@drawable/btn_tiles"
+            android:contentDescription="@string/option_register"
+            android:onClick="RegisterDevices"
+            android:src="@drawable/tile_register" />
+        
+        <ImageButton
+	         android:id="@+id/btnSettings"
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:onClick="SendSettings"
+	         android:contentDescription="@string/option_settings"
+	         android:layout_weight=".25"
+	         android:background="@drawable/btn_tiles"
+	         android:src="@drawable/tile_ubicheck" />
+    </TableRow>
+</RelativeLayout>

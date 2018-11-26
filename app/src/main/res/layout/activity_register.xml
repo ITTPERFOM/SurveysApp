@@ -1,0 +1,212 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    tools:context="com.timetracker.surveys.RegisterActivity" >
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#f3f3f3"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/txtTitle"
+            style="@style/textview_Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/option_register"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+        
+    </RelativeLayout>
+
+    <TableRow
+        android:id="@+id/trDeviceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header"
+        android:gravity="center"
+        android:padding="5dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin" >
+
+        <TextView
+            android:id="@+id/lblDeviceName"
+            style="@style/textview_Text"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:text="@string/register_device_name"
+            android:background="#ffffff"/>
+
+        <EditText
+            android:id="@+id/txtDeviceName"
+            android:layout_width="180dp"
+            android:layout_height="50dp"
+            android:background="@drawable/edittext"
+            android:paddingLeft="5dp"
+            android:ems="10"
+            android:inputType="text"/>
+        
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/trDeviceCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/trDeviceName" 
+        android:gravity="center" 
+        android:padding="5dp"
+    	android:paddingLeft="@dimen/activity_horizontal_margin"
+    	android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:id="@+id/lblDeviceCode"
+            style="@style/textview_Text"
+            android:layout_width="120dp"
+            android:layout_height="50dp"
+            android:background="#ffffff"
+            android:text="@string/register_device_code" />
+
+        <EditText
+            android:id="@+id/txtDeviceCode"
+            android:layout_width="180dp"
+            android:layout_height="50dp"
+            android:background="@drawable/edittext"
+            android:paddingLeft="5dp"
+            android:ems="10"
+            android:inputType="text" />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/trDeviceTerms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/trDeviceCode" 
+        android:gravity="center" 
+        android:padding="5dp"
+    	android:paddingLeft="@dimen/activity_horizontal_margin"
+    	android:paddingRight="@dimen/activity_horizontal_margin">
+
+        
+        <CheckBox
+            android:id="@+id/checkTerms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/register_device_terms" />
+
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/trButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/trDeviceTerms" 
+        android:gravity="center" 
+        android:padding="5dp">
+        
+        <Button
+            android:id="@+id/btnCheckIn"
+            style="@style/button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/green_button"
+            android:onClick="RegisterDevice"
+            android:text="@string/Login" />
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/trDeviceNameInfo"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/trButton" 
+        android:gravity="center" 
+        android:padding="5dp">
+        
+        <TextView
+            android:id="@+id/lblDeviceNameInfo"
+            style="@style/textview_Text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff" />
+        
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/trButtonBiometric"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/trDeviceNameInfo" 
+        android:gravity="center" 
+        android:padding="5dp"
+        android:visibility="gone">
+        
+        <Button
+            android:id="@+id/btnBiometric"
+            style="@style/button_text"
+            android:background="@drawable/btn_start"
+            android:onClick="registerPerson"
+            android:text="@string/register_device_biometric" />
+
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/trButtonSelectBiometric"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/trButtonBiometric" 
+        android:gravity="center" 
+        android:padding="5dp"
+        android:visibility="gone">
+        
+        <Button
+            android:id="@+id/btnSelectBiometric"
+            style="@style/button_text"
+            android:background="@drawable/btn_check"
+            android:onClick="selectPerson"
+            android:text="@string/select_device_biometric" />
+
+    </TableRow>
+    
+    <TableRow
+        android:id="@+id/trButtonReset"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_below="@id/trButtonSelectBiometric" 
+        android:gravity="center" 
+        android:padding="5dp">
+        
+        <Button
+            android:id="@+id/btnReset"
+            style="@style/button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/red_button"
+            android:onClick="ResetDevice"
+            android:text="@string/register_device_reset" />
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tr_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#00467f"
+        android:gravity="center" >
+
+        <ImageButton
+         android:id="@+id/btnHome"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:onClick="SendHome"
+         android:contentDescription="@string/option_home"
+         android:layout_weight=".25"
+         android:background="@drawable/btn_tiles"
+         android:src="@drawable/tile_back" />
+    </TableRow>
+
+</RelativeLayout>

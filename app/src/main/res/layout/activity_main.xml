@@ -1,0 +1,108 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.timetracker.surveys.MainActivity" >
+
+    <TextView
+      android:id="@+id/txtIntroduction"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      android:layout_centerHorizontal="true"
+      android:layout_marginTop="18dp"
+      android:text="@string/hello_world"
+      android:textAppearance="?android:attr/textAppearanceLarge" />
+
+   <TextView
+      android:id="@+id/lblDeviceName"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentStart="true"
+      android:layout_below="@+id/txtIntroduction"
+      android:layout_marginTop="50dp"
+      android:text="@string/username"
+      android:textAppearance="?android:attr/textAppearanceMedium" />
+
+   <EditText
+      android:id="@+id/editTextEmail"
+       android:inputType="text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignBottom="@+id/lblDeviceName"
+      android:layout_marginLeft="32dp"
+      android:layout_marginStart="32dp"
+      android:layout_toRightOf="@+id/lblDeviceName"
+      android:layout_toEndOf="@+id/lblDeviceName"
+      android:ems="10" >
+
+      <requestFocus />
+   </EditText>
+
+   <TextView
+      android:id="@+id/lblDeviceCode"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignLeft="@+id/lblDeviceName"
+      android:layout_alignStart="@+id/lblDeviceName"
+      android:layout_below="@+id/lblDeviceName"
+      android:layout_marginTop="38dp"
+      android:text="@string/password"
+      android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    
+
+   <Button
+      android:id="@+id/btnCheckIn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/editTextEmail"
+      android:layout_centerHorizontal="true"
+      android:layout_marginTop="94dp"
+      android:onClick="login"
+       style="@style/button_text" 
+      android:background="@drawable/green_button" 
+      android:text="@string/Login" />
+
+   <TextView
+      android:id="@+id/textView4"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignLeft="@+id/lblDeviceCode"
+      android:layout_alignStart="@+id/lblDeviceCode"
+      android:layout_below="@+id/lblDeviceCode"
+      android:layout_marginLeft="30dp"
+      android:layout_marginStart="30dp"
+      android:layout_marginTop="48dp"
+      android:text="@string/attempts"
+      android:textAppearance="?android:attr/textAppearanceMedium" />
+
+   <TextView
+      android:id="@+id/textView5"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignRight="@+id/txtIntroduction"
+      android:layout_alignEnd="@+id/txtIntroduction"
+      android:layout_alignTop="@+id/textView4"
+      android:text="@string/Empty" />
+   
+   
+    <Button
+      android:id="@+id/btnCheckConnectivity"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@+id/btnCheckIn"
+      android:layout_centerHorizontal="true"
+      android:layout_marginTop="24dp"
+      android:onClick="CheckConectivity"
+      android:visibility="gone"
+      android:text="@string/check_conectivity" />
+   
+
+</RelativeLayout>
+   

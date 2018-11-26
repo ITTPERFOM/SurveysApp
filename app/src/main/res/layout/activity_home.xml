@@ -1,0 +1,192 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f3f3f3"
+    android:orientation="horizontal"
+    tools:context=".PreviewActivity" 
+    android:gravity="center">
+
+  <RelativeLayout
+      android:id="@+id/header"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      android:gravity="center" >
+
+               <ImageView
+                   android:id="@+id/imgLogo"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_alignParentTop="true"
+                   android:layout_centerHorizontal="true"
+                   android:contentDescription="@string/app_name"
+                   android:src="@drawable/ittperformance_logo" />
+               
+  </RelativeLayout>
+
+  <RelativeLayout
+      	android:id="@+id/connection"
+      	android:layout_below="@id/header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        android:gravity="center" >
+
+      <TextView
+          	android:id="@+id/txtConnection"
+          	android:layout_width="fill_parent"
+          	android:layout_height="wrap_content"
+          	android:layout_alignParentTop="true"
+          	android:layout_centerHorizontal="true"
+         	android:layout_margin="5dp" />
+
+  </RelativeLayout>
+  
+  <ScrollView
+      android:id="@+id/scrollableContents"
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:layout_below="@id/connection"
+      android:layout_above="@+id/tr_options"
+      android:background="#ffffff" >
+
+	<LinearLayout
+	      android:layout_width="fill_parent"
+	      android:layout_height="wrap_content"
+	      android:gravity="center_horizontal"
+	      android:orientation="vertical"
+	      android:layout_marginLeft="40dp"
+	      android:layout_marginStart="40dp"
+	      android:layout_marginRight="40dp"
+	      android:layout_marginEnd="40dp"> 
+
+
+	      <TextView
+	          android:id="@+id/txtSelectedSurveyHeader"
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_gravity="start"
+	          android:textStyle="bold" />
+	      
+       <TextView
+	          android:id="@+id/txtSelectedSurveyText"
+	          android:layout_width="wrap_content"
+	          android:layout_height="wrap_content"
+	          android:layout_gravity="start"/>
+       
+	     <Button
+	         android:id="@+id/btnStartSurvey"
+	         style="@style/button_text"
+	         android:layout_marginTop="20dp"
+	         android:background="@drawable/btn_start"
+	         android:onClick="StartSurvey"
+	         android:text="@string/Surveys"
+	         android:textSize="20sp" />
+	     
+	     <Button
+		    android:id="@+id/btnSelectSurvey"
+		    style="@style/button_text"
+		    android:layout_marginTop="13dp"
+		    android:background="@drawable/btn_check"
+		    android:onClick="SelectSurvey"
+		    android:text="@string/home_select_survey" 
+		    android:textSize="20sp" />
+     
+		<Button
+		    android:id="@+id/btnDownloadSurvey"
+		    style="@style/button_text"
+		    android:layout_marginTop="13dp"
+		    android:background="@drawable/btn_download"
+		    android:onClick="DownloadSurvey"
+		    android:text="@string/home_download_survey" 
+		    android:textSize="20sp" />
+
+		<Button
+		    android:id="@+id/btnUploadAnswers"
+		    style="@style/button_text"
+		    android:layout_marginTop="13dp"
+		    android:background="@drawable/btn_upload"
+		    android:onClick="UploadAnswers"
+		    android:text="@string/home_upload_answers" 
+		    android:textSize="20sp" />
+	
+	   <Button
+	       android:id="@+id/btnCheckIn"
+	       style="@style/button_text"
+	       android:layout_marginTop="13dp"
+	       android:background="@drawable/btn_checkin"
+	       android:onClick="CheckIn"
+	       android:text="@string/Checkin"
+	       android:textSize="20sp" />
+	
+	   <TextView
+	       android:id="@+id/txtfooter"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:layout_margin="5dp"
+	       android:layout_marginTop="16dp"
+	       android:textColor="#000"
+	       android:textSize="20sp" />
+
+    </LinearLayout>
+</ScrollView>
+
+<RelativeLayout
+    android:id="@+id/messages"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+	</RelativeLayout>
+  
+  <TableRow
+		android:id="@+id/tr_options"
+     	android:layout_width="match_parent"
+     	android:layout_height="wrap_content" 
+     	android:background="#00467f"
+		android:layout_alignParentBottom="true" 
+		android:gravity="center" >
+
+     <ImageButton
+         android:id="@+id/btnHome"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:onClick="SendHome"
+         android:contentDescription="@string/option_home"
+         android:layout_weight=".25"
+         android:background="@drawable/btn_tiles"
+         android:src="@drawable/tile_home" />
+
+     <ImageButton
+         android:id="@+id/btnRegister"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:onClick="RegisterDevices"
+         android:contentDescription="@string/option_register"
+         android:layout_weight=".25"
+         android:background="@drawable/btn_tiles"
+         android:src="@drawable/tile_register" />
+
+     <ImageButton
+         android:id="@+id/btnSettings"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:onClick="SendSettings"
+         android:contentDescription="@string/option_settings"
+         android:layout_weight=".25"
+         android:background="@drawable/btn_tiles"
+         android:src="@drawable/tile_ubicheck" />
+
+     <ImageButton
+         android:id="@+id/btnInformation"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:onClick="SendInformation"
+         android:contentDescription="@string/option_information"
+         android:layout_weight=".25"
+         android:background="@drawable/btn_tiles"
+         android:src="@drawable/tile_info" />
+
+ </TableRow>
+
+</RelativeLayout>
