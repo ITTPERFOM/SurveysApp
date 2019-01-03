@@ -2116,6 +2116,11 @@ public class SurveyActivity extends Activity {
 			 if (ConnectionMethods.isInternetConnected(SurveyActivity.this,false).equals("")){
 				progress.setMessage("Realizando consulta, por favor espere...");
       		   	progress.show();
+      		   	if (Question.Options.equals("DeviceID")){
+					Devices Device = db.GetDevice();
+      		   		scanContent += "-" + Device.DeviceID;
+				}
+
 	     		new AsyncGetTable(Question.QuestionID).execute("/Procedures?value=" + URLEncoder.encode(String.valueOf(Question.QuestionID) + "|" + scanContent));
 			 }else{
 	   			Toast.makeText(getApplicationContext(), "Dispositivo no conectado a internet",Toast.LENGTH_LONG).show();
@@ -2544,7 +2549,7 @@ public class SurveyActivity extends Activity {
             		String[] rows = result.split(Pattern.quote("\\r\\n"));
             		boolean isHeader = true;
             		if(rows.length > 0){
-            			if(rows.length == 2 && QuestionID == 22272){
+            			if(rows.length == 2 && (QuestionID == 22272 || QuestionID == 85289)){
             				final Questions Q = db.getQuestion(QuestionID);
 				    		int currentOrder = Q.OrderNumber + 1;
             				String[] columns = rows[1].split(Pattern.quote(","));
@@ -2684,6 +2689,12 @@ public class SurveyActivity extends Activity {
             			}
             		}
             	}
+            	else {
+            		Questions Q = db.getQuestion(QuestionID);
+            		if (Q.Options.equals("DeviceID")){
+						Toast.makeText(getBaseContext(), "No existe ubicheck", Toast.LENGTH_LONG).show();
+					}
+				}
 			} 
             catch (Exception e) {
 				 Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
