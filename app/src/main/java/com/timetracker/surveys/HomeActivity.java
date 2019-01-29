@@ -14,6 +14,12 @@ import java.util.Locale;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.timetracker.business.ConnectionMethods;
 import com.timetracker.business.DialogMethods;
 import com.timetracker.business.GPSTracker;
@@ -29,6 +35,10 @@ import com.timetracker.sqlite.MySQLiteHelper;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.location.Location;
+import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.annotation.SuppressLint;
@@ -70,6 +80,13 @@ public class HomeActivity extends Activity {
 	SharedPreferences sharedpreferences;
 	public MySQLiteHelper db = new MySQLiteHelper(HomeActivity.this);
 	final int SurveyCount = 0;
+
+	// New GPS
+	private FusedLocationProviderClient fusedLocationProviderClient;
+	private static final int MY_PERMISSION_REQUEST_FINE_LOCATION = 101;
+	private LocationRequest locationRequest;
+	private LocationCallback locationCallback;
+	private Location lc;
 	
 	
 	//================================================================================
@@ -83,6 +100,9 @@ public class HomeActivity extends Activity {
 		progress = new ProgressDialog(HomeActivity.this);
 		progress.setCancelable(false);
 		setContentView(R.layout.activity_home);
+		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+		GetLocation(fusedLocationProviderClient,this);
 		try
 		{
 			Devices Device = db.GetDevice();
@@ -117,6 +137,7 @@ public class HomeActivity extends Activity {
 	protected void onResume() { 
 		super.onResume(); 
 		InitialVerification();
+		startLocationUpdates(this);
 	}
 	
 	@Override
@@ -128,7 +149,7 @@ public class HomeActivity extends Activity {
 	     }
 	    db.close();
 	    Runtime.getRuntime().gc();
-	    GPSTracker.stopUsingGPS();
+		stopLocationUpdates();
 	}
 	
 	public void InitialVerification(){
@@ -141,6 +162,7 @@ public class HomeActivity extends Activity {
 					txtfooter.setText("Dispositivo en espera de autorizacion"); 
 					break;
 				case 2:
+					startTimer();
 					if(!progress.isShowing()){
 						Buttons(true);
 						txtfooter.setText(""); 
@@ -329,44 +351,35 @@ public class HomeActivity extends Activity {
 	public void CheckIn(View view){
  	   try
  	   {
- 		   Devices Device = db.GetDevice();
-		   if (ContextCompat.checkSelfPermission(HomeActivity.this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			   int isPermited = 0;
-	           ActivityCompat.requestPermissions(HomeActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},isPermited);
-		   }else{
-			   Buttons(false);
-			   String message = "Registrando Ubicacion";
-			   Message msg = Message.obtain();
-			   msg.obj = message;
-			   ProgressMessageHandler.sendMessage(msg);
-			   progress.show();
- 			   double latitude = 0;
- 			   double longitude = 0;
- 			   if(GPSTracker.canGetLocation())
- 			   {
- 				   latitude = GPSTracker.getLatitude();
- 				   longitude = GPSTracker.getLongitude();
- 			   }
- 			   if(latitude == 0 || longitude == 0){
- 				   progress.dismiss();
- 				   Buttons(true);
- 				   DialogMethods.showInformationDialog(HomeActivity.this, "GPS apagado", "GPS apagado. Favor de encenderlo y esperar unos momentos antes de volver a intentar.", null);
- 			   }else{
- 				   SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
- 				   Tracker Tracker = new Tracker(0,Device.DeviceID,latitude,longitude,ft.format(new Date()));
- 				   if (ConnectionMethods.isInternetConnected(HomeActivity.this,false).equals("")){
- 					   Tracker.TrackerID = db.addTrackers(Tracker);
- 					   AsynTrackerCreate AsynTrackerCreate = new AsynTrackerCreate(Tracker);
- 					   AsynTrackerCreate.execute("/Trackers");
- 				   }else{
- 					  db.addTrackers(Tracker);
- 					  Buttons(true);
- 					  progress.dismiss();
- 					  DialogMethods.showInformationDialog(HomeActivity.this, "Ubicacion guardada", "Ubicacion guardada de manera local.", null);
- 				   }
- 	 			  	
- 			   }
-		   }
+		   Handler handler = new Handler();
+		   handler.postDelayed(new Runnable() {
+			   public void run() {
+				   Devices Device = db.GetDevice();
+				   if (ContextCompat.checkSelfPermission(HomeActivity.this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+					   int isPermited = 0;
+					   ActivityCompat.requestPermissions(HomeActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},isPermited);
+				   }else{
+					   Buttons(false);
+					   String message = "Registrando Ubicacion";
+					   Message msg = Message.obtain();
+					   msg.obj = message;
+					   ProgressMessageHandler.sendMessage(msg);
+					   progress.show();
+					   SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
+					   Tracker Tracker = new Tracker(0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),ft.format(new Date()));
+					   if (ConnectionMethods.isInternetConnected(HomeActivity.this,false).equals("")){
+						   Tracker.TrackerID = db.addTrackers(Tracker);
+						   AsynTrackerCreate AsynTrackerCreate = new AsynTrackerCreate(Tracker);
+						   AsynTrackerCreate.execute("/Trackers");
+					   }else{
+						   db.addTrackers(Tracker);
+						   Buttons(true);
+						   progress.dismiss();
+						   DialogMethods.showInformationDialog(HomeActivity.this, "Ubicacion guardada", "Ubicacion guardada de manera local.", null);
+					   }
+				   }
+			   }
+		   }, 1000);
  	   } 
  	   catch (Exception ex) 
  	   {
@@ -1020,6 +1033,88 @@ public class HomeActivity extends Activity {
 		    this.EndingImage = EndingImage;
 		    this.FooterImage = FooterImage;
 		    this.BackgroundImage = BackgroundImage;
+		}
+	}
+
+	//================================================================================
+	// NEW GPS METHODS
+	//================================================================================
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+		switch (requestCode) {
+			case MY_PERMISSION_REQUEST_FINE_LOCATION:
+
+				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					//permission was granted do nothing and carry on
+				} else {
+					Toast.makeText(getApplicationContext(), "This app requires location permissions to be granted", Toast.LENGTH_SHORT).show();
+					finish();
+				}
+				break;
+		}
+	}
+	private void startLocationUpdates(Context context) {
+		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+			fusedLocationProviderClient.requestLocationUpdates(InicializeLR(), InicializeLC(), null);
+		} else {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
+			}
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		stopLocationUpdates();
+	}
+
+	private void stopLocationUpdates() {
+		fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+	}
+
+	private LocationRequest InicializeLR(){
+		locationRequest = new LocationRequest();
+		locationRequest.setInterval(10);
+		locationRequest.setFastestInterval(15);
+		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+		return locationRequest;
+	};
+
+	private LocationCallback InicializeLC(){
+		locationCallback = new LocationCallback() {
+			@Override
+			public void onLocationResult(LocationResult locationResult) {
+				super.onLocationResult(locationResult);
+				for (Location location : locationResult.getLocations()) {
+					if (location != null) {
+						lc = location;
+					}
+				}
+			}
+		};
+		return locationCallback;
+	}
+
+	private void  GetLocation(FusedLocationProviderClient fusedLocationProviderClient, Context context){
+		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+			fusedLocationProviderClient.getLastLocation().addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
+				@Override
+				public void onSuccess(Location location) {
+					if (location != null) {
+						lc = location;
+					}
+				}
+			});
+		} else {
+			// request permissions
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
+			}
 		}
 	}
 }

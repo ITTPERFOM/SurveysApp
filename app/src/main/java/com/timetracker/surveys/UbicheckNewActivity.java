@@ -3,6 +3,12 @@ package com.timetracker.surveys;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.timetracker.business.ConnectionMethods;
 import com.timetracker.business.DialogMethods;
 import com.timetracker.business.GPSTracker;
@@ -13,13 +19,18 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
@@ -29,6 +40,7 @@ import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 @SuppressLint("ClickableViewAccessibility")
 public class UbicheckNewActivity extends Activity {
@@ -38,7 +50,7 @@ public class UbicheckNewActivity extends Activity {
     //================================================================================
 	
 	private ProgressDialog progress;
-	private GPSTracker GPSTracker;
+	//private GPSTracker GPSTracker;
 	private MySQLiteHelper db = new MySQLiteHelper(UbicheckNewActivity.this);
 	private double latitude = 0;
 	private double longitude = 0;
@@ -46,6 +58,13 @@ public class UbicheckNewActivity extends Activity {
 	private int GlobalClientID = 0;
 	private TableLayout tblClientOptions;
 	private EditText txtClient;
+
+    // New GPS
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private static final int MY_PERMISSION_REQUEST_FINE_LOCATION = 101;
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+    private Location lc;
 	
 	//================================================================================
     // Activity Events
@@ -55,13 +74,13 @@ public class UbicheckNewActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ubicheck_new);
-		GPSTracker = new GPSTracker(getApplicationContext());
+		//GPSTracker = new GPSTracker(getApplicationContext());
 		progress = new ProgressDialog(UbicheckNewActivity.this);
 		progress.setCancelable(false);
 		tblClientOptions = (TableLayout) findViewById(R.id.tblClientOptions);
 		txtClient = (EditText) findViewById(R.id.txtClient);
-		EditText txtLatitude = (EditText) findViewById(R.id.txtLatitude);
-		EditText txtLongitude = (EditText) findViewById(R.id.txtLongitude);
+		final EditText txtLatitude = (EditText) findViewById(R.id.txtLatitude);
+		final EditText txtLongitude = (EditText) findViewById(R.id.txtLongitude);
 		txtLatitude.setEnabled(false);
 		txtLongitude.setEnabled(false);
 		DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener(){
@@ -85,28 +104,28 @@ public class UbicheckNewActivity extends Activity {
 					finish();
 				}
 				DeviceID = Device.DeviceID;
-				
-		    	if(GPSTracker.canGetLocation())
- 			   	{
- 				   latitude = GPSTracker.getLatitude();
- 				   longitude = GPSTracker.getLongitude();
- 			   	}
-		    	if(latitude == 0 || longitude == 0){
-	          		DialogMethods.showInformationDialog(UbicheckNewActivity.this, "GPS apagado", "GPS apagado. Favor de encenderlo y esperar unos momentos antes de volver a intentar.",onClickListener);
-	          	}else{
-	          		txtLatitude.setText(Double.toString(latitude));
-	          		txtLongitude.setText(Double.toString(longitude));
+
+                //NEW GPS
+                fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+                GetLocation(fusedLocationProviderClient,this);
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        if(lc != null){
+                            txtLatitude.setText(Double.toString(lc.getLatitude()));
+                            txtLongitude.setText(Double.toString(lc.getLongitude()));
+                        }
+                    }
+                }, 1000);
 	          	}
 		    }
-		}else{
-			DialogMethods.showInformationDialog(UbicheckNewActivity.this, "Sin Conexion", "No se detecto una conexion a internet. Favor de conectarse a una red antes de volver a intentar.",onClickListener);
-		}
 	}
 	
 	public void onDestroy() {
 	    super.onDestroy();
 	    db.close();
-	    GPSTracker.stopUsingGPS();
 	}
 	
 	//================================================================================
@@ -339,4 +358,92 @@ public class UbicheckNewActivity extends Activity {
 		startActivity(intent);
 		finish();
 	}
+
+    //================================================================================
+    // NEW GPS METHODS
+    //================================================================================
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case MY_PERMISSION_REQUEST_FINE_LOCATION:
+
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //permission was granted do nothing and carry on
+                } else {
+                    Toast.makeText(getApplicationContext(), "This app requires location permissions to be granted", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startLocationUpdates(this);
+    }
+    private void startLocationUpdates(Context context) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationProviderClient.requestLocationUpdates(InicializeLR(), InicializeLC(), null);
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    private void stopLocationUpdates() {
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+    }
+
+    private LocationRequest InicializeLR(){
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(10);
+        locationRequest.setFastestInterval(15);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        return locationRequest;
+    };
+
+    private LocationCallback InicializeLC(){
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        lc = location;
+                    }
+                }
+            }
+        };
+        return locationCallback;
+    }
+
+    private void  GetLocation(FusedLocationProviderClient fusedLocationProviderClient, Context context){
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        lc = location;
+
+                    }
+                }
+            });
+        } else {
+            // request permissions
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
+            }
+        }
+    }
 }

@@ -1,12 +1,21 @@
 package com.timetracker.surveys;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.timetracker.sqlite.MySQLiteHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import android.Manifest;
+import android.os.Build;
+import android.os.Handler;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -138,6 +147,14 @@ public class SurveyActivity extends Activity {
     protected List<String> oldListSentTo = new ArrayList<String>();
     private MySQLiteHelper db = new MySQLiteHelper(SurveyActivity.this);
     ProgressDialog progress;
+
+	// New GPS
+	private FusedLocationProviderClient fusedLocationProviderClient;
+	private static final int MY_PERMISSION_REQUEST_FINE_LOCATION = 101;
+	private LocationRequest locationRequest;
+	private LocationCallback locationCallback;
+	private Location lc;
+	private double latitude,longitude;
     
 	//================================================================================
     // Activity Events
@@ -148,6 +165,9 @@ public class SurveyActivity extends Activity {
 		super.onCreate(null);
 		progress = new ProgressDialog(SurveyActivity.this);
 		progress.setCancelable(false);
+		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+		GetLocation(fusedLocationProviderClient,this);
 		try
 		{ 
 			setContentView(R.layout.activity_survey);
@@ -1613,87 +1633,91 @@ public class SurveyActivity extends Activity {
 	 
 	 public class ButtonSendSurvey implements View.OnClickListener 
 	    {
-			public void onClick( View view ){
+			public void onClick(final View view ){
 				progress.setMessage("Guardando respuestas, por favor espere...");
 				progress.show();
 	    		try
 	    		{
-	    			view.setEnabled(false);
-	    			view.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_button));
-	    			List<Answers> listAnswers = new ArrayList<Answers>();
-	    			GPSTracker = new GPSTracker(getApplicationContext());
-	   	          	double latitude=0;
-	   	          	double longitude=0;
-	   	          	if(GPSTracker.canGetLocation())
-	   	          	{
-	   	          		latitude = GPSTracker.getLatitude();
-	   	          		longitude = GPSTracker.getLongitude();
-	   	          	}
-	   	          	else
-	   	          	{
-	   	          		Toast.makeText(getApplicationContext(), "GPS deshabilitado", Toast.LENGTH_LONG).show();
-	   	          	}
-	   	          	GPSTracker.stopUsingGPS();
-	   	          	Devices Device = db.GetDevice();
-	   	          	String DeviceMac = Device.Name;
-	          		if(DeviceMac == null){
-	          			DeviceMac = "";
-	          		}
-	          		Calendar c = Calendar.getInstance(); 
-	  				int year = c.get(Calendar.YEAR);
-	  				int month = c.get(Calendar.MONTH);
-	  				int day = c.get(Calendar.DAY_OF_MONTH);
-	  				int hour = c.get(Calendar.HOUR_OF_DAY);
-	  				int seconds = c.get(Calendar.SECOND);
-	  				int milliseccons = c.get(Calendar.MILLISECOND);
-	  				String randomID = UUID.randomUUID().toString();
-	  				int SurveyID = 0;
-	  				String Identifier = "";
-	  				SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
-	  				SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
-	  				String DateFormFinish = ft.format(new Date());
-	          		for(List<Questions> listrow: SurveyQuestions)
-	          		{
-	          			for(Questions row: listrow)
-	      				{
-	          				if(row.Answer == null){
-	          					row.Answer = "_.";
-	          				}
-	          				SurveyID = row.SurveyID;
-	          				if((row.QuestionTypeID == 15 ||  row.QuestionTypeID == 20) && row.Answer.equals("1")){
-	          					row.Answer = db.getPhoto(row.QuestionID);
-	          				}
-	          				Identifier = randomID + String.valueOf(year) + String.valueOf(month) + String.valueOf(day) + String.valueOf(hour) + String.valueOf(seconds) + String.valueOf(milliseccons);
-	          				Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID);
-	          				listAnswers.add(item);
-	      				}   
-	          		}
-	          		sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-	                Editor editor = sharedpreferences.edit();
-	   		      	editor.remove("savequestions");
-	   		      	editor.remove("saveindex");
-	   		      	editor.commit();
-	   		      	db.updateQuestionAnswers(SurveyID);
-	   		      	db.deletePhotos();
-	   		      	for(Answers row: listAnswers)
-	 	    		{
-	 	        		db.addAnswers(row);
-	 	    		}
-	   		      	SelectedSurvey.UbicheckID = 0;
-	   		      	SelectedSurvey.DateFormStart = "";
-	   		      	db.UpdateSelectedSurvey(SelectedSurvey);
-	   		      	if (ConnectionMethods.isInternetConnected(SurveyActivity.this,false).equals("")) 
-	          		{
-	          			HttpAsyncTask httpAsyncTask = new HttpAsyncTask(SurveyID,Identifier,Device.DeviceID);
-	          			httpAsyncTask.execute("/Answers");
-	    	        }
-	    	        else
-	    	        {
-	    	        	progress.dismiss();
-	    	        	TakeSurveyAgain(SurveyID,true);
-	    	        }
-		        } 
-	    		catch (Exception e) 
+					Handler handler = new Handler();
+					handler.postDelayed(new Runnable() {
+						public void run() {
+							view.setEnabled(false);
+							view.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_button));
+							List<Answers> listAnswers = new ArrayList<Answers>();
+
+
+							if(lc != null)
+							{
+								latitude = lc.getLatitude();
+								longitude = lc.getLongitude();
+							}
+							else
+							{
+								Toast.makeText(getApplicationContext(), "GPS deshabilitado", Toast.LENGTH_LONG).show();
+							}
+							stopLocationUpdates();
+							Devices Device = db.GetDevice();
+							String DeviceMac = Device.Name;
+							if(DeviceMac == null){
+								DeviceMac = "";
+							}
+							Calendar c = Calendar.getInstance();
+							int year = c.get(Calendar.YEAR);
+							int month = c.get(Calendar.MONTH);
+							int day = c.get(Calendar.DAY_OF_MONTH);
+							int hour = c.get(Calendar.HOUR_OF_DAY);
+							int seconds = c.get(Calendar.SECOND);
+							int milliseccons = c.get(Calendar.MILLISECOND);
+							String randomID = UUID.randomUUID().toString();
+							int SurveyID = 0;
+							String Identifier = "";
+							SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
+							SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
+							String DateFormFinish = ft.format(new Date());
+							for(List<Questions> listrow: SurveyQuestions)
+							{
+								for(Questions row: listrow)
+								{
+									if(row.Answer == null){
+										row.Answer = "_.";
+									}
+									SurveyID = row.SurveyID;
+									if((row.QuestionTypeID == 15 ||  row.QuestionTypeID == 20) && row.Answer.equals("1")){
+										row.Answer = db.getPhoto(row.QuestionID);
+									}
+									Identifier = randomID + String.valueOf(year) + String.valueOf(month) + String.valueOf(day) + String.valueOf(hour) + String.valueOf(seconds) + String.valueOf(milliseccons);
+									Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID);
+									listAnswers.add(item);
+								}
+							}
+							sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+							Editor editor = sharedpreferences.edit();
+							editor.remove("savequestions");
+							editor.remove("saveindex");
+							editor.commit();
+							db.updateQuestionAnswers(SurveyID);
+							db.deletePhotos();
+							for(Answers row: listAnswers)
+							{
+								db.addAnswers(row);
+							}
+							SelectedSurvey.UbicheckID = 0;
+							SelectedSurvey.DateFormStart = "";
+							db.UpdateSelectedSurvey(SelectedSurvey);
+							if (ConnectionMethods.isInternetConnected(SurveyActivity.this,false).equals(""))
+							{
+								HttpAsyncTask httpAsyncTask = new HttpAsyncTask(SurveyID,Identifier,Device.DeviceID);
+								httpAsyncTask.execute("/Answers");
+							}
+							else
+							{
+								progress.dismiss();
+								TakeSurveyAgain(SurveyID,true);
+							}
+						}
+					}, 1000);
+		        }
+	    		catch (Exception e)
 		        {
 	    			progress.dismiss();
 		        	Toast.makeText(getBaseContext(), "E008:" + e.toString(), Toast.LENGTH_LONG).show();
@@ -2549,7 +2573,7 @@ public class SurveyActivity extends Activity {
             		String[] rows = result.split(Pattern.quote("\\r\\n"));
             		boolean isHeader = true;
             		if(rows.length > 0){
-            			if(rows.length == 2 && (QuestionID == 22272 || QuestionID == 85289)){
+            			if(rows.length == 2 && (QuestionID == 22272 || QuestionID == 85289 || QuestionID == 85840)){
             				final Questions Q = db.getQuestion(QuestionID);
 				    		int currentOrder = Q.OrderNumber + 1;
             				String[] columns = rows[1].split(Pattern.quote(","));
@@ -2711,5 +2735,86 @@ public class SurveyActivity extends Activity {
         }
         return index;
 	}
- 
+
+	//================================================================================
+	// NEW GPS METHODS
+	//================================================================================
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+		switch (requestCode) {
+			case MY_PERMISSION_REQUEST_FINE_LOCATION:
+
+				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					//permission was granted do nothing and carry on
+				} else {
+					Toast.makeText(getApplicationContext(), "This app requires location permissions to be granted", Toast.LENGTH_SHORT).show();
+					finish();
+				}
+				break;
+		}
+	}
+	private void startLocationUpdates(Context context) {
+		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+			fusedLocationProviderClient.requestLocationUpdates(InicializeLR(), InicializeLC(), null);
+		} else {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
+			}
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		stopLocationUpdates();
+	}
+
+	private void stopLocationUpdates() {
+		fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+	}
+
+	private LocationRequest InicializeLR(){
+		locationRequest = new LocationRequest();
+		locationRequest.setInterval(10);
+		locationRequest.setFastestInterval(15);
+		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+		return locationRequest;
+	};
+
+	private LocationCallback InicializeLC(){
+		locationCallback = new LocationCallback() {
+			@Override
+			public void onLocationResult(LocationResult locationResult) {
+				super.onLocationResult(locationResult);
+				for (Location location : locationResult.getLocations()) {
+					if (location != null) {
+						lc = location;
+					}
+				}
+			}
+		};
+		return locationCallback;
+	}
+
+	private void  GetLocation(FusedLocationProviderClient fusedLocationProviderClient, Context context){
+		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+			fusedLocationProviderClient.getLastLocation().addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
+				@Override
+				public void onSuccess(Location location) {
+					if (location != null) {
+						lc = location;
+					}
+				}
+			});
+		} else {
+			// request permissions
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
+			}
+		}
+	}
 }

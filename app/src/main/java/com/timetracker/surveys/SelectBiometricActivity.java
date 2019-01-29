@@ -6,6 +6,11 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.timetracker.business.ConnectionMethods;
 import com.timetracker.business.DialogMethods;
 import com.timetracker.business.GPSTracker;
@@ -20,8 +25,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -37,15 +45,13 @@ public class SelectBiometricActivity extends Activity {
 	private MySQLiteHelper db = new MySQLiteHelper(SelectBiometricActivity.this);
 	private ProgressDialog progressDialog;
 	private int DeviceID = 0;
-	private GPSTracker GPSTracker;
 	private LinearLayout lyButtons;
 	private boolean UsesKioskMode = false;
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		GPSTracker = new GPSTracker(getApplicationContext());
 		setContentView(R.layout.activity_select_biometric);
 		lyButtons = (LinearLayout) findViewById(R.id.Buttons);
 		DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener(){
@@ -74,18 +80,6 @@ public class SelectBiometricActivity extends Activity {
 		    int isPermited = 0;
             ActivityCompat.requestPermissions(SelectBiometricActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},isPermited);
             return;
-		}
-		
-		double latitude = 0;
-	   	double longitude = 0;
-    	if(GPSTracker.canGetLocation())
-	   	{
-		   latitude = GPSTracker.getLatitude();
-		   longitude = GPSTracker.getLongitude();
-	   	}
-		if(latitude == 0 && longitude == 0){
-			DialogMethods.showInformationDialog(SelectBiometricActivity.this, "GPS apagado", "GPS apagado. Favor de encenderlo y esperar unos momentos antes de volver a intentar.",onClickListener);
-			return;
 		}
 		List<Biometrics> Biometrics = db.getBiometricsByName(); 
 		if(Biometrics != null && Biometrics.size() > 0){
@@ -117,7 +111,6 @@ public class SelectBiometricActivity extends Activity {
 	public void onDestroy() {
 	    super.onDestroy();
 	    db.close();
-	    GPSTracker.stopUsingGPS();
 	}
 	
 	//================================================================================

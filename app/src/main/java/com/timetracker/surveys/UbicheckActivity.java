@@ -12,6 +12,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.timetracker.business.ConnectionMethods;
 import com.timetracker.business.DialogMethods;
 import com.timetracker.business.GPSTracker;
@@ -26,20 +32,26 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
@@ -79,6 +91,14 @@ public class UbicheckActivity extends Activity {
 	protected String _DataBaseImagePath;
 	private boolean processingImage;
 	protected Bitmap CameraBitmap;
+
+	// New GPS
+	private FusedLocationProviderClient fusedLocationProviderClient;
+	private static final int MY_PERMISSION_REQUEST_FINE_LOCATION = 101;
+	private LocationRequest locationRequest;
+	private LocationCallback locationCallback;
+	private Location lc;
+
 	//================================================================================
     // Activity Events
     //================================================================================
@@ -88,6 +108,21 @@ public class UbicheckActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ubicheck);
 		GPSTracker = new GPSTracker(getApplicationContext());
+		//NEW GPS
+		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+		GetLocation(fusedLocationProviderClient,this);
+
+		Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			public void run() {
+				if(lc == null){
+					Toast.makeText(UbicheckActivity.this, "This is my Toast message!",
+							Toast.LENGTH_SHORT).show();
+				}
+			}
+		}, 1000);
+
 		//Luxand
 		_CameraImagePath = Environment.getExternalStorageDirectory() + "/_CameraImage.jpg";
 		_DataBaseImagePath = Environment.getExternalStorageDirectory() + "/_DataBaseImage.jpg";
@@ -156,20 +191,17 @@ public class UbicheckActivity extends Activity {
             return;
 		}
 		
-		double latitude = 0;
-	   	double longitude = 0;
-    	if(GPSTracker.canGetLocation())
-	   	{
-		   latitude = GPSTracker.getLatitude();
-		   longitude = GPSTracker.getLongitude();
-	   	}
-		if(latitude == 0 && longitude == 0){
-			DialogMethods.showInformationDialog(UbicheckActivity.this, "GPS apagado", "GPS apagado. Favor de encenderlo y esperar unos momentos antes de volver a intentar.",onClickListener);
-			return;
-		}
+
 		if(!processingImage){
-			Refresh(null);
+            Handler handlers = new Handler();
+            handlers.postDelayed(new Runnable() {
+                public void run() {
+                    Refresh(null);
+                }
+            }, 1000);
 		}
+
+
 		if(Device.UsesCreateBranch == 0){
 			LinearLayout AddNewBranch = (LinearLayout)findViewById(R.id.AddNewBranch);
 			AddNewBranch.setVisibility(View.GONE);
@@ -185,7 +217,7 @@ public class UbicheckActivity extends Activity {
 	    	db.updateDevice(Device);
 	    }
 	    db.close();
-	    GPSTracker.stopUsingGPS();
+		stopLocationUpdates();
 	}
 	
 	public void AddBranch(View view){
@@ -237,7 +269,7 @@ public class UbicheckActivity extends Activity {
 		layoutRefresh.setVisibility(View.GONE);
 		showSpinner("Buscando Sucursales");
 		Devices Device = db.GetDevice();
-		UbicheckRequest UbicheckRequest = new UbicheckRequest(0,Device.DeviceID,GPSTracker.getLatitude(),GPSTracker.getLongitude(),new Date(),0,BiometricID,GPSTracker.usesMockLocation);
+		UbicheckRequest UbicheckRequest = new UbicheckRequest(0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),0,BiometricID,GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,false);
 		AsyncUbicheck.execute("/Ubicheck");
 	}
@@ -245,7 +277,7 @@ public class UbicheckActivity extends Activity {
 	public void DoUbicheckCheckIn(){
 		showSpinner("Registrando Entrada");
 		Devices Device = db.GetDevice();
-		UbicheckRequest UbicheckRequest = new UbicheckRequest(1,Device.DeviceID,GPSTracker.getLatitude(),GPSTracker.getLongitude(),new Date(), CheckInBranchID,BiometricID,GPSTracker.usesMockLocation);
+		UbicheckRequest UbicheckRequest = new UbicheckRequest(1,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(), CheckInBranchID,BiometricID,GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,true);
 		AsyncUbicheck.execute("/Ubicheck");
 	}
@@ -253,7 +285,7 @@ public class UbicheckActivity extends Activity {
 	public void DoUbicheckCheckOut(){
 		showSpinner("Registrando Salida");
 		Devices Device = db.GetDevice();
-		UbicheckRequest UbicheckRequest = new UbicheckRequest(2,Device.DeviceID,GPSTracker.getLatitude(),GPSTracker.getLongitude(),new Date(),0,BiometricID,GPSTracker.usesMockLocation);
+		UbicheckRequest UbicheckRequest = new UbicheckRequest(2,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),0,BiometricID,GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,false);
 		AsyncUbicheck.execute("/Ubicheck");
 	}
@@ -263,7 +295,7 @@ public class UbicheckActivity extends Activity {
 		Spinner ActivityCheckInSpinner = (Spinner) findViewById(R.id.ActivityCheckInSpinner);
 		int ElementID = ElementsValue.get(ActivityCheckInSpinner.getSelectedItemPosition());
 		Devices Device = db.GetDevice();
-		UbicheckDetailsRequest UbicheckDetailsRequest = new UbicheckDetailsRequest(0,ElementID,Device.DeviceID,GPSTracker.getLatitude(),GPSTracker.getLongitude(),new Date(),BiometricID);
+		UbicheckDetailsRequest UbicheckDetailsRequest = new UbicheckDetailsRequest(0,ElementID,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),BiometricID);
 		AsyncUbicheckDetails AsyncUbicheckDetails = new AsyncUbicheckDetails(UbicheckDetailsRequest);
 		AsyncUbicheckDetails.execute("/UbicheckDetails");
 	}
@@ -272,7 +304,7 @@ public class UbicheckActivity extends Activity {
 		showSpinner("Cerrando Actividad");
 		int UbicheckDetailID = OpenUbicheckDetailID;
 		Devices Device = db.GetDevice();
-		UbicheckDetailsRequest UbicheckDetailsRequest = new UbicheckDetailsRequest(UbicheckDetailID,0,Device.DeviceID,GPSTracker.getLatitude(),GPSTracker.getLongitude(),new Date(),BiometricID);
+		UbicheckDetailsRequest UbicheckDetailsRequest = new UbicheckDetailsRequest(UbicheckDetailID,0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),BiometricID);
 		AsyncUbicheckDetails AsyncUbicheckDetails = new AsyncUbicheckDetails(UbicheckDetailsRequest);
 		AsyncUbicheckDetails.execute("/UbicheckDetails");
 	}
@@ -758,6 +790,93 @@ public class UbicheckActivity extends Activity {
 			Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
         	startActivity(intent);
         	finish();
+		}
+	}
+	//================================================================================
+	// NEW GPS METHODS
+	//================================================================================
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+		switch (requestCode) {
+			case MY_PERMISSION_REQUEST_FINE_LOCATION:
+
+				if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					//permission was granted do nothing and carry on
+				} else {
+					Toast.makeText(getApplicationContext(), "This app requires location permissions to be granted", Toast.LENGTH_SHORT).show();
+					finish();
+				}
+				break;
+		}
+	}
+	@Override
+	protected void onResume() {
+		super.onResume();
+		startLocationUpdates(this);
+	}
+	private void startLocationUpdates(Context context) {
+		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+			fusedLocationProviderClient.requestLocationUpdates(InicializeLR(), InicializeLC(), null);
+		} else {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
+			}
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		stopLocationUpdates();
+	}
+
+	private void stopLocationUpdates() {
+		fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+	}
+
+	private LocationRequest InicializeLR(){
+		locationRequest = new LocationRequest();
+		locationRequest.setInterval(10);
+		locationRequest.setFastestInterval(15);
+		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+		return locationRequest;
+	};
+
+	private LocationCallback InicializeLC(){
+		locationCallback = new LocationCallback() {
+			@Override
+			public void onLocationResult(LocationResult locationResult) {
+				super.onLocationResult(locationResult);
+				for (Location location : locationResult.getLocations()) {
+					if (location != null) {
+						lc = location;
+					}
+				}
+			}
+		};
+		return locationCallback;
+	}
+
+	private void  GetLocation(FusedLocationProviderClient fusedLocationProviderClient, Context context){
+		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+			fusedLocationProviderClient.getLastLocation().addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
+				@Override
+				public void onSuccess(Location location) {
+					if (location != null) {
+						lc = location;
+
+					}
+				}
+			});
+		} else {
+			// request permissions
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
+			}
 		}
 	}
 }
