@@ -1655,7 +1655,6 @@ public class SurveyActivity extends Activity {
 							{
 								Toast.makeText(getApplicationContext(), "GPS deshabilitado", Toast.LENGTH_LONG).show();
 							}
-							stopLocationUpdates();
 							Devices Device = db.GetDevice();
 							String DeviceMac = Device.Name;
 							if(DeviceMac == null){
@@ -2769,7 +2768,6 @@ public class SurveyActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		stopLocationUpdates();
 	}
 
 	private void stopLocationUpdates() {

@@ -397,7 +397,6 @@ public class UbicheckNewActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        stopLocationUpdates();
     }
 
     private void stopLocationUpdates() {

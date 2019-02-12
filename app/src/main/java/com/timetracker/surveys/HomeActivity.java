@@ -1,4 +1,4 @@
- package com.timetracker.surveys;
+package com.timetracker.surveys;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -149,7 +149,6 @@ public class HomeActivity extends Activity {
 	     }
 	    db.close();
 	    Runtime.getRuntime().gc();
-		stopLocationUpdates();
 	}
 	
 	public void InitialVerification(){
@@ -348,7 +347,7 @@ public class HomeActivity extends Activity {
     // Check In
     //================================================================================
 
-	public void CheckIn(View view){
+	public void CheckIn(final View view){
  	   try
  	   {
 		   Handler handler = new Handler();
@@ -359,24 +358,28 @@ public class HomeActivity extends Activity {
 					   int isPermited = 0;
 					   ActivityCompat.requestPermissions(HomeActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},isPermited);
 				   }else{
-					   Buttons(false);
-					   String message = "Registrando Ubicacion";
-					   Message msg = Message.obtain();
-					   msg.obj = message;
-					   ProgressMessageHandler.sendMessage(msg);
-					   progress.show();
-					   SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
-					   Tracker Tracker = new Tracker(0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),ft.format(new Date()));
-					   if (ConnectionMethods.isInternetConnected(HomeActivity.this,false).equals("")){
-						   Tracker.TrackerID = db.addTrackers(Tracker);
-						   AsynTrackerCreate AsynTrackerCreate = new AsynTrackerCreate(Tracker);
-						   AsynTrackerCreate.execute("/Trackers");
-					   }else{
-						   db.addTrackers(Tracker);
-						   Buttons(true);
-						   progress.dismiss();
-						   DialogMethods.showInformationDialog(HomeActivity.this, "Ubicacion guardada", "Ubicacion guardada de manera local.", null);
-					   }
+				   		if(lc != null){
+							Buttons(false);
+							String message = "Registrando Ubicacion";
+							Message msg = Message.obtain();
+							msg.obj = message;
+							ProgressMessageHandler.sendMessage(msg);
+							progress.show();
+							SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
+							Tracker Tracker = new Tracker(0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),ft.format(new Date()));
+							if (ConnectionMethods.isInternetConnected(HomeActivity.this,false).equals("")){
+								Tracker.TrackerID = db.addTrackers(Tracker);
+								AsynTrackerCreate AsynTrackerCreate = new AsynTrackerCreate(Tracker);
+								AsynTrackerCreate.execute("/Trackers");
+							}else{
+								db.addTrackers(Tracker);
+								Buttons(true);
+								progress.dismiss();
+								DialogMethods.showInformationDialog(HomeActivity.this, "Ubicacion guardada", "Ubicacion guardada de manera local.", null);
+							}
+						}else {
+							CheckIn(view);
+						}
 				   }
 			   }
 		   }, 1000);
@@ -1069,7 +1072,7 @@ public class HomeActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		stopLocationUpdates();
+
 	}
 
 	private void stopLocationUpdates() {

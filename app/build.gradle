@@ -6,8 +6,8 @@ android {
         applicationId "com.timetracker.surveys"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 234
-        versionName "2.34"
+        versionCode 235
+        versionName "2.35"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

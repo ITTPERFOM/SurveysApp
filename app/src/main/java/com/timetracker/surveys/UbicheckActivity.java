@@ -217,7 +217,6 @@ public class UbicheckActivity extends Activity {
 	    	db.updateDevice(Device);
 	    }
 	    db.close();
-		stopLocationUpdates();
 	}
 	
 	public void AddBranch(View view){
@@ -830,7 +829,6 @@ public class UbicheckActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		stopLocationUpdates();
 	}
 
 	private void stopLocationUpdates() {
