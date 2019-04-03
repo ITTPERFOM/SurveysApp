@@ -92,4 +92,5 @@
     <string name="select_biometric_field_name">Nombre</string>
     <string name="select_biometric_button_search">Buscar Empleado</string>
     <string name="select_biometric_buttons_header">Seleccionar Empleado </string>
+    <string name="dataStatus">Uso de datos</string>
 </resources>

@@ -35,9 +35,15 @@ import com.timetracker.sqlite.MySQLiteHelper;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -99,6 +105,7 @@ public class HomeActivity extends Activity {
 		GPSTracker = new GPSTracker(getApplicationContext());
 		progress = new ProgressDialog(HomeActivity.this);
 		progress.setCancelable(false);
+		db.InitTableDataUsage();
 		setContentView(R.layout.activity_home);
 		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -332,6 +339,7 @@ public class HomeActivity extends Activity {
 	
 	public void SendSettings(View view){
 		Devices Device = db.GetDevice();
+		if(isConnected()){
 		if(Device != null && Device.UsesBiometric == 1 && Device.UsesKioskMode == 1){
 			Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.SelectBiometricActivity.class);
 			startActivity(intent);
@@ -341,6 +349,9 @@ public class HomeActivity extends Activity {
 			startActivity(intent);
 			finish();
 		}
+        }else{
+		    buildAlertMessageNoOnline();
+        }
    }
 	
 	//================================================================================
@@ -348,46 +359,51 @@ public class HomeActivity extends Activity {
     //================================================================================
 
 	public void CheckIn(final View view){
- 	   try
- 	   {
-		   Handler handler = new Handler();
-		   handler.postDelayed(new Runnable() {
-			   public void run() {
-				   Devices Device = db.GetDevice();
-				   if (ContextCompat.checkSelfPermission(HomeActivity.this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-					   int isPermited = 0;
-					   ActivityCompat.requestPermissions(HomeActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},isPermited);
-				   }else{
-				   		if(lc != null){
-							Buttons(false);
-							String message = "Registrando Ubicacion";
-							Message msg = Message.obtain();
-							msg.obj = message;
-							ProgressMessageHandler.sendMessage(msg);
-							progress.show();
-							SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
-							Tracker Tracker = new Tracker(0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),ft.format(new Date()));
-							if (ConnectionMethods.isInternetConnected(HomeActivity.this,false).equals("")){
-								Tracker.TrackerID = db.addTrackers(Tracker);
-								AsynTrackerCreate AsynTrackerCreate = new AsynTrackerCreate(Tracker);
-								AsynTrackerCreate.execute("/Trackers");
-							}else{
-								db.addTrackers(Tracker);
-								Buttons(true);
-								progress.dismiss();
-								DialogMethods.showInformationDialog(HomeActivity.this, "Ubicacion guardada", "Ubicacion guardada de manera local.", null);
+        db.Data(140);
+		if(lc == null){
+			final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+			if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+				buildAlertMessageNoGps();
+			}
+		}else {
+			try {
+				Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {
+					public void run() {
+						Devices Device = db.GetDevice();
+						if (ContextCompat.checkSelfPermission(HomeActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+							int isPermited = 0;
+							ActivityCompat.requestPermissions(HomeActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, isPermited);
+						} else {
+							if (lc != null) {
+								Buttons(false);
+								String message = "Registrando Ubicacion";
+								Message msg = Message.obtain();
+								msg.obj = message;
+								ProgressMessageHandler.sendMessage(msg);
+								progress.show();
+								SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+								Tracker Tracker = new Tracker(0, Device.DeviceID, lc.getLatitude(), lc.getLongitude(), ft.format(new Date()));
+								if (ConnectionMethods.isInternetConnected(HomeActivity.this, false).equals("")) {
+									Tracker.TrackerID = db.addTrackers(Tracker);
+									AsynTrackerCreate AsynTrackerCreate = new AsynTrackerCreate(Tracker);
+									AsynTrackerCreate.execute("/Trackers");
+								} else {
+									db.addTrackers(Tracker);
+									Buttons(true);
+									progress.dismiss();
+									DialogMethods.showInformationDialog(HomeActivity.this, "Ubicacion guardada", "Ubicacion guardada de manera local.", null);
+								}
+							} else {
+								CheckIn(view);
 							}
-						}else {
-							CheckIn(view);
 						}
-				   }
-			   }
-		   }, 1000);
- 	   } 
- 	   catch (Exception ex) 
- 	   {
- 		   DialogMethods.showErrorDialog(HomeActivity.this, "Ocurrio un error al momento de checar ubicacion. Info: " + ex.toString(), "Activity:Home | CheckIn | Error:" + ex.toString());
- 	   }
+					}
+				}, 1000);
+			} catch (Exception ex) {
+				DialogMethods.showErrorDialog(HomeActivity.this, "Ocurrio un error al momento de checar ubicacion. Info: " + ex.toString(), "Activity:Home | CheckIn | Error:" + ex.toString());
+			}
+		}
     }
 	
 	//================================================================================
@@ -1072,7 +1088,7 @@ public class HomeActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-
+		stopLocationUpdates();
 	}
 
 	private void stopLocationUpdates() {
@@ -1120,4 +1136,48 @@ public class HomeActivity extends Activity {
 			}
 		}
 	}
+	private void buildAlertMessageNoGps() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Parece que su GPS esta apagado Quiere prenderlo?")
+				.setCancelable(false)
+				.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+					public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+						startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+						dialog.cancel();
+					}
+				});
+		final AlertDialog alert = builder.create();
+		alert.show();
+	}
+    private void buildAlertMessageNoOnline() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Parece que no esta conectado a internet, quiere activar su conexión?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    protected boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

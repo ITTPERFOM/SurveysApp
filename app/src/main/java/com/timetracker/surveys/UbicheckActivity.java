@@ -1,7 +1,9 @@
 package com.timetracker.surveys;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ import com.timetracker.sqlite.MySQLiteHelper;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -39,7 +42,10 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -48,6 +54,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -98,8 +105,8 @@ public class UbicheckActivity extends Activity {
 	private LocationRequest locationRequest;
 	private LocationCallback locationCallback;
 	private Location lc;
-
-	//================================================================================
+    private Button btnRefresh;
+	//	//================================================================================
     // Activity Events
     //================================================================================
 	
@@ -107,105 +114,106 @@ public class UbicheckActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ubicheck);
-		GPSTracker = new GPSTracker(getApplicationContext());
-		//NEW GPS
-		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-		GetLocation(fusedLocationProviderClient,this);
+		btnRefresh = (Button) findViewById(R.id.btnRefresh);
 
-		Handler handler = new Handler();
-		handler.postDelayed(new Runnable() {
-			public void run() {
-				if(lc == null){
-					Toast.makeText(UbicheckActivity.this, "This is my Toast message!",
-							Toast.LENGTH_SHORT).show();
+			GPSTracker = new GPSTracker(getApplicationContext());
+			//NEW GPS
+			fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+			GetLocation(fusedLocationProviderClient,this);
+
+			//Luxand
+			_CameraImagePath = Environment.getExternalStorageDirectory() + "/_CameraImage.jpg";
+			_DataBaseImagePath = Environment.getExternalStorageDirectory() + "/_DataBaseImage.jpg";
+			//
+			DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener(){
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+					Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
+					startActivity(intent);
+					finish();
+				}
+			};
+			Devices Device = db.GetDevice();
+			//Luxand
+			try {
+				int res = FSDK.ActivateLibrary("HRYh6MxLk7gGq0LTpKjXuoyzyH10895TLYW9mcQ971upyg43e4hahTnepztBB1c2pF1aGdRj5H+aHrj4+J/SpyGBiXADZ1/ZCaU3yHzdXErmION80bHnNxoEBB7bb5aIX4P/rTN4IhHOkTYay/p3xfRFts9URUWZxdayezIcvws=");
+				FSDK.Initialize();
+				FSDK.SetFaceDetectionParameters(false, false, 100);
+				FSDK.SetFaceDetectionThreshold(5);
+				if (res != FSDK.FSDKE_OK) {
+					Toast.makeText(getBaseContext(), "Error activando FaceSDK: " + res , Toast.LENGTH_LONG).show();
+				}
+			}catch (Exception e) {
+				Toast.makeText(getBaseContext(), "exception " + e.getMessage(), Toast.LENGTH_LONG).show();
+			}
+			//
+			if(Device == null || Device.Status != 2){
+				DialogMethods.showInformationDialog(UbicheckActivity.this, "Dispositivo sin registrar", "Dispositivo sin registrar. Favor de registrarlo para continuar.",onClickListener);
+				return;
+			}
+			if(Device.UsesBiometric == 1 && Device.BiometricID == 0){
+				DialogMethods.showInformationDialog(UbicheckActivity.this, "Biometrico sin registrar", "Biometrico sin registrar. Favor de registrarlo para continuar.",onClickListener);
+				return;
+			}
+			if(Device.UsesBiometric == 1 && Device.UsesKioskMode == 1 && Device.KioskBranchID == 0){
+				DialogMethods.showInformationDialog(UbicheckActivity.this, "Biometrico sin registrar", "Kiosco sin sucursal asignada. Favor de agregar sucursal para continuar.",onClickListener);
+				return;
+			}
+			if(Device.UsesBiometric == 1){
+				UsesBiometric = true;
+				BiometricID = Device.BiometricID;
+				if(Device.UsesKioskMode == 1){
+					UsesKioskMode = true;
+					KioskBranchID = Device.KioskBranchID;
 				}
 			}
-		}, 1000);
-
-		//Luxand
-		_CameraImagePath = Environment.getExternalStorageDirectory() + "/_CameraImage.jpg";
-		_DataBaseImagePath = Environment.getExternalStorageDirectory() + "/_DataBaseImage.jpg";
-		//
-		DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener(){
-	        @Override
-	        public void onClick(DialogInterface dialog, int which) {
-        		dialog.dismiss();
-	        	Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
-	        	startActivity(intent);
-	        	finish();
-	        }
-	    };
-		Devices Device = db.GetDevice();
-		//Luxand
-		try {
-			int res = FSDK.ActivateLibrary("m3EqUYK5p2JcviRPHbHO5enc+4pi7NvhnQ9HtchXYITWknOiTPn4yJtMIjOB+Gws92+VEzB3HKed5B2vVHVz3wD9gNVx08H9FnTZjJt+5+k+in7n+7iKsSKwfnUy7/DDRVk37ySCOzKInDtRvufu2gdQo7sPJ/AcSV9sJBhIgA4=");
-			FSDK.Initialize();
-			FSDK.SetFaceDetectionParameters(false, false, 100);
-			FSDK.SetFaceDetectionThreshold(5);
-			if (res != FSDK.FSDKE_OK) {
-				Toast.makeText(getBaseContext(), "Error activando FaceSDK: " + res , Toast.LENGTH_LONG).show();
+			boolean isFormUbicheckActive = false;
+			SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
+			if(SelectedSurvey != null){
+				if(SelectedSurvey.UbicheckID != 0){
+					isFormUbicheckActive = true;
+				}
 			}
-		}catch (Exception e) {
-			Toast.makeText(getBaseContext(), "exception " + e.getMessage(), Toast.LENGTH_LONG).show();
-		}
-		//
-		if(Device == null || Device.Status != 2){
-			DialogMethods.showInformationDialog(UbicheckActivity.this, "Dispositivo sin registrar", "Dispositivo sin registrar. Favor de registrarlo para continuar.",onClickListener);
-			return;
-		}
-		if(Device.UsesBiometric == 1 && Device.BiometricID == 0){
-			DialogMethods.showInformationDialog(UbicheckActivity.this, "Biometrico sin registrar", "Biometrico sin registrar. Favor de registrarlo para continuar.",onClickListener);
-			return;
-		}
-		if(Device.UsesBiometric == 1 && Device.UsesKioskMode == 1 && Device.KioskBranchID == 0){
-			DialogMethods.showInformationDialog(UbicheckActivity.this, "Biometrico sin registrar", "Kiosco sin sucursal asignada. Favor de agregar sucursal para continuar.",onClickListener);
-			return;
-		}
-		if(Device.UsesBiometric == 1){
-			UsesBiometric = true;
-			BiometricID = Device.BiometricID;
-			if(Device.UsesKioskMode == 1){
-				UsesKioskMode = true;
-				KioskBranchID = Device.KioskBranchID;
+			if(isFormUbicheckActive){
+				DialogMethods.showInformationDialog(UbicheckActivity.this, "Ubicheck-Forma Activa", "Entrada registrada con forma. Favor de terminar forma para registrar salida.",onClickListener);
+				return;
 			}
-		}
-		boolean isFormUbicheckActive = false;
-		SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
-		if(SelectedSurvey != null){
-			if(SelectedSurvey.UbicheckID != 0){
-				isFormUbicheckActive = true;
+			if (!ConnectionMethods.isInternetConnected(UbicheckActivity.this, false).equals("")){
+				DialogMethods.showInformationDialog(UbicheckActivity.this, "Sin Conexion", "No se detecto una conexion a internet. Favor de conectarse a una red antes de volver a intentar.",onClickListener);
+				return;
 			}
-		}
-		if(isFormUbicheckActive){
-			DialogMethods.showInformationDialog(UbicheckActivity.this, "Ubicheck-Forma Activa", "Entrada registrada con forma. Favor de terminar forma para registrar salida.",onClickListener);
-			return;
-		}
-		if (!ConnectionMethods.isInternetConnected(UbicheckActivity.this, false).equals("")){
-			DialogMethods.showInformationDialog(UbicheckActivity.this, "Sin Conexion", "No se detecto una conexion a internet. Favor de conectarse a una red antes de volver a intentar.",onClickListener);
-			return;
-		}
-		if (ContextCompat.checkSelfPermission(UbicheckActivity.this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-		    int isPermited = 0;
-            ActivityCompat.requestPermissions(UbicheckActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},isPermited);
-            return;
-		}
-		
-
-		if(!processingImage){
-            Handler handlers = new Handler();
-            handlers.postDelayed(new Runnable() {
-                public void run() {
-                    Refresh(null);
-                }
-            }, 1000);
-		}
+			if (ContextCompat.checkSelfPermission(UbicheckActivity.this,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+				int isPermited = 0;
+				ActivityCompat.requestPermissions(UbicheckActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},isPermited);
+				return;
+			}
 
 
-		if(Device.UsesCreateBranch == 0){
-			LinearLayout AddNewBranch = (LinearLayout)findViewById(R.id.AddNewBranch);
-			AddNewBranch.setVisibility(View.GONE);
-		}
+			if(!processingImage){
+				Handler handlers = new Handler();
+				handlers.postDelayed(new Runnable() {
+					public void run() {
+						Refresh(null);
+					}
+				}, 1000);
+			}
+
+
+			if(Device.UsesCreateBranch == 0){
+				LinearLayout AddNewBranch = (LinearLayout)findViewById(R.id.AddNewBranch);
+				AddNewBranch.setVisibility(View.GONE);
+			}
+            btnRefresh.setVisibility(View.INVISIBLE);
+
+        Handler btn = new Handler();
+        btn.postDelayed(new Runnable() {
+            public void run() {
+                btnRefresh.setVisibility(View.VISIBLE);
+            }
+        }, 20000);
 	}
 	
 	public void onDestroy() {
@@ -226,13 +234,17 @@ public class UbicheckActivity extends Activity {
    }
 	
 	public void CheckOut(View view){
-		if(UsesBiometric){
-    		UbicheckOption = 2;
-    		showSpinner("Registrando Salida");
-			AuthenticateUser(BiometricID);
-    	}else{
-    		DoUbicheckCheckOut();
-    	}
+		if(isOnline()) {
+			if (UsesBiometric) {
+				UbicheckOption = 2;
+				showSpinner("Registrando Salida");
+				AuthenticateUser(BiometricID);
+			} else {
+				DoUbicheckCheckOut();
+			}
+		}else {
+			buildAlertMessageNoOnline();
+		}
 	}
 	
 	public void ActivityCheckIn(View view){
@@ -264,13 +276,20 @@ public class UbicheckActivity extends Activity {
 	}
 
 	public void Refresh(View view){
-		LinearLayout layoutRefresh = (LinearLayout)findViewById(R.id.layoutRefresh);
-		layoutRefresh.setVisibility(View.GONE);
-		showSpinner("Buscando Sucursales");
-		Devices Device = db.GetDevice();
-		UbicheckRequest UbicheckRequest = new UbicheckRequest(0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),0,BiometricID,GPSTracker.usesMockLocation);
-		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,false);
-		AsyncUbicheck.execute("/Ubicheck");
+		if(lc == null){
+			final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+			if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+				buildAlertMessageNoGps();
+			}
+		}else {
+			LinearLayout layoutRefresh = (LinearLayout) findViewById(R.id.layoutRefresh);
+			layoutRefresh.setVisibility(View.GONE);
+			//showSpinner("Buscando Sucursales");
+			Devices Device = db.GetDevice();
+			UbicheckRequest UbicheckRequest = new UbicheckRequest(0, Device.DeviceID, lc.getLatitude(), lc.getLongitude(), new Date(), 0, BiometricID, GPSTracker.usesMockLocation);
+			AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest, false);
+			AsyncUbicheck.execute("/Ubicheck");
+		}
 	}
 	
 	public void DoUbicheckCheckIn(){
@@ -279,6 +298,7 @@ public class UbicheckActivity extends Activity {
 		UbicheckRequest UbicheckRequest = new UbicheckRequest(1,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(), CheckInBranchID,BiometricID,GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,true);
 		AsyncUbicheck.execute("/Ubicheck");
+		db.Data(140);
 	}
 	
 	public void DoUbicheckCheckOut(){
@@ -287,6 +307,7 @@ public class UbicheckActivity extends Activity {
 		UbicheckRequest UbicheckRequest = new UbicheckRequest(2,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),0,BiometricID,GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,false);
 		AsyncUbicheck.execute("/Ubicheck");
+		db.Data(140);
 	}
 	
 	public void DoActivityCheckIn(){
@@ -297,6 +318,7 @@ public class UbicheckActivity extends Activity {
 		UbicheckDetailsRequest UbicheckDetailsRequest = new UbicheckDetailsRequest(0,ElementID,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),BiometricID);
 		AsyncUbicheckDetails AsyncUbicheckDetails = new AsyncUbicheckDetails(UbicheckDetailsRequest);
 		AsyncUbicheckDetails.execute("/UbicheckDetails");
+		db.Data(140);
 	}
 	
 	public void DoActivityCheckOut(){
@@ -306,6 +328,7 @@ public class UbicheckActivity extends Activity {
 		UbicheckDetailsRequest UbicheckDetailsRequest = new UbicheckDetailsRequest(UbicheckDetailID,0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),BiometricID);
 		AsyncUbicheckDetails AsyncUbicheckDetails = new AsyncUbicheckDetails(UbicheckDetailsRequest);
 		AsyncUbicheckDetails.execute("/UbicheckDetails");
+		db.Data(140);
 	}
 	
 	//================================================================================
@@ -442,6 +465,7 @@ public class UbicheckActivity extends Activity {
     		      	  			newButton.setOnClickListener(new View.OnClickListener() {
     		      	  				@Override
     			                    public void onClick(View v) {
+    		      	  					if(isOnline()){
     			                    	CheckInBranchID = ((Button) v).getId();
     			                    	if(UsesBiometric){
     			                    		UbicheckOption = 1;
@@ -450,6 +474,9 @@ public class UbicheckActivity extends Activity {
     			                    	}else{
     			                    		DoUbicheckCheckIn();
     			                    	}
+										}else {
+											buildAlertMessageNoOnline();
+										}
     			                    }
     			                });
     		      	  			LinearLayout linLayout = new LinearLayout(UbicheckActivity.this);
@@ -877,4 +904,49 @@ public class UbicheckActivity extends Activity {
 			}
 		}
 	}
+	private void buildAlertMessageNoGps() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Parece que su GPS esta apagado Quiere prenderlo?")
+				.setCancelable(false)
+				.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+					public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+						startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+						dialog.cancel();
+					}
+				});
+		final AlertDialog alert = builder.create();
+		alert.show();
+	}
+	private void buildAlertMessageNoOnline() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Parece que no esta conectado a internet, quiere activar su conexión?")
+				.setCancelable(false)
+				.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+					public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+						startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+						dialog.cancel();
+					}
+				});
+		final AlertDialog alert = builder.create();
+		alert.show();
+	}
+
+	protected boolean isOnline() {
+		ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo netInfo = cm.getActiveNetworkInfo();
+		if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 }

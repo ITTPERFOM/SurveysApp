@@ -114,7 +114,7 @@ public class SurveyActivity extends Activity {
 	//================================================================================
     // Global Variables
     //================================================================================
-	
+
 	int j=0;
 	List<List<Questions>> SurveyQuestions;
 	LinearLayout lm;
@@ -143,7 +143,7 @@ public class SurveyActivity extends Activity {
     protected int idDatePicker = 70000;
     protected int idTimePicker = 80000;
     protected int idFooterLayout = 90000;
-	
+
     protected List<String> oldListSentTo = new ArrayList<String>();
     private MySQLiteHelper db = new MySQLiteHelper(SurveyActivity.this);
     ProgressDialog progress;
@@ -155,11 +155,11 @@ public class SurveyActivity extends Activity {
 	private LocationCallback locationCallback;
 	private Location lc;
 	private double latitude,longitude;
-    
+
 	//================================================================================
     // Activity Events
     //================================================================================
-	
+
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(null);
@@ -169,7 +169,7 @@ public class SurveyActivity extends Activity {
 
 		GetLocation(fusedLocationProviderClient,this);
 		try
-		{ 
+		{
 			setContentView(R.layout.activity_survey);
 			setupUI(findViewById(R.id.rlMain));
 			_tempDir = Environment.getExternalStorageDirectory() + "/Survey_Signature.png";
@@ -266,11 +266,11 @@ public class SurveyActivity extends Activity {
 	      }
 	      super.onResume();
 	   }
-	  
+
 	@Override
     protected void onSaveInstanceState(Bundle outState ) {
 		try
-		{ 
+		{
 			outState.putBoolean("PHOTO_TAKEN", _taken );
 			outState.putBoolean("Scanned", _Scanned );
 			outState.putBoolean("signed", _signed );
@@ -295,23 +295,23 @@ public class SurveyActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "E00X:" + ex.toString(), Toast.LENGTH_LONG).show();
 		}
 	}
-	
+
 	@Override
 	public void onDestroy() {
 	    super.onDestroy();
 	    db.close();
 	    Runtime.getRuntime().gc();
 	}
-	
+
 	//================================================================================
     // Hide Soft Keyboard Methods
     //================================================================================
-	
+
 	public static void hideSoftKeyboard(Activity activity) {
 	    InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
 	    inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
 	}
-	
+
 	public void setupUI(View view) {
 	    if(!(view instanceof EditText)) {
 	        view.setOnTouchListener(new View.OnTouchListener() {
@@ -330,11 +330,11 @@ public class SurveyActivity extends Activity {
 	        }
 	    }
 	}
-	
+
 	//================================================================================
     // Load Saved Controls
     //================================================================================
-	  
+
 	private void loadSavecontrols() {
 		 increase=100/SurveyQuestions.size();
          List<Questions>  questions= SurveyQuestions.get(j);
@@ -356,13 +356,13 @@ public class SurveyActivity extends Activity {
         	 ImageView IV =(ImageView)findViewById(R.id.imgFooter);
         	 IV.setImageBitmap(BM);
          }
-          
+
 	}
 
 	//================================================================================
     // Load Controls
     //================================================================================
-	
+
 	private void loadcontrols(String SurveyID) {
 		SurveyQuestions=db.getQuestions(Integer.parseInt(SurveyID));
 		increase=100/SurveyQuestions.size();
@@ -389,11 +389,11 @@ public class SurveyActivity extends Activity {
 			IV.setImageBitmap(BM);
 		}
 	}
-	
+
 	//================================================================================
     // Section Methods
     //================================================================================
-	
+
 	public void Sections(View view){
 		   try
 			{
@@ -409,7 +409,7 @@ public class SurveyActivity extends Activity {
 						   View control =(View) findViewById(question.QuestionID+idKey);
 						   String other = null;
 							if(question.QuestionTypeID == 10){
-								int lastdigit = (question.QuestionID%1000)*1000; 
+								int lastdigit = (question.QuestionID%1000)*1000;
 					    		int seekBarID = question.QuestionID + idKey + lastdigit + 2;
 				 				SeekBar currentSeekBar= (SeekBar)control.findViewById(seekBarID);
 				 				TextView currentTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
@@ -457,7 +457,7 @@ public class SurveyActivity extends Activity {
 						   i++;
 						}
 						//Save questions
-						 sharedpreferences=getSharedPreferences(MyPREFERENCES, 
+						 sharedpreferences=getSharedPreferences(MyPREFERENCES,
 				          	      Context.MODE_PRIVATE);
 						 Editor editor = sharedpreferences.edit();
 				         editor.putInt("savequestions", questions.get(0).SurveyID);
@@ -482,8 +482,8 @@ public class SurveyActivity extends Activity {
 							Button btnSections = (Button) findViewById(R.id.btnSections);
 							btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
 							//btnSections.setBackgroundColor(Color.GRAY);
-					        
-					        
+
+
 					        TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
 				            txtTitle.setText("Seleccione Secci�n");
 				            Button btnNext = (Button) findViewById(R.id.btnNext);
@@ -492,13 +492,13 @@ public class SurveyActivity extends Activity {
 				            btnNext.setVisibility(View.GONE);
 				            btnBack.setVisibility(View.GONE);
 				            btnSections1.setVisibility(View.GONE);
-				            
+
 				            Controls control= new Controls();
 							lm.removeAllViews();
 							View controls=control.CreateSectionControls(this,SurveyQuestions);
 							lm.addView(controls);
-							
-		
+
+
 							for(int e=0;e<SurveyQuestions.size();e++ )
 							{
 								Button button=  (Button) findViewById(e);
@@ -523,12 +523,12 @@ public class SurveyActivity extends Activity {
 		            btnNext.setVisibility(View.GONE);
 		            btnBack.setVisibility(View.GONE);
 		            btnSections1.setVisibility(View.GONE);
-		            
+
 		            Controls control= new Controls();
 					lm.removeAllViews();
 					View controls=control.CreateSectionControls(this,SurveyQuestions);
 					lm.addView(controls);
-					
+
 
 					for(int e=0;e<SurveyQuestions.size();e++ )
 					{
@@ -538,29 +538,29 @@ public class SurveyActivity extends Activity {
 		            progressBar = (ProgressBar) findViewById(R.id.progressBar1);
 		            progressBar.setProgress(progressStatus);
 		            TextView textView = (TextView) findViewById(R.id.txtPercent);
-		            textView.setText(progressStatus+"%");   
-					
+		            textView.setText(progressStatus+"%");
+
 				}
 		    }
 		       catch(Exception ex){
 		    	   Toast.makeText(getApplicationContext(), "E002:" + ex.toString(), Toast.LENGTH_LONG).show();
-			}	  
+			}
 	  }
-	
-	public class ButtonChangeSecion implements View.OnClickListener 
+
+	public class ButtonChangeSecion implements View.OnClickListener
 	{
 	   	public void onClick(View view ){
 	   		try
 	   		{
 	   			int id= view.getId();
 	   			SelectSection(id);
-	
+
 	   	    } catch (Exception e) {
 	   				 Toast.makeText(getBaseContext(), "E003:" + e.toString(), Toast.LENGTH_LONG).show();
-	   	  } 
-	   	} 	
+	   	  }
+	   	}
 	}
-	
+
 	public void SelectSection(int id){
 		   try
 			{
@@ -569,15 +569,15 @@ public class SurveyActivity extends Activity {
         		int qty =increaseQty*(id+1);
         		 progressStatus=qty;
         		 j=id;
-				
-			   
+
+
 			   Button btnNext = (Button) findViewById(R.id.btnNext);
 	            Button btnBack = (Button) findViewById(R.id.btnBack);
 	            Button btnSections = (Button) findViewById(R.id.btnSections);
 	            btnNext.setVisibility(View.VISIBLE);
 	            btnBack.setVisibility(View.VISIBLE);
 	            btnSections.setVisibility(View.VISIBLE);
-			   
+
         	    List<Questions> questions= SurveyQuestions.get(id);
         	    TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
 	            txtTitle.setText(questions.get(0).SectionName);
@@ -590,18 +590,18 @@ public class SurveyActivity extends Activity {
 	            progressStatus=qty;
 	            progressBar.setProgress(progressStatus);
 	            TextView textView = (TextView) findViewById(R.id.txtPercent);
-	            textView.setText(qty+"%");      
+	            textView.setText(qty+"%");
 
 		    }
 		       catch(Exception ex){
 		    	   Toast.makeText(getApplicationContext(), "E004:" + ex.toString(),Toast.LENGTH_LONG).show();
-	       }	  
+	       }
 	}
-	
+
 	//================================================================================
     // Survey Movement Buttons
     //================================================================================
-	
+
 	public void Back(View view){
 	   try
 		{
@@ -610,19 +610,19 @@ public class SurveyActivity extends Activity {
 		   Button btnSections = (Button) findViewById(R.id.btnSections);
 		   btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
 	        if (j<=0)
-	        {	
+	        {
 	        	Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
 	    		startActivity(intent);
 	    		finish();
 	        }
 	        else
-	        { 
+	        {
 	        	if(j>=SurveyQuestions.size())
 				{
 	        		 progressStatus=progressStatus+increase;
 				}
 	        	 j=j-1;
-	        	
+
 	        	    List<Questions> questions= SurveyQuestions.get(j);
 	        	    TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
 		            txtTitle.setText(questions.get(0).SectionName);
@@ -635,7 +635,7 @@ public class SurveyActivity extends Activity {
 		            progressStatus=progressStatus-increase;
 		            progressBar.setProgress(progressStatus);
 		            TextView textView = (TextView) findViewById(R.id.txtPercent);
-		            textView.setText(progressStatus+"%");      
+		            textView.setText(progressStatus+"%");
 	              Surveys S = db.getSurvey(questions.get(0).SurveyID);
 	              if(!S.BackgroundImage.equals("")){
 	            	  Bitmap BM = StringToBitMap(S.BackgroundImage);
@@ -648,7 +648,7 @@ public class SurveyActivity extends Activity {
 	    }
 	       catch(Exception ex){
 	    	   Toast.makeText(getApplicationContext(), "E005:" + ex.toString(), Toast.LENGTH_LONG).show();
-		}	  
+		}
 	}
 
 	public void Next(View view){
@@ -666,7 +666,7 @@ public class SurveyActivity extends Activity {
 				int i=0;
 				for(Questions question: questions)
 					{
-						
+
 						ErrorQuestion = question.QuestionID;
 						View control =(View) findViewById(question.QuestionID+idKey);
 						if(control != null && !control.isEnabled()){
@@ -677,7 +677,7 @@ public class SurveyActivity extends Activity {
 						}
 						String other = null;
 						if(question.QuestionTypeID == 10){
-							int lastdigit = (question.QuestionID%1000)*1000; 
+							int lastdigit = (question.QuestionID%1000)*1000;
 				    		int seekBarID = question.QuestionID + idKey + lastdigit + 2;
 			 				SeekBar currentSeekBar= (SeekBar)control.findViewById(seekBarID);
 			 				TextView currentTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
@@ -709,7 +709,7 @@ public class SurveyActivity extends Activity {
 					        EmptyControls=true;
 					        //TextView txtQuestion = (TextView) findViewById(question.QuestionID);
 					        //txtQuestion.setBackgroundColor(Color.RED);
-					        
+
 					        TextView txtError = (TextView) findViewById(question.QuestionID+90000);
 					        txtError.setText(validate.Value);
 						}
@@ -724,18 +724,18 @@ public class SurveyActivity extends Activity {
 						}
 					   i++;
 					}
-				   
+
 				  	SurveyQuestions.set(j, questions);
 					if (EmptyControls==true)
 					{
 						Button btnNext = (Button) findViewById(R.id.btnNext);
 						btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
 						//btnNext.setBackgroundColor(Color.RED);
-						
+
 						Button btnSections = (Button) findViewById(R.id.btnSections);
 						btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
 						//btnSections.setBackgroundColor(Color.RED);
-						
+
 						return;
 					}
 					else
@@ -743,7 +743,7 @@ public class SurveyActivity extends Activity {
 						Button btnNext = (Button) findViewById(R.id.btnNext);
 						btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
 				        //btnNext.setBackgroundColor(Color.GRAY);
-				        
+
 				    	Button btnSections = (Button) findViewById(R.id.btnSections);
 				    	 btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
 						//btnSections.setBackgroundColor(Color.GRAY);
@@ -764,22 +764,22 @@ public class SurveyActivity extends Activity {
 		            progressBar.setProgress(progressStatus);
 		            TextView textView = (TextView) findViewById(R.id.txtPercent);
 		            textView.setText(progressStatus+"%");
-		            
+
 		            //Save questions
 		            MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
 			        for(Questions questionstosave: questions)
 			        {
 			        	sqlite.updateQuestion(questionstosave);
 			        }
-		            
-		            sharedpreferences = getSharedPreferences(MyPREFERENCES, 
+
+		            sharedpreferences = getSharedPreferences(MyPREFERENCES,
 		          	      Context.MODE_PRIVATE);
 		            Editor editor = sharedpreferences.edit();
 		            editor.putInt("savequestions", nextQuestions.get(0).SurveyID);
 		            editor.putInt("saveindex", j);
 		            editor.putInt("Flag", 1);
 		            editor.commit();
-		            
+
 				}
 				else
 				{
@@ -814,7 +814,7 @@ public class SurveyActivity extends Activity {
 
 	       }
 	}
-	
+
 	public void Next2(View view){
 			int ErrorQuestion = 0;
 			try
@@ -834,7 +834,7 @@ public class SurveyActivity extends Activity {
 						ErrorQuestion = question.QuestionID;
 						View control =(View) findViewById(question.QuestionID+idKey);
 						if(question.QuestionTypeID == 10){
-							int lastdigit = (question.QuestionID%1000)*1000; 
+							int lastdigit = (question.QuestionID%1000)*1000;
 				    		int seekBarID = question.QuestionID + idKey + lastdigit + 2;
 			 				SeekBar currentSeekBar= (SeekBar)control.findViewById(seekBarID);
 			 				TextView currentTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
@@ -863,7 +863,7 @@ public class SurveyActivity extends Activity {
 					        EmptyControls=true;
 					        //TextView txtQuestion = (TextView) findViewById(question.QuestionID);
 					        //txtQuestion.setBackgroundColor(Color.RED);
-					        
+
 					        TextView txtError = (TextView) findViewById(question.QuestionID+90000);
 					        txtError.setText(validate.Value);
 						}
@@ -878,18 +878,18 @@ public class SurveyActivity extends Activity {
 						}
 					   i++;
 					}
-				   
+
 				  	SurveyQuestions.set(j, questions);
 					if (EmptyControls==true)
 					{
 						Button btnNext = (Button) findViewById(R.id.btnNext);
 						btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
 						//btnNext.setBackgroundColor(Color.RED);
-						
+
 						Button btnSections = (Button) findViewById(R.id.btnSections);
 						btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
 						//btnSections.setBackgroundColor(Color.RED);
-						
+
 						return;
 					}
 					else
@@ -897,7 +897,7 @@ public class SurveyActivity extends Activity {
 						Button btnNext = (Button) findViewById(R.id.btnNext);
 						btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
 				        //btnNext.setBackgroundColor(Color.GRAY);
-				        
+
 				    	Button btnSections = (Button) findViewById(R.id.btnSections);
 				    	 btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
 						//btnSections.setBackgroundColor(Color.GRAY);
@@ -918,22 +918,22 @@ public class SurveyActivity extends Activity {
 		            progressBar.setProgress(progressStatus);
 		            TextView textView = (TextView) findViewById(R.id.txtPercent);
 		            textView.setText(progressStatus+"%");
-		            
+
 		            //Save questions
 		            MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
 			         for(Questions questionstosave: questions)
 			         {
 			        	 sqlite.updateQuestion(questionstosave);
 			         }
-		            
-		            sharedpreferences=getSharedPreferences(MyPREFERENCES, 
+
+		            sharedpreferences=getSharedPreferences(MyPREFERENCES,
 		          	      Context.MODE_PRIVATE);
 		            Editor editor = sharedpreferences.edit();
 		            editor.putInt("savequestions", nextQuestions.get(0).SurveyID);
 		            editor.putInt("saveindex", j);
 		            editor.putInt("Flag", 0);
 		            editor.commit();
-		            
+
 				}
 				else
 				{
@@ -967,11 +967,11 @@ public class SurveyActivity extends Activity {
 	    	   Toast.makeText(getApplicationContext(), "E007: Q:" + String.valueOf(ErrorQuestion) + " " + ex.toString(),Toast.LENGTH_LONG).show();
 	       }
 	}
-	
+
 	//================================================================================
     // Helpers
     //================================================================================
-	
+
   	public void ChangeColos(Boolean flag)
   	{
   		try
@@ -995,7 +995,7 @@ public class SurveyActivity extends Activity {
  		 }
 
   	}
-  	
+
   	public Bitmap StringToBitMap(String encodedString){
 	      try{
 	        byte [] encodeByte=Base64.decode(encodedString,Base64.DEFAULT);
@@ -1006,11 +1006,11 @@ public class SurveyActivity extends Activity {
 	        return null;
 	      }
 	}
-	
+
   	//================================================================================
     // Save Answers
-    //================================================================================ 
-	    
+    //================================================================================
+
 	private class HttpAsyncTask extends AsyncTask<String, Void, String> {
     	int SurveyID;
     	String Identifier;
@@ -1024,7 +1024,7 @@ public class SurveyActivity extends Activity {
         protected String doInBackground(String... params) {
         	String resultado = "";
         	try {
-        		List<Integer> AnswersWithImages = db.getAnswersWithImages(); 
+        		List<Integer> AnswersWithImages = db.getAnswersWithImages();
         		if(AnswersWithImages != null && AnswersWithImages.size() > 0){
      			   for(Integer AnswerID: AnswersWithImages){
      				   Answers Answer = db.getAnswerByAnswerID(AnswerID);
@@ -1067,7 +1067,7 @@ public class SurveyActivity extends Activity {
 	    			return "Ocurrion un error " + resultado;
 	    		}
         	}catch (Exception e) {
-        		return "Ocurrion un error Exception";                  
+        		return "Ocurrion un error Exception";
         	}
         }
         @Override
@@ -1086,11 +1086,11 @@ public class SurveyActivity extends Activity {
         	}
        }
     }
-	 	
+
 	//================================================================================
     // Create Control Listeners
     //================================================================================
-	 
+
 	public  void CreateListeners(List<Questions> questions,Boolean HasValues)
 	{
 		for(Questions question: questions)
@@ -1105,62 +1105,62 @@ public class SurveyActivity extends Activity {
 			}
 		}
 	}
-	
+
 	public  void ChooseControl(int QuestionID,int QuestionTypeID,String Answer)
 	{
 		 switch (QuestionTypeID) {
-		 	case 0:  
+		 	case 0:
 	 			CreateListenerButtonFinish(QuestionID);
 	 			break;
-		 	case 1:  
+		 	case 1:
 		 		CreateListenerText(QuestionID);
 		 		break;
-		 	case 2:  
+		 	case 2:
 		 		CreateListenerText(QuestionID);
 	 			break;
-		 	case 3:  
+		 	case 3:
 		 		CreateListenerText(QuestionID);
 		 		break;
-		 	case 4:  
+		 	case 4:
 		 		CreateListenerRadiobuttons(QuestionID);
-		 		break;	 				 
-		 	case 5:  
+		 		break;
+		 	case 5:
 	 			CreateListenerCheckBoxes(QuestionID);
 	 			break;
-		 	case 6:  
+		 	case 6:
 	        	CreateListenerGridSingle(QuestionID);
 	        	break;
-		 	case 7:  
+		 	case 7:
 	        	CreateListenerGridMultiple(QuestionID);
 	        	break;
-		 	case 8:  
+		 	case 8:
 	        	CreateListenerGridSliderInterval(QuestionID);
 	        	break;
-		 	case 9:  
+		 	case 9:
 		 		CreateListenerSlider(QuestionID);
 		 		break;
-	        case 10:  
+	        case 10:
 	        	CreateListenerSliderInterval(QuestionID);
 	        	break;
-	        case 11:  
+	        case 11:
 	        	CreateListenerInformation(QuestionID);
 	        	break;
-			case 12:  
+			case 12:
 				CreateListenerInformationImage(QuestionID,Answer);
 				break;
-			case 13:  
+			case 13:
 				CreateListenerDateTime(QuestionID);
 				break;
-			case 14:  
+			case 14:
 				CreateListenerSignature(QuestionID);
 				break;
-			case 15:  
+			case 15:
 				CreateListenerImage(QuestionID);
 				break;
-			case 16:  
+			case 16:
 				CreateListenerBarcode(QuestionID);
 				break;
-			case 17:  
+			case 17:
 				CreateListenerDropdown(QuestionID);
 				break;
 			case 18:
@@ -1179,16 +1179,16 @@ public class SurveyActivity extends Activity {
 				break;
 		 }
 	 }
-	 
+
 	//================================================================================
     // Control Flow Methods
     //================================================================================
-    
+
     public String ShowLayout(String SendTo){
     	 if(SendTo.equals("") || oldListSentTo.contains(SendTo)){
     		 return "";
     	 }
-    	 int intSendTo = Integer.parseInt(SendTo); 
+    	 int intSendTo = Integer.parseInt(SendTo);
     	 if(idLinearLayout < 0){
     		 Next2(null);
 			 return "";
@@ -1204,12 +1204,12 @@ public class SurveyActivity extends Activity {
     		 return "";
     	 }
      }
-     
+
     public String HideLayout(String SendTo, int SurveyID){
     	 if(SendTo.equals("") || oldListSentTo.contains(SendTo)){
     		 return "";
     	 }
-    	 int intSendTo = Integer.parseInt(SendTo); 
+    	 int intSendTo = Integer.parseInt(SendTo);
     	 if(idLinearLayout < 0){
 			 return "";
 		 }
@@ -1223,7 +1223,7 @@ public class SurveyActivity extends Activity {
 			 return "";
 		 }
      }
-     
+
     @SuppressLint("DefaultLocale")
     public void CheckFlowFromControl(int QuestionID, int qOrderNumber, int qSurveyID, Boolean isListener){
     	 int flowOption = 0;
@@ -1300,7 +1300,7 @@ public class SurveyActivity extends Activity {
 		 		}catch(Exception ex){
 		 			isAnswerNumeric = false;
 		 		}
-		 		
+
 		 		if(Q.Condition.equals("=")){
 		 			if(ValueQuestion.equals(ValueAnswer)){
 		 				listSentTo.add(ShowLayout(Q.SendTo));
@@ -1429,8 +1429,8 @@ public class SurveyActivity extends Activity {
 				 		}
 			 		}
 	 			}else if(Q.QuestionTypeID == 10){
-	 				SeekbarWithIntervals currentSeekbarWithIntervals = (SeekbarWithIntervals)findViewById(Q.QuestionID + idKey);  
-	 				int lastdigit = (Q.QuestionID%1000)*1000; 
+	 				SeekbarWithIntervals currentSeekbarWithIntervals = (SeekbarWithIntervals)findViewById(Q.QuestionID + idKey);
+	 				int lastdigit = (Q.QuestionID%1000)*1000;
 		    		int seekBarID = Q.QuestionID + idKey + lastdigit + 2;
 	 				SeekBar currentSeekBar= (SeekBar)currentSeekbarWithIntervals.findViewById(seekBarID);
 	 				TextView currentTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
@@ -1491,20 +1491,20 @@ public class SurveyActivity extends Activity {
     		 for (String sentTo: listSentTo) {
         		 if(!sentTo.equals("")){
             		 Boolean isInteger = false;
-            		 try {  
+            		 try {
             			 nextOrderNumber = Integer.parseInt(sentTo);
             			 isInteger = true;
-            	      } catch (NumberFormatException e) {  
+            	      } catch (NumberFormatException e) {
             	    	  Toast.makeText(getApplicationContext(), "E0011: No se pudo convertir " + sentTo + " a entero", Toast.LENGTH_LONG).show();
-            	      } 
+            	      }
             		 if(isInteger){
         				 CheckFlowFromControl(0,nextOrderNumber,Q.SurveyID, true);
             		 }
-            	 } 
+            	 }
         	 }
     	 }
      }
-     
+
     @SuppressLint("DefaultLocale")
 	public String GetValueFromControl(int QuestionID, int QuestionTypeID){
     	 String result = "";
@@ -1547,7 +1547,7 @@ public class SurveyActivity extends Activity {
     	 }
     	 return result;
      }
-    
+
     @SuppressLint("DefaultLocale")
 	public void ClearValueFromControl(int QuestionID, int QuestionTypeID){
     	 View currentControl = findViewById(QuestionID + idKey);
@@ -1586,8 +1586,8 @@ public class SurveyActivity extends Activity {
 	    		 }
 	    		 break;
 	    	 case 10:
-	    		 SeekbarWithIntervals currentSeekbarWithIntervals = (SeekbarWithIntervals)findViewById(QuestionID + idKey); 
-	    		 int lastdigit = (QuestionID%1000)*1000; 
+	    		 SeekbarWithIntervals currentSeekbarWithIntervals = (SeekbarWithIntervals)findViewById(QuestionID + idKey);
+	    		 int lastdigit = (QuestionID%1000)*1000;
 	    		 int seekBarID = QuestionID + idKey + lastdigit + 2;
 	    		 SeekBar currentSeekBar = (SeekBar)currentSeekbarWithIntervals.findViewById(seekBarID);
 	    		 TextView currentSeekBarTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
@@ -1620,18 +1620,18 @@ public class SurveyActivity extends Activity {
 	    		 break;
     	 }
      }
-    
-    
+
+
 	//================================================================================
     // Create Button Finish Listener
     //================================================================================
-	 
+
 	 private void CreateListenerButtonFinish(int controlid) {
 		 Button button =  (Button) findViewById(controlid+idKey);
 		 button.setOnClickListener( new ButtonSendSurvey() );
-	 } 	
-	 
-	 public class ButtonSendSurvey implements View.OnClickListener 
+	 }
+
+	 public class ButtonSendSurvey implements View.OnClickListener
 	    {
 			public void onClick(final View view ){
 				progress.setMessage("Guardando respuestas, por favor espere...");
@@ -1723,11 +1723,11 @@ public class SurveyActivity extends Activity {
 				}
 			}
 	    }
-	 
+
 	 //================================================================================
 	 // Take Survey Again
 	 //================================================================================
-	 
+
 	 public void TakeSurveyAgain(final int SurveyID,Boolean isSuccessful){
 		 try{
 			 Devices Device = db.GetDevice();
@@ -1770,13 +1770,13 @@ public class SurveyActivity extends Activity {
 			 Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
 			 Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
         	 startActivity(intent);
-		} 
+		}
 	 }
-	 
+
 	 //================================================================================
 	 // Create Text Listener
 	 //================================================================================
-	 
+
 	 public void CreateListenerText(int controlid) {
 		 final EditText editText = (EditText)findViewById(controlid+idKey);
 		 Button button = (Button) findViewById(controlid+idKey2);
@@ -1814,11 +1814,11 @@ public class SurveyActivity extends Activity {
 			 }
 		 });
      }
-	 
+
 	 //================================================================================
 	 // Create Radio Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerRadiobuttons(final int controlid) {
     	 RadioGroup radioGroup = (RadioGroup) findViewById(controlid+idKey);
     	 for(int count = 0; count < radioGroup.getChildCount(); count++) {
@@ -1879,7 +1879,7 @@ public class SurveyActivity extends Activity {
 	 //================================================================================
 	 // Create Check box Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerCheckBoxes(int controlid) {
     	 LinearLayout linearLayout=  (LinearLayout) findViewById(controlid+idKey);
     	 for(int count = 0; count < linearLayout.getChildCount(); count++) {
@@ -1898,13 +1898,13 @@ public class SurveyActivity extends Activity {
 		    });
 		}
  	}
-	 
+
 	 //================================================================================
 	 // Create Simple Grid Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerGridSingle(int controlid) {
-		 TableLayout TL = (TableLayout)findViewById(controlid + idKey); 
+		 TableLayout TL = (TableLayout)findViewById(controlid + idKey);
 		 for(int i = 0; i < TL.getChildCount(); i++) {
 		    if (TL.getChildAt(i) instanceof TableRow) {
 		    	TableRow TR = (TableRow)TL.getChildAt(i);
@@ -1917,7 +1917,7 @@ public class SurveyActivity extends Activity {
 		    }
 		}
 	 }
-	 
+
 	 OnClickListener GridRadioButtonListener = new OnClickListener (){
 		 public void onClick(View v) {
 			 boolean checked = ((RadioButton) v).isChecked();
@@ -1930,36 +1930,36 @@ public class SurveyActivity extends Activity {
 			 ((RadioButton) v).setChecked(checked);
 		 }
 	 };
-	 
+
 	 //================================================================================
 	 // Create Slider Interval Grid Listener
 	 //================================================================================
-		 
+
 	 private void CreateListenerGridSliderInterval(int controlid) {
 	 }
 
 	 //================================================================================
 	 // Create Multiple Grid Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerGridMultiple(int controlid) {
 	 }
-	 
+
 	 //================================================================================
 	 // Create Slider Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerSlider(int controlid) {
 	 }
 
 	 //================================================================================
 	 // Create Interval Slider Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerSliderInterval(int controlid) {
-		SeekbarWithIntervals sk = (SeekbarWithIntervals)findViewById(controlid+idKey);  
+		SeekbarWithIntervals sk = (SeekbarWithIntervals)findViewById(controlid+idKey);
 		View sb= (View)sk.findViewById(R.id.seekbar);
-		int lastdigit=(controlid%1000)*1000; 
+		int lastdigit=(controlid%1000)*1000;
 		int id=controlid+idKey+lastdigit+2;
 		sb.setId(id);
 	    sk.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -1967,19 +1967,19 @@ public class SurveyActivity extends Activity {
 			  public void onProgressChanged(SeekBar seekBar, int progresValue, boolean fromUser) {
 				  int controlid = seekBar.getId();
 				  TextView txtTitle = (TextView)findViewById(controlid-1);
-				  int lastdigit =((controlid-2)%1000)*1000; 
-				  int questionid = controlid-lastdigit-2-idKey; 
+				  int lastdigit =((controlid-2)%1000)*1000;
+				  int questionid = controlid-lastdigit-2-idKey;
 				  String Value  = db.getQuestionValueByID(questionid);
 				  String[] Respuestas=Value.split("\\|\\|@@\\|\\|");
 				  txtTitle.setText(Respuestas[progresValue]);
 				  oldListSentTo = new ArrayList<String>();
 				  CheckFlowFromControl(questionid,0,0,true);
 			  }
-			
+
 			  @Override
 			  public void onStartTrackingTouch(SeekBar seekBar) {
 			  }
-			
+
 			  @Override
 			  public void onStopTrackingTouch(SeekBar seekBar) {
 			  }
@@ -1989,16 +1989,16 @@ public class SurveyActivity extends Activity {
 	 //================================================================================
 	 // Create Information Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerInformation(final int controlid) {
 		  Button btnNext = (Button) findViewById(R.id.btnNext);
 		  btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
 	 }
-	 
+
 	 //================================================================================
 	 // Create Information Image Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerInformationImage(int controlid,String Answer) {
 	 }
 
@@ -2007,40 +2007,40 @@ public class SurveyActivity extends Activity {
 	 //================================================================================
 
 	 public void CreateListenerDateTime(final int controlid) {
-		 DatePicker dp = (DatePicker)findViewById(controlid + idDatePicker); 
+		 DatePicker dp = (DatePicker)findViewById(controlid + idDatePicker);
 		 if(!dp.equals(null)){
 			 dp.init(dp.getYear(), dp.getMonth(), dp.getDayOfMonth(), new DatePicker.OnDateChangedListener()
-			 { 
+			 {
 				@Override
 				public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-				} 
+				}
 			 });
 		 }
 		 TimePicker tp = (TimePicker)findViewById(controlid + idTimePicker);
 		 if(!tp.equals(null)){
 			 tp.setOnTimeChangedListener(new OnTimeChangedListener()
-			 { 
+			 {
 				 public void onTimeChanged(TimePicker arg0, int arg1, int arg2) {
-				 } 
+				 }
 			 });
 		 }
 	 }
-	 
+
 	 //================================================================================
 	 // Create Signature Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerSignature(int controlid) {
 		 Button button = (Button) findViewById(controlid+idKey2);
 		 button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
             	_currentControlID=view.getId();
-                Intent intent = new Intent(SurveyActivity.this, SignatureActivity.class); 
+                Intent intent = new Intent(SurveyActivity.this, SignatureActivity.class);
                 startActivityForResult(intent,1);
             }
-		 });	 
+		 });
 	 }
-	 
+
 	 protected void onSignatureTaken(int controlid)
 	 {
 		try
@@ -2049,12 +2049,12 @@ public class SurveyActivity extends Activity {
 			 Editor editor = sharedpreferences.edit();
 			 editor.putInt("Flag", 0);
 			 editor.commit();
-			
+
 			_currentControlID=controlid+idKey;
 			_Scanned=false;
 		    _taken = false;
 			_signed = true;
-		
+
 	    	Bitmap bitmap = decodeFile(_tempDir);
 	    	ImageView _image = (ImageView) findViewById(controlid);
 	    	_image.setImageBitmap(bitmap);
@@ -2065,16 +2065,16 @@ public class SurveyActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "E009:" + ex.toString(),Toast.LENGTH_SHORT).show();
 		}
 	 }
-	 
+
 	 //================================================================================
 	 // Create Photo Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerImage(int controlid) {
 		 Button button=  (Button) findViewById(controlid+idKey2);
 		 button.setOnClickListener( new ButtonClickHandler() );
 	 }
-	 
+
 	 protected void onPhotoTaken(int controlid)
 	 {
     	try
@@ -2083,7 +2083,7 @@ public class SurveyActivity extends Activity {
     		Editor editor = sharedpreferences.edit();
     		editor.putInt("Flag", 0);
     		editor.commit();
-	    		
+
 	    	_currentControlID=controlid+idKey;
 	    	_taken = true;
 	        _signed=false;
@@ -2093,7 +2093,7 @@ public class SurveyActivity extends Activity {
 	    	if(Question.QuestionTypeID == 20){
 	    		Question.Image = BitMapToString(bitmap);
 	    		db.updateQuestionImage(Question);
-	    		Intent intent = new Intent(SurveyActivity.this, SignatureActivity.class); 
+	    		Intent intent = new Intent(SurveyActivity.this, SignatureActivity.class);
                 intent.putExtra("sQuestionID", Integer.toString(controlid - idKey));
                 startActivityForResult(intent,1);
 	    	}else{
@@ -2107,33 +2107,33 @@ public class SurveyActivity extends Activity {
     		Toast.makeText(getApplicationContext(), "E010:" + ex.toString(),Toast.LENGTH_SHORT).show();
     	}
     }
-	 
+
 	 //================================================================================
 	 // Create Bar code Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerBarcode(int controlid) {
 		 Button button=  (Button) findViewById(controlid+idKey2);
 		 button.setOnClickListener( new ButtonClickBarcode() );
      }
-	 
+
 	 private void onScanned(String scanContent,int ControID) {
-		 
+
 		 sharedpreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
 		 Editor editor = sharedpreferences.edit();
 		 editor.putInt("Flag", 0);
 		 editor.commit();
- 		
+
 		 _currentControlID=ControID+idKey;
 		 _Scanned=true;
 		 _taken = false;
 		 _signed=false;
 		 _ScannedValue=scanContent;
 		 TextView _textView = (TextView) findViewById(ControID);
-		 _textView.setText(scanContent); 
+		 _textView.setText(scanContent);
 		 oldListSentTo = new ArrayList<String>();
 		 CheckFlowFromControl(ControID - idKey,0,0,true);
-		 
+
 		 Questions Question = db.getQuestion(ControID - idKey);
 		 if(Question.ProcedureID > 0){
 			 if (ConnectionMethods.isInternetConnected(SurveyActivity.this,false).equals("")){
@@ -2162,14 +2162,14 @@ public class SurveyActivity extends Activity {
 			}
 		 }
 	 }
-	 
+
 	 //================================================================================
 	 // Camera Methods
 	 //================================================================================
-	 
-	 public class ButtonClickBarcode implements View.OnClickListener 
+
+	 public class ButtonClickBarcode implements View.OnClickListener
 	 {
-		 public void onClick( View view ){  
+		 public void onClick( View view ){
 			 try {
 	    		_Scanned=false;
 			    _taken = false;
@@ -2183,8 +2183,8 @@ public class SurveyActivity extends Activity {
 			 }
 		 }
 	 }
-		
-	 public class ButtonClickHandler implements View.OnClickListener 
+
+	 public class ButtonClickHandler implements View.OnClickListener
 	 {
 		 public void onClick(View view ){
 			 try {
@@ -2210,19 +2210,19 @@ public class SurveyActivity extends Activity {
 			 }
 		 }
 	 }
-	 
+
 	 @Override
-	 protected void onActivityResult(int requestCode, int resultCode, Intent data) 
-	 {	
+	 protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	 {
 		 try {
 			 super.onActivityResult(requestCode, resultCode, data);
-			 
+
 			 if (requestCode==49374)
-			 {  
+			 {
 				 IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 				 if (scanningResult != null) {
 					 String scanContent = scanningResult.getContents();
-					 onScanned(scanContent,_currentControlID-idKey);	
+					 onScanned(scanContent,_currentControlID-idKey);
 				 }
 				 else{
 					 Toast toast = Toast.makeText(getApplicationContext(), "No scan data received!", Toast.LENGTH_SHORT);
@@ -2237,7 +2237,7 @@ public class SurveyActivity extends Activity {
 					 if(status.equalsIgnoreCase("done")){
 						 onSignatureTaken(_currentControlID-idKey);
 					 }
-				 }  
+				 }
 			 }
 			 else
 			 {
@@ -2255,7 +2255,7 @@ public class SurveyActivity extends Activity {
 			 toas1t.show();
 		 }
 	 }
-		    
+
 	 public  Bitmap decodeFile(String path) {
 		 int orientation;
 		 try {
@@ -2279,19 +2279,19 @@ public class SurveyActivity extends Activity {
 				 m.postRotate(180);
 				 return Bitmap.createBitmap(bm, 0, 0, bm.getWidth(),bm.getHeight(), m, true);
 			 } else if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
-				 m.postRotate(90); 
+				 m.postRotate(90);
 				 return Bitmap.createBitmap(bm, 0, 0, bm.getWidth(),bm.getHeight(), m, true);
 			 }
 			 else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
 				 m.postRotate(270);
 				 return Bitmap.createBitmap(bm, 0, 0, bm.getWidth(),bm.getHeight(), m, true);
-			 } 
+			 }
 			 return bm;
 		 } catch (Exception e) {
 			 return null;
 		 }
 	 }
-	 
+
 	 public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
 	    int height = options.outHeight;
 	    int width = options.outWidth;
@@ -2305,7 +2305,7 @@ public class SurveyActivity extends Activity {
 	    }
 	    return inSampleSize;
 	 }
-	 
+
 	 public String BitMapToString(Bitmap bitmap){
 		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		    bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
@@ -2313,11 +2313,11 @@ public class SurveyActivity extends Activity {
 		    String temp=Base64.encodeToString(b, Base64.DEFAULT);
 		    return temp;
 		}
-	 
+
 	 //================================================================================
 	 // Create Drop Down Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerDropdown(final int controlid) {
 		Spinner dropdown=  (Spinner) findViewById(controlid+idKey);
 		dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -2334,13 +2334,13 @@ public class SurveyActivity extends Activity {
 			@Override
 			public void onNothingSelected(AdapterView<?> parentView) {
 			}
-		});	
+		});
  	}
-	 
+
 	//================================================================================
 	// Create Auto Complete Listener
 	//================================================================================
-	 
+
 	 public void CreateListenerAutoComplete(int controlid) {
 		 final AutoCompleteTextView currentAutoComplete = (AutoCompleteTextView)findViewById(controlid+idKey);
 		 currentAutoComplete.addTextChangedListener(new TextWatcher() {
@@ -2421,36 +2421,36 @@ public class SurveyActivity extends Activity {
 
 		 }
 	 }
-	 
+
 	 //================================================================================
 	 // Create Canvas Listener
 	 //================================================================================
-	 
+
 	 private void CreateListenerCanvas(final int controlid) {
 		 Button button = (Button) findViewById(controlid+idKey2);
 		 button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
             	_currentControlID = view.getId();
-                Intent intent = new Intent(SurveyActivity.this, SignatureActivity.class); 
+                Intent intent = new Intent(SurveyActivity.this, SignatureActivity.class);
                 intent.putExtra("sQuestionID", Integer.toString(controlid));
                 startActivityForResult(intent,1);
             }
-		 });	 
+		 });
 	 }
-	 
+
 	//================================================================================
 	// Create Photo Canvas Listener
 	//================================================================================
-	 
+
 	 private void CreateListenerPhotoCanvas(int controlid) {
 		 Button button=  (Button) findViewById(controlid+idKey2);
 		 button.setOnClickListener( new ButtonClickHandler() );
 	 }
-	
+
 	//================================================================================
 	// Create Button Listener
 	//================================================================================
-		 
+
 	 public void CreateListenerButton(int controlid) {
 		 Button button = (Button) findViewById(controlid+idKey2);
 		 final int QuestionID = controlid;
@@ -2472,21 +2472,21 @@ public class SurveyActivity extends Activity {
 			 });
 		 }
      }
-	 
+
 	//================================================================================
     // Check Device type
 	//================================================================================
-		
+
 	public boolean isTablet(Context context) {
 	    boolean xlarge = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE);
 	    boolean large = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
 	    return (xlarge || large);
 	}
-	
+
 	//================================================================================
     // External Data Base Functionality
 	//================================================================================
-	
+
 	@SuppressLint("ClickableViewAccessibility")
 	private class AsyncGetTable extends AsyncTask<String, Void, String> {
    		int QuestionID;
@@ -2563,7 +2563,7 @@ public class SurveyActivity extends Activity {
 		   		}
 		   		return;
 		   	}
-            try 
+            try
             {
             	final TableLayout GridTable = (TableLayout) findViewById(QuestionID+idKey3);
             	GridTable.removeAllViews();
@@ -2572,16 +2572,16 @@ public class SurveyActivity extends Activity {
             		String[] rows = result.split(Pattern.quote("\\r\\n"));
             		boolean isHeader = true;
             		if(rows.length > 0){
-            			if(rows.length == 2 && (QuestionID == 22272 || QuestionID == 85289 || QuestionID == 85840)){
+						String[] columnsTemp = rows[1].split(Pattern.quote(","));
+            			if(rows.length == 2 && columnsTemp[columnsTemp.length-1].equals("btn:SelectAllBlockBarcode")){
             				final Questions Q = db.getQuestion(QuestionID);
 				    		int currentOrder = Q.OrderNumber + 1;
-            				String[] columns = rows[1].split(Pattern.quote(","));
             				boolean blockAll = false;
-        					if(columns[columns.length-1].equals("btn:SelectAllBlock")){
+        					if(columnsTemp[columnsTemp.length-1].startsWith("btn:SelectAllBlock")){
     							blockAll = true;
     						}
-            				for(int j = 0; j < columns.length; j++) {
-				    			if(!columns[j].toString().equals("") && !columns[j].toString().startsWith("btn:Select")){
+            				for(int j = 0; j < columnsTemp.length; j++) {
+				    			if(!columnsTemp[j].toString().equals("") && !columnsTemp[j].toString().startsWith("btn:Select")){
 				    				Questions newQuestion = db.getQuestionByOrderNumberAndSurveyID(currentOrder, Q.SurveyID);
 				    				if(newQuestion != null){
 				    					currentOrder++;
@@ -2589,7 +2589,7 @@ public class SurveyActivity extends Activity {
 				    					if(View instanceof EditText){
 				    						EditText editText = (EditText)View;
         					    			if(editText != null){
-        					    				editText.setText(columns[j].toString());
+        					    				editText.setText(columnsTemp[j].toString());
         					    				if(blockAll){
         					    					editText.setEnabled(false);
         					    				}
@@ -2597,13 +2597,13 @@ public class SurveyActivity extends Activity {
 				    					}else if(View instanceof Spinner){
 				    						Spinner Spinner = (Spinner)View;
         					    			if(Spinner != null){
-        					    				Spinner.setSelection(getIndex(Spinner, columns[j].toString()));
+        					    				Spinner.setSelection(getIndex(Spinner, columnsTemp[j].toString()));
         					    				if(blockAll){
         					    					Spinner.setEnabled(false);
         					    				}
         					    			}
 				    					}
-    					    			
+
 				    				}
 					    		}
 				    		}
@@ -2662,7 +2662,7 @@ public class SurveyActivity extends Activity {
                             	            					    				}
                             	            					    			}
                 	            					    					}
-                        	            					    			
+
                 	            					    				}
                     	            					    		}
                 	            					    		}
@@ -2718,13 +2718,13 @@ public class SurveyActivity extends Activity {
 						Toast.makeText(getBaseContext(), "No existe ubicheck", Toast.LENGTH_LONG).show();
 					}
 				}
-			} 
+			}
             catch (Exception e) {
 				 Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
-			} 
+			}
        }
    }
-	
+
 	private int getIndex(Spinner spinner, String myString){
         int index = 0;
         for (int i=0;i<spinner.getCount();i++){
@@ -2813,6 +2813,171 @@ public class SurveyActivity extends Activity {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
 			}
+		}
+	}
+
+
+	public void Save(){
+		int ErrorQuestion = 0;
+		try
+		{
+			lm = (LinearLayout) findViewById(R.id.activity_survey);
+			Validations validations= new Validations();
+			if(j>=SurveyQuestions.size())
+			{
+				return;
+			}
+			Boolean EmptyControls= false;
+			List<Questions> questions= SurveyQuestions.get(j);
+			int i=0;
+			for(Questions question: questions)
+			{
+
+				ErrorQuestion = question.QuestionID;
+				View control =(View) findViewById(question.QuestionID+idKey);
+				if(control != null && !control.isEnabled()){
+					Questions Q2 = db.getQuestion(question.QuestionID);
+					Q2.Blocked = 1;
+					db.updateQuestionBlocked(Q2);
+					question.Blocked = 1;
+				}
+				String other = null;
+				if(question.QuestionTypeID == 10){
+					int lastdigit = (question.QuestionID%1000)*1000;
+					int seekBarID = question.QuestionID + idKey + lastdigit + 2;
+					SeekBar currentSeekBar= (SeekBar)control.findViewById(seekBarID);
+					TextView currentTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
+					other = currentTitle.getText().toString();
+				}
+				if(question.QuestionTypeID == 4){
+					Questions Q2 = db.getQuestion(question.QuestionID);
+					if(!question.OtherOption.equals("") && (Q2.Answer.equals(question.OtherOption))){
+						int idLayout = (idLinearLayout + (question.OrderNumber + 1));
+						LinearLayout linearLayoutEdit = (LinearLayout)findViewById(idLayout);
+						int childcount = linearLayoutEdit.getChildCount();
+						for (int x=0; x < childcount; x++){
+							View v = linearLayoutEdit.getChildAt(x);
+							if (v instanceof EditText) {
+								EditText EditText = (EditText)v;
+								other = EditText.getText().toString();
+							}
+						}
+					}
+				}
+				Boolean isVisible = true;
+				View invisibleLayout = (View)findViewById(idLinearLayout + (question.OrderNumber + 1));
+				if(invisibleLayout != null && invisibleLayout.getVisibility() != View.VISIBLE){
+					isVisible = false;
+				}
+				Message validate= validations.ValidateControl(getApplicationContext(),control,question,isTablet(this),other,isVisible);
+				if (validate.ID ==2)
+				{
+					EmptyControls=true;
+					//TextView txtQuestion = (TextView) findViewById(question.QuestionID);
+					//txtQuestion.setBackgroundColor(Color.RED);
+
+					TextView txtError = (TextView) findViewById(question.QuestionID+90000);
+					txtError.setText(validate.Value);
+				}
+				else
+				{
+					TextView txtError = (TextView) findViewById(question.QuestionID+90000);
+					txtError.setText("");
+					// TextView txtQuestion = (TextView) findViewById(question.QuestionID);
+					//txtQuestion.setBackgroundColor(Color.WHITE);
+					question.Answer=validate.Value;
+					questions.set(i, question);
+				}
+				i++;
+			}
+
+			SurveyQuestions.set(j, questions);
+			if (EmptyControls==true)
+			{
+				Button btnNext = (Button) findViewById(R.id.btnNext);
+				btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
+				//btnNext.setBackgroundColor(Color.RED);
+
+				Button btnSections = (Button) findViewById(R.id.btnSections);
+				btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
+				//btnSections.setBackgroundColor(Color.RED);
+
+				return;
+			}
+			else
+			{
+				Button btnNext = (Button) findViewById(R.id.btnNext);
+				btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+				//btnNext.setBackgroundColor(Color.GRAY);
+
+				Button btnSections = (Button) findViewById(R.id.btnSections);
+				btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+				//btnSections.setBackgroundColor(Color.GRAY);
+			}
+			if (SurveyQuestions.size()>j+1)
+			{
+				j=j+1;
+				List<Questions> nextQuestions= SurveyQuestions.get(j);
+				TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+				txtTitle.setText(nextQuestions.get(0).SectionName);
+				Controls control= new Controls();
+				lm.removeAllViews();
+				View controls=control.CreateControls(this,nextQuestions);
+				lm.addView(controls);
+				CreateListeners(nextQuestions,true);
+				progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+				progressStatus=progressStatus+increase;
+				progressBar.setProgress(progressStatus);
+				TextView textView = (TextView) findViewById(R.id.txtPercent);
+				textView.setText(progressStatus+"%");
+
+				//Save questions
+				MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
+				for(Questions questionstosave: questions)
+				{
+					sqlite.updateQuestion(questionstosave);
+				}
+
+				sharedpreferences = getSharedPreferences(MyPREFERENCES,
+						Context.MODE_PRIVATE);
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("savequestions", nextQuestions.get(0).SurveyID);
+				editor.putInt("saveindex", j);
+				editor.putInt("Flag", 1);
+				editor.commit();
+
+			}
+			else
+			{
+				RelativeLayout relative = (RelativeLayout) findViewById(R.id.rlMain);
+				relative.setBackgroundResource(0);
+				MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
+				for(Questions questionstosave: questions)
+				{
+					sqlite.updateQuestion(questionstosave);
+				}
+				sharedpreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("savequestions", questions.get(0).SurveyID);
+				editor.putInt("saveindex", j);
+				editor.putInt("Flag", 1);
+				editor.commit();
+				Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma",0,0);
+				List<Questions> listitems = new ArrayList<Questions>();
+				listitems.add(item);
+				j=j+1;
+				TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+				txtTitle.setText(listitems.get(0).SectionName);
+				Controls control= new Controls();
+				lm.removeAllViews();
+				View controls=control.CreateControls(this,listitems);
+				lm.addView(controls);
+				CreateListeners(listitems,false);
+			}
+		}
+		catch(Exception ex){
+			Toast.makeText(getApplicationContext(), "E006: Q:" + String.valueOf(ErrorQuestion) + " " + ex.toString(),Toast.LENGTH_LONG).show();
+
 		}
 	}
 }

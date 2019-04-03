@@ -4,10 +4,10 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.timetracker.surveys"
-        minSdkVersion 19
+        minSdkVersion 22
         targetSdkVersion 26
-        versionCode 235
-        versionName "2.35"
+        versionCode 253
+        versionName "2.53"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

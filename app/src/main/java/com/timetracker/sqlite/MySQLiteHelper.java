@@ -1,6 +1,8 @@
 package com.timetracker.sqlite;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     // Global Variables
     //================================================================================
 	
-    private static final int DATABASE_VERSION = 45;
+    private static final int DATABASE_VERSION = 46;
     private static final String DATABASE_NAME = "SurveysDB";
  
     public MySQLiteHelper(Context context) {
@@ -169,6 +171,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         		"BiometricID INTEGER PRIMARY KEY , " +
                 "Name TEXT, " +
         		"LastConecction INTEGER)";
+
+        String CREATE_DataUsed_TABLE = ("CREATE TABLE DataUsed ( " +
+                "LastMonth INTEGER, "+
+                "Data INTEGER)");
         
         try
         {
@@ -181,7 +187,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         	db.execSQL(CREATE_PHOTO_TABLE);
         	db.execSQL(CREATE_SELECTED_SURVEY_TABLE);
         	db.execSQL(CREATE_TRACKERS_TABLE);
-        	db.execSQL(CREATE_BIOMETRICS_TABLE);
+            db.execSQL(CREATE_BIOMETRICS_TABLE);
+            db.execSQL(CREATE_DataUsed_TABLE);
         }
         catch(Exception e)
         {
@@ -190,6 +197,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
  
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    	if(oldVersion == 45){
+			db.execSQL("CREATE TABLE DataUsed ( " +
+					"LastMonth INTEGER, "+
+					"Data INTEGER)");
+		}
     	if(oldVersion < 24){
     		db.execSQL("DROP TABLE IF EXISTS Devices");
         	db.execSQL("DROP TABLE IF EXISTS surveys");
@@ -414,7 +426,87 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.close();
         return i;
     }
-    
+    //================================================================================
+    // Data Used Methods
+    //================================================================================
+    public int  LastMonth() {
+        String query = "SELECT LastMonth FROM DataUsed ";
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
+                "LastMonth INTEGER, "+
+                "Data INTEGER)");
+        Cursor cursor = db.rawQuery(query, null);
+        int lastMonth = 0;
+        try {
+            if (cursor.moveToFirst()) {
+                if(cursor.getString(0)!=null)
+                {
+                    lastMonth =  Integer.parseInt(cursor.getString(0));
+                }
+            }
+            if(cursor != null){
+                cursor.close();
+            }
+            db.close();
+            return lastMonth;
+        }catch (Exception e){
+            return 0;
+        }
+    }
+	public void InitTableDataUsage(){
+		SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
+                "LastMonth INTEGER, "+
+                "Data INTEGER)");
+	}
+
+    public int  GetDataUsage() {
+        String query = "SELECT Data FROM DataUsed ";
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
+                "LastMonth INTEGER, "+
+                "Data INTEGER)");
+        Cursor cursor = db.rawQuery(query, null);
+        int data = 0;
+        try {
+            if (cursor.moveToFirst()) {
+                if(cursor.getString(0)!=null)
+                {
+                    data =  Integer.parseInt(cursor.getString(0));
+                }
+            }
+            if(cursor != null){
+                cursor.close();
+            }
+            db.close();
+            return data;
+        }catch (Exception e){
+            return 0;
+        }
+    }
+
+    public  void EraseDatausageTable(){
+        String query = "DELETE FROM DataUsed ";
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
+        db.close();
+    }
+
+    public void  Data(int data) {
+        int trueData = GetDataUsage() + data;
+        String query = "UPDATE DataUsed " +
+                "SET Data = " + Integer.toString(trueData);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(query);
+    }
+    public void insertCurrentDate(Date date){
+        SQLiteDatabase db = this.getWritableDatabase();
+        int currentdate = Integer.parseInt(new SimpleDateFormat("MM").format(new Date()));
+        String sql = "insert into DataUsed(Data,LastMonth) "
+                + "values(?,?)";
+        Object[] args = new Object[]{0,currentdate};
+        db.execSQL(sql, args);
+    }
     //================================================================================
     // Answers Methods
     //================================================================================
@@ -949,6 +1041,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(String.format("DELETE FROM QUESTIONS"));
         db.close();
     }
+
+
 
     public int  getQuestionsQty(String SurveyID) {
         String query = "SELECT count(*) FROM QUESTIONS WHERE SurveyID="+SurveyID ;
