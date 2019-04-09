@@ -885,12 +885,9 @@ public class SurveyActivity extends Activity {
 							if (isChecked)
 							{
 								FinishUbicheck = "0";
-								db.AppendUbicheckID(UbicheckID);
 								btnDrawable = android.R.drawable.checkbox_on_background;
 							}else {
 								FinishUbicheck  = "1";
-								db.AppendUbicheckID(0);
-								db.AddUbicheckIDToSurveys(UbicheckID);
 							}
 
 							cb.setButtonDrawable(btnDrawable);
@@ -1082,11 +1079,9 @@ public class SurveyActivity extends Activity {
 							if (isChecked)
 							{
 								FinishUbicheck = "0";
-								db.AppendUbicheckID(UbicheckID);
 								btnDrawable = android.R.drawable.checkbox_on_background;
 							}else {
 								FinishUbicheck  = "1";
-								db.AppendUbicheckID(0);
 							}
 
 							cb.setButtonDrawable(btnDrawable);
@@ -1268,11 +1263,9 @@ public class SurveyActivity extends Activity {
 								if (isChecked)
 								{
 									FinishUbicheck = "0";
-									db.AppendUbicheckID(UbicheckID);
 									btnDrawable = android.R.drawable.checkbox_on_background;
 								}else {
 									FinishUbicheck  = "1";
-									db.AppendUbicheckID(0);
 								}
 
 								cb.setButtonDrawable(btnDrawable);
