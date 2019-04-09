@@ -32,6 +32,7 @@ public class SelectSurvey extends Activity {
 	        if (extras != null) {
 	            if (extras.containsKey("UbicheckID")) {
 	            	UbicheckID = extras.getInt("UbicheckID", 0);
+	            	db.AppendUbicheckID(UbicheckID);
 	            }
 	            if (extras.containsKey("DistributionChannel")) {
 	            	DistributionChannel = extras.getString("DistributionChannel", "");

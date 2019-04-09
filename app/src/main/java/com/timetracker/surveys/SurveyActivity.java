@@ -16,6 +16,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.CompoundButton;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -144,6 +147,8 @@ public class SurveyActivity extends Activity {
     protected int idTimePicker = 80000;
     protected int idFooterLayout = 90000;
 
+	private String FinishUbicheck ="1";
+
     protected List<String> oldListSentTo = new ArrayList<String>();
     private MySQLiteHelper db = new MySQLiteHelper(SurveyActivity.this);
     ProgressDialog progress;
@@ -166,6 +171,8 @@ public class SurveyActivity extends Activity {
 		progress = new ProgressDialog(SurveyActivity.this);
 		progress.setCancelable(false);
 		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+		ContinueSurvey();
 
 		GetLocation(fusedLocationProviderClient,this);
 		try
@@ -213,57 +220,60 @@ public class SurveyActivity extends Activity {
 		}
 	}
 
+	public void  ContinueSurvey(){
+		sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+		if(sharedpreferences.contains("savequestions")){
+			int Flag= sharedpreferences.getInt("Flag", 0);
+			if (Flag==1)
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle("Encuesta incompleta")
+						.setMessage("�le gustar�a completar la encuesta?")
+						.setCancelable(false)
+						.setPositiveButton("Si",new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						})
+						.setNegativeButton("No",new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+								Editor editor = sharedpreferences.edit();
+								editor.remove("savequestions");
+								editor.remove("saveindex");
+								editor.commit();
+								Devices Device = db.GetDevice();
+								db.deletePhotos();
+								if(Device.UsesFormWithUbicheck == 1 && Device.UsesClientValidation == 1){
+									db.deleteSelectedSurveys();
+									Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
+									startActivity(intent);
+									finish();
+								}else{
+									SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
+									if(SelectedSurvey != null){
+										db.updateQuestionAnswers(SelectedSurvey.SurveyID);
+									}
+									Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.StartSurvey.class);
+									startActivity(intent);
+									finish();
+								}
+							}
+						});
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
+			else
+			{
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("Flag", 1);
+				editor.commit();
+			}
+		}
+	}
+
 	@Override
   	protected void onResume() {
-	      sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-	      if(sharedpreferences.contains("savequestions")){
-	    	  int Flag= sharedpreferences.getInt("Flag", 0);
-	    	  if (Flag==1)
-	    	  {
-		    	  AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		          builder.setTitle("Encuesta incompleta")
-		          .setMessage("�le gustar�a completar la encuesta?")
-		          .setCancelable(false)
-		          .setPositiveButton("Si",new DialogInterface.OnClickListener() {
-		              public void onClick(DialogInterface dialog, int id) {
-		                  dialog.cancel();
-		              }
-		          })
-		          .setNegativeButton("No",new DialogInterface.OnClickListener() {
-		              public void onClick(DialogInterface dialog, int id) {
-		                  dialog.cancel();
-		                  Editor editor = sharedpreferences.edit();
-		     		      editor.remove("savequestions");
-		     		      editor.remove("saveindex");
-		     		      editor.commit();
-		     		      Devices Device = db.GetDevice();
-		     		      db.deletePhotos();
-		     		      if(Device.UsesFormWithUbicheck == 1 && Device.UsesClientValidation == 1){
-		     		    	  db.deleteSelectedSurveys();
-		     		    	  Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
-		     		    	  startActivity(intent);
-		     		    	  finish();
-		     		      }else{
-		     		    	  SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
-		     		    	  if(SelectedSurvey != null){
-		     		    		 db.updateQuestionAnswers(SelectedSurvey.SurveyID);
-		     		    	  }
-		     		    	  Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.StartSurvey.class);
-		     		    	  startActivity(intent);
-		     		    	  finish();
-		     		      }
-		              }
-		          });
-		          AlertDialog alert = builder.create();
-		          alert.show();
-	    	  }
-	    	  else
-	    	  {
-	    		  Editor editor = sharedpreferences.edit();
-	    		  editor.putInt("Flag", 1);
-	    		  editor.commit();
-	    	  }
-	      }
 	      super.onResume();
 	   }
 
@@ -651,168 +661,447 @@ public class SurveyActivity extends Activity {
 		}
 	}
 
-	public void Next(View view){
-			int ErrorQuestion = 0;
-			try
+	public void Backto(){
+		try
+		{
+			Button btnNext = (Button) findViewById(R.id.btnNext);
+			btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+			Button btnSections = (Button) findViewById(R.id.btnSections);
+			btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+			if (j<=0)
 			{
-				lm = (LinearLayout) findViewById(R.id.activity_survey);
-				Validations validations= new Validations();
+				Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
+				startActivity(intent);
+				finish();
+			}
+			else
+			{
 				if(j>=SurveyQuestions.size())
 				{
-					return;
+					progressStatus=progressStatus+increase;
 				}
-				Boolean EmptyControls= false;
+				j=j-1;
+
 				List<Questions> questions= SurveyQuestions.get(j);
-				int i=0;
-				for(Questions question: questions)
-					{
+				TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+				txtTitle.setText(questions.get(0).SectionName);
+				Controls control= new Controls();
+				lm.removeAllViews();
+				View controls=control.CreateControls(this,questions);
+				lm.addView(controls);
+				CreateListeners(questions,true);
+				progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+				progressStatus=progressStatus-increase;
+				progressBar.setProgress(progressStatus);
+				TextView textView = (TextView) findViewById(R.id.txtPercent);
+				textView.setText(progressStatus+"%");
+				Surveys S = db.getSurvey(questions.get(0).SurveyID);
+				if(!S.BackgroundImage.equals("")){
+					Bitmap BM = StringToBitMap(S.BackgroundImage);
+					BitmapDrawable DR = new BitmapDrawable(getResources(), BM);
+					DR.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
+					RelativeLayout layout =(RelativeLayout)findViewById(R.id.rlMain);
+					layout.setBackgroundDrawable(DR);
+				}
+			}
+		}
+		catch(Exception ex){
+			Toast.makeText(getApplicationContext(), "E005:" + ex.toString(), Toast.LENGTH_LONG).show();
+		}
+	}
 
-						ErrorQuestion = question.QuestionID;
-						View control =(View) findViewById(question.QuestionID+idKey);
-						if(control != null && !control.isEnabled()){
-							Questions Q2 = db.getQuestion(question.QuestionID);
-							Q2.Blocked = 1;
-	    					db.updateQuestionBlocked(Q2);
-							question.Blocked = 1;
-						}
-						String other = null;
-						if(question.QuestionTypeID == 10){
-							int lastdigit = (question.QuestionID%1000)*1000;
-				    		int seekBarID = question.QuestionID + idKey + lastdigit + 2;
-			 				SeekBar currentSeekBar= (SeekBar)control.findViewById(seekBarID);
-			 				TextView currentTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
-							other = currentTitle.getText().toString();
-						}
-						if(question.QuestionTypeID == 4){
-							Questions Q2 = db.getQuestion(question.QuestionID);
-							if(!question.OtherOption.equals("") && (Q2.Answer.equals(question.OtherOption))){
-								int idLayout = (idLinearLayout + (question.OrderNumber + 1));
-								LinearLayout linearLayoutEdit = (LinearLayout)findViewById(idLayout);
-								int childcount = linearLayoutEdit.getChildCount();
-								for (int x=0; x < childcount; x++){
-									View v = linearLayoutEdit.getChildAt(x);
-									if (v instanceof EditText) {
-										EditText EditText = (EditText)v;
-		 		    	    	    	other = EditText.getText().toString();
-									}
-		 		    	    	}
-						   }
-						}
-						Boolean isVisible = true;
-						View invisibleLayout = (View)findViewById(idLinearLayout + (question.OrderNumber + 1));
-						if(invisibleLayout != null && invisibleLayout.getVisibility() != View.VISIBLE){
-							isVisible = false;
-						}
-						Message validate= validations.ValidateControl(getApplicationContext(),control,question,isTablet(this),other,isVisible);
-					   if (validate.ID ==2)
-						{
-					        EmptyControls=true;
-					        //TextView txtQuestion = (TextView) findViewById(question.QuestionID);
-					        //txtQuestion.setBackgroundColor(Color.RED);
+	public void Next(View view){
+		int ErrorQuestion = 0;
+		try
+		{
+			lm = (LinearLayout) findViewById(R.id.activity_survey);
+			Validations validations= new Validations();
+			if(j>=SurveyQuestions.size())
+			{
+				return;
+			}
+			Boolean EmptyControls= false;
+			List<Questions> questions= SurveyQuestions.get(j);
+			int i=0;
+			for(Questions question: questions)
+			{
 
-					        TextView txtError = (TextView) findViewById(question.QuestionID+90000);
-					        txtError.setText(validate.Value);
+				ErrorQuestion = question.QuestionID;
+				View control =(View) findViewById(question.QuestionID+idKey);
+				if(control != null && !control.isEnabled()){
+					Questions Q2 = db.getQuestion(question.QuestionID);
+					Q2.Blocked = 1;
+					db.updateQuestionBlocked(Q2);
+					question.Blocked = 1;
+				}
+				String other = null;
+				if(question.QuestionTypeID == 10){
+					int lastdigit = (question.QuestionID%1000)*1000;
+					int seekBarID = question.QuestionID + idKey + lastdigit + 2;
+					SeekBar currentSeekBar= (SeekBar)control.findViewById(seekBarID);
+					TextView currentTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
+					other = currentTitle.getText().toString();
+				}
+				if(question.QuestionTypeID == 4){
+					Questions Q2 = db.getQuestion(question.QuestionID);
+					if(!question.OtherOption.equals("") && (Q2.Answer.equals(question.OtherOption))){
+						int idLayout = (idLinearLayout + (question.OrderNumber + 1));
+						LinearLayout linearLayoutEdit = (LinearLayout)findViewById(idLayout);
+						int childcount = linearLayoutEdit.getChildCount();
+						for (int x=0; x < childcount; x++){
+							View v = linearLayoutEdit.getChildAt(x);
+							if (v instanceof EditText) {
+								EditText EditText = (EditText)v;
+								other = EditText.getText().toString();
+							}
 						}
-						else
-						{
-							 TextView txtError = (TextView) findViewById(question.QuestionID+90000);
-							 txtError.setText("");
-							// TextView txtQuestion = (TextView) findViewById(question.QuestionID);
-						      //txtQuestion.setBackgroundColor(Color.WHITE);
-							question.Answer=validate.Value;
-							questions.set(i, question);
-						}
-					   i++;
 					}
-
-				  	SurveyQuestions.set(j, questions);
-					if (EmptyControls==true)
-					{
-						Button btnNext = (Button) findViewById(R.id.btnNext);
-						btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
-						//btnNext.setBackgroundColor(Color.RED);
-
-						Button btnSections = (Button) findViewById(R.id.btnSections);
-						btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
-						//btnSections.setBackgroundColor(Color.RED);
-
-						return;
-					}
-					else
-					{
-						Button btnNext = (Button) findViewById(R.id.btnNext);
-						btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
-				        //btnNext.setBackgroundColor(Color.GRAY);
-
-				    	Button btnSections = (Button) findViewById(R.id.btnSections);
-				    	 btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
-						//btnSections.setBackgroundColor(Color.GRAY);
-					}
-				if (SurveyQuestions.size()>j+1)
+				}
+				Boolean isVisible = true;
+				View invisibleLayout = (View)findViewById(idLinearLayout + (question.OrderNumber + 1));
+				if(invisibleLayout != null && invisibleLayout.getVisibility() != View.VISIBLE){
+					isVisible = false;
+				}
+				Message validate= validations.ValidateControl(getApplicationContext(),control,question,isTablet(this),other,isVisible);
+				if (validate.ID ==2)
 				{
-					j=j+1;
-					List<Questions> nextQuestions= SurveyQuestions.get(j);
-					TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-					txtTitle.setText(nextQuestions.get(0).SectionName);
-					Controls control= new Controls();
-					lm.removeAllViews();
-					View controls=control.CreateControls(this,nextQuestions);
-					lm.addView(controls);
-					CreateListeners(nextQuestions,true);
-		            progressBar = (ProgressBar) findViewById(R.id.progressBar1);
-		            progressStatus=progressStatus+increase;
-		            progressBar.setProgress(progressStatus);
-		            TextView textView = (TextView) findViewById(R.id.txtPercent);
-		            textView.setText(progressStatus+"%");
+					EmptyControls=true;
+					//TextView txtQuestion = (TextView) findViewById(question.QuestionID);
+					//txtQuestion.setBackgroundColor(Color.RED);
 
-		            //Save questions
-		            MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
-			        for(Questions questionstosave: questions)
-			        {
-			        	sqlite.updateQuestion(questionstosave);
-			        }
-
-		            sharedpreferences = getSharedPreferences(MyPREFERENCES,
-		          	      Context.MODE_PRIVATE);
-		            Editor editor = sharedpreferences.edit();
-		            editor.putInt("savequestions", nextQuestions.get(0).SurveyID);
-		            editor.putInt("saveindex", j);
-		            editor.putInt("Flag", 1);
-		            editor.commit();
-
+					TextView txtError = (TextView) findViewById(question.QuestionID+90000);
+					txtError.setText(validate.Value);
 				}
 				else
 				{
-					RelativeLayout relative = (RelativeLayout) findViewById(R.id.rlMain);
-					relative.setBackgroundResource(0);
-					MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
-			        for(Questions questionstosave: questions)
-			        {
-			        	sqlite.updateQuestion(questionstosave);
-			        }
-		            sharedpreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
-		            Editor editor = sharedpreferences.edit();
-		            editor.putInt("savequestions", questions.get(0).SurveyID);
-		            editor.putInt("saveindex", j);
-		            editor.putInt("Flag", 1);
-		            editor.commit();
-					Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma",0,0);
-					List<Questions> listitems = new ArrayList<Questions>();
-					listitems.add(item);
-					j=j+1;
-					TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-					txtTitle.setText(listitems.get(0).SectionName);
-					Controls control= new Controls();
-					lm.removeAllViews();
-					View controls=control.CreateControls(this,listitems);
-					lm.addView(controls);
-					CreateListeners(listitems,false);
+					TextView txtError = (TextView) findViewById(question.QuestionID+90000);
+					txtError.setText("");
+					// TextView txtQuestion = (TextView) findViewById(question.QuestionID);
+					//txtQuestion.setBackgroundColor(Color.WHITE);
+					question.Answer=validate.Value;
+					questions.set(i, question);
 				}
-	    	}
-	       catch(Exception ex){
-	    	   Toast.makeText(getApplicationContext(), "E006: Q:" + String.valueOf(ErrorQuestion) + " " + ex.toString(),Toast.LENGTH_LONG).show();
+				i++;
+			}
 
-	       }
+			SurveyQuestions.set(j, questions);
+			if (EmptyControls==true)
+			{
+				Button btnNext = (Button) findViewById(R.id.btnNext);
+				btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
+				//btnNext.setBackgroundColor(Color.RED);
+
+				Button btnSections = (Button) findViewById(R.id.btnSections);
+				btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
+				//btnSections.setBackgroundColor(Color.RED);
+
+				return;
+			}
+			else
+			{
+				Button btnNext = (Button) findViewById(R.id.btnNext);
+				btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+				//btnNext.setBackgroundColor(Color.GRAY);
+
+				Button btnSections = (Button) findViewById(R.id.btnSections);
+				btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+				//btnSections.setBackgroundColor(Color.GRAY);
+			}
+			if (SurveyQuestions.size()>j+1)
+			{
+				j=j+1;
+				List<Questions> nextQuestions= SurveyQuestions.get(j);
+				TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+				txtTitle.setText(nextQuestions.get(0).SectionName);
+				Controls control= new Controls();
+				lm.removeAllViews();
+				View controls=control.CreateControls(this,nextQuestions);
+				lm.addView(controls);
+				CreateListeners(nextQuestions,true);
+				progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+				progressStatus=progressStatus+increase;
+				progressBar.setProgress(progressStatus);
+				TextView textView = (TextView) findViewById(R.id.txtPercent);
+				textView.setText(progressStatus+"%");
+
+				//Save questions
+				MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
+				for(Questions questionstosave: questions)
+				{
+					sqlite.updateQuestion(questionstosave);
+				}
+
+				sharedpreferences = getSharedPreferences(MyPREFERENCES,
+						Context.MODE_PRIVATE);
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("savequestions", nextQuestions.get(0).SurveyID);
+				editor.putInt("saveindex", j);
+				editor.putInt("Flag", 1);
+				editor.commit();
+
+			}
+			else
+			{
+				RelativeLayout relative = (RelativeLayout) findViewById(R.id.rlMain);
+				relative.setBackgroundResource(0);
+				MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
+				for(Questions questionstosave: questions)
+				{
+					sqlite.updateQuestion(questionstosave);
+				}
+				sharedpreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("savequestions", questions.get(0).SurveyID);
+				editor.putInt("saveindex", j);
+				editor.putInt("Flag", 1);
+				editor.commit();
+				Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma ",0,0);
+				List<Questions> listitems = new ArrayList<Questions>();
+				listitems.add(item);
+				j=j+1;
+				TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+				txtTitle.setText(listitems.get(0).SectionName);
+				Controls control= new Controls();
+				lm.removeAllViews();
+				View controls=control.CreateControls(this,listitems);
+				lm.addView(controls);
+
+				if(db.CheckUbicheckID()){
+					final int UbicheckID = db.GetUbicheckID();
+					final CheckBox cb = new CheckBox(getApplicationContext());
+					cb.setText("Finalizar sin marcar ubicheck");
+					cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+					cb.setTextColor(ContextCompat.getColor(this, R.color.white));
+					cb.setBackgroundResource(R.drawable.btn_form);
+					cb.setGravity(Gravity.CENTER);
+					cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
+					cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+						// checkbox status is changed from uncheck to checked.
+						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+							int btnDrawable = android.R.drawable.checkbox_off_background;
+
+							if (isChecked)
+							{
+								FinishUbicheck = "0";
+								db.AppendUbicheckID(UbicheckID);
+								btnDrawable = android.R.drawable.checkbox_on_background;
+							}else {
+								FinishUbicheck  = "1";
+								db.AppendUbicheckID(0);
+								db.AddUbicheckIDToSurveys(UbicheckID);
+							}
+
+							cb.setButtonDrawable(btnDrawable);
+
+						}
+					});
+					lm.addView(cb);
+				}
+				CreateListeners(listitems,false);
+			}
+		}
+		catch(Exception ex){
+			Toast.makeText(getApplicationContext(), "E006: Q:" + String.valueOf(ErrorQuestion) + " " + ex.toString(),Toast.LENGTH_LONG).show();
+
+		}
+	}
+
+	public void Nexto(){
+		int ErrorQuestion = 0;
+		try
+		{
+			lm = (LinearLayout) findViewById(R.id.activity_survey);
+			Validations validations= new Validations();
+			if(j>=SurveyQuestions.size())
+			{
+				return;
+			}
+			Boolean EmptyControls= false;
+			List<Questions> questions= SurveyQuestions.get(j);
+			int i=0;
+			for(Questions question: questions)
+			{
+
+				ErrorQuestion = question.QuestionID;
+				View control =(View) findViewById(question.QuestionID+idKey);
+				if(control != null && !control.isEnabled()){
+					Questions Q2 = db.getQuestion(question.QuestionID);
+					Q2.Blocked = 1;
+					db.updateQuestionBlocked(Q2);
+					question.Blocked = 1;
+				}
+				String other = null;
+				if(question.QuestionTypeID == 10){
+					int lastdigit = (question.QuestionID%1000)*1000;
+					int seekBarID = question.QuestionID + idKey + lastdigit + 2;
+					SeekBar currentSeekBar= (SeekBar)control.findViewById(seekBarID);
+					TextView currentTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
+					other = currentTitle.getText().toString();
+				}
+				if(question.QuestionTypeID == 4){
+					Questions Q2 = db.getQuestion(question.QuestionID);
+					if(!question.OtherOption.equals("") && (Q2.Answer.equals(question.OtherOption))){
+						int idLayout = (idLinearLayout + (question.OrderNumber + 1));
+						LinearLayout linearLayoutEdit = (LinearLayout)findViewById(idLayout);
+						int childcount = linearLayoutEdit.getChildCount();
+						for (int x=0; x < childcount; x++){
+							View v = linearLayoutEdit.getChildAt(x);
+							if (v instanceof EditText) {
+								EditText EditText = (EditText)v;
+								other = EditText.getText().toString();
+							}
+						}
+					}
+				}
+				Boolean isVisible = true;
+				View invisibleLayout = (View)findViewById(idLinearLayout + (question.OrderNumber + 1));
+				if(invisibleLayout != null && invisibleLayout.getVisibility() != View.VISIBLE){
+					isVisible = false;
+				}
+				Message validate= validations.ValidateControl(getApplicationContext(),control,question,isTablet(this),other,isVisible);
+				if (validate.ID ==2)
+				{
+					EmptyControls=true;
+					//TextView txtQuestion = (TextView) findViewById(question.QuestionID);
+					//txtQuestion.setBackgroundColor(Color.RED);
+
+					TextView txtError = (TextView) findViewById(question.QuestionID+90000);
+					txtError.setText(validate.Value);
+				}
+				else
+				{
+					TextView txtError = (TextView) findViewById(question.QuestionID+90000);
+					txtError.setText("");
+					// TextView txtQuestion = (TextView) findViewById(question.QuestionID);
+					//txtQuestion.setBackgroundColor(Color.WHITE);
+					question.Answer=validate.Value;
+					questions.set(i, question);
+				}
+				i++;
+			}
+
+			SurveyQuestions.set(j, questions);
+			if (EmptyControls==true)
+			{
+				Button btnNext = (Button) findViewById(R.id.btnNext);
+				btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
+				//btnNext.setBackgroundColor(Color.RED);
+
+				Button btnSections = (Button) findViewById(R.id.btnSections);
+				btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
+				//btnSections.setBackgroundColor(Color.RED);
+
+				return;
+			}
+			else
+			{
+				Button btnNext = (Button) findViewById(R.id.btnNext);
+				btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+				//btnNext.setBackgroundColor(Color.GRAY);
+
+				Button btnSections = (Button) findViewById(R.id.btnSections);
+				btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+				//btnSections.setBackgroundColor(Color.GRAY);
+			}
+			if (SurveyQuestions.size()>j+1)
+			{
+				j=j+1;
+				List<Questions> nextQuestions= SurveyQuestions.get(j);
+				TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+				txtTitle.setText(nextQuestions.get(0).SectionName);
+				Controls control= new Controls();
+				lm.removeAllViews();
+				View controls=control.CreateControls(this,nextQuestions);
+				lm.addView(controls);
+				CreateListeners(nextQuestions,true);
+				progressBar = (ProgressBar) findViewById(R.id.progressBar1);
+				progressStatus=progressStatus+increase;
+				progressBar.setProgress(progressStatus);
+				TextView textView = (TextView) findViewById(R.id.txtPercent);
+				textView.setText(progressStatus+"%");
+
+				//Save questions
+				MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
+				for(Questions questionstosave: questions)
+				{
+					sqlite.updateQuestion(questionstosave);
+				}
+
+				sharedpreferences = getSharedPreferences(MyPREFERENCES,
+						Context.MODE_PRIVATE);
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("savequestions", nextQuestions.get(0).SurveyID);
+				editor.putInt("saveindex", j);
+				editor.putInt("Flag", 1);
+				editor.commit();
+
+			}
+			else
+			{
+				RelativeLayout relative = (RelativeLayout) findViewById(R.id.rlMain);
+				relative.setBackgroundResource(0);
+				MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
+				for(Questions questionstosave: questions)
+				{
+					sqlite.updateQuestion(questionstosave);
+				}
+				sharedpreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("savequestions", questions.get(0).SurveyID);
+				editor.putInt("saveindex", j);
+				editor.putInt("Flag", 1);
+				editor.commit();
+				Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma ",0,0);
+				List<Questions> listitems = new ArrayList<Questions>();
+				listitems.add(item);
+				j=j+1;
+				TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+				txtTitle.setText(listitems.get(0).SectionName);
+				Controls control= new Controls();
+				lm.removeAllViews();
+				View controls=control.CreateControls(this,listitems);
+				lm.addView(controls);
+				if(db.CheckUbicheckID()){
+					final int UbicheckID = db.GetUbicheckID();
+					final CheckBox cb = new CheckBox(getApplicationContext());
+					cb.setText("Finalizar sin marcar ubicheck");
+					cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+					cb.setTextColor(ContextCompat.getColor(this, R.color.white));
+					cb.setBackgroundResource(R.drawable.btn_form);
+					cb.setGravity(Gravity.CENTER);
+					cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
+					cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+						// checkbox status is changed from uncheck to checked.
+						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+							int btnDrawable = android.R.drawable.checkbox_off_background;
+
+							if (isChecked)
+							{
+								FinishUbicheck = "0";
+								db.AppendUbicheckID(UbicheckID);
+								btnDrawable = android.R.drawable.checkbox_on_background;
+							}else {
+								FinishUbicheck  = "1";
+								db.AppendUbicheckID(0);
+							}
+
+							cb.setButtonDrawable(btnDrawable);
+
+						}
+					});
+					lm.addView(cb);
+				}
+				CreateListeners(listitems,false);
+			}
+		}
+		catch(Exception ex){
+			Toast.makeText(getApplicationContext(), "E006: Q:" + String.valueOf(ErrorQuestion) + " " + ex.toString(),Toast.LENGTH_LONG).show();
+
+		}
 	}
 
 	public void Next2(View view){
@@ -950,7 +1239,7 @@ public class SurveyActivity extends Activity {
 		            editor.putInt("saveindex", j);
 		            editor.putInt("Flag", 0);
 		            editor.commit();
-		            Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma",0,0);
+		            Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma ",0,0);
 					List<Questions> listitems = new ArrayList<Questions>();
 					listitems.add(item);
 					j=j+1;
@@ -960,6 +1249,38 @@ public class SurveyActivity extends Activity {
 					lm.removeAllViews();
 					View controls=control.CreateControls(this,listitems);
 					lm.addView(controls);
+					if(db.CheckUbicheckID()){
+						final int UbicheckID = db.GetUbicheckID();
+						final CheckBox cb = new CheckBox(getApplicationContext());
+						cb.setText("Finalizar sin marcar ubicheck");
+						cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+						cb.setTextColor(ContextCompat.getColor(this, R.color.white));
+						cb.setBackgroundResource(R.drawable.btn_form);
+						cb.setGravity(Gravity.CENTER);
+						cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
+						cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+							// checkbox status is changed from uncheck to checked.
+							public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+								int btnDrawable = android.R.drawable.checkbox_off_background;
+
+								if (isChecked)
+								{
+									FinishUbicheck = "0";
+									db.AppendUbicheckID(UbicheckID);
+									btnDrawable = android.R.drawable.checkbox_on_background;
+								}else {
+									FinishUbicheck  = "1";
+									db.AppendUbicheckID(0);
+								}
+
+								cb.setButtonDrawable(btnDrawable);
+
+							}
+						});
+						lm.addView(cb);
+					}
 					CreateListeners(listitems,false);
 				}
 	    	}
@@ -967,6 +1288,8 @@ public class SurveyActivity extends Activity {
 	    	   Toast.makeText(getApplicationContext(), "E007: Q:" + String.valueOf(ErrorQuestion) + " " + ex.toString(),Toast.LENGTH_LONG).show();
 	       }
 	}
+
+
 
 	//================================================================================
     // Helpers
@@ -1058,9 +1381,10 @@ public class SurveyActivity extends Activity {
    		   			item.put("DateFormFinish", row.DateFormFinish);
    		   			item.put("UbicheckID", row.Ubicheck);
    		   			item.put("DeviceID", DeviceID);
+					item.put("FinishUbicheck", FinishUbicheck);
 	    			jsArray.put(item);
 	    		}
-	    		resultado = ConnectionMethods.Post(SurveyActivity.this,jsArray.toString(), params[0],true);
+	    		resultado = ConnectionMethods.Post(SurveyActivity.this,jsArray.toString() , params[0],true);
 	    		if(resultado.equals("")){
 	    			return resultado;
 	    		} else{
@@ -1732,7 +2056,7 @@ public class SurveyActivity extends Activity {
 		 try{
 			 Devices Device = db.GetDevice();
 			 if(Device.UsesFormWithUbicheck == 1 && Device.UsesClientValidation == 1){
-				 db.deleteSelectedSurveys();
+			 	 db.deleteSelectedSurveys();
 				 Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
 	        	 startActivity(intent);
 			 }else{
@@ -2102,6 +2426,10 @@ public class SurveyActivity extends Activity {
 	    	}
 	    	oldListSentTo = new ArrayList<String>();
 	    	CheckFlowFromControl(controlid - idKey,0,0,true);
+	    	//Save();
+			//Nexto();
+			//Backto();
+			//Saves();
     	}
     	catch(Exception ex){
     		Toast.makeText(getApplicationContext(), "E010:" + ex.toString(),Toast.LENGTH_SHORT).show();
@@ -2755,6 +3083,7 @@ public class SurveyActivity extends Activity {
 				break;
 		}
 	}
+	@SuppressLint("MissingPermission")
 	private void startLocationUpdates(Context context) {
 		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 			fusedLocationProviderClient.requestLocationUpdates(InicializeLR(), InicializeLC(), null);
@@ -2798,6 +3127,7 @@ public class SurveyActivity extends Activity {
 		return locationCallback;
 	}
 
+	@SuppressLint("MissingPermission")
 	private void  GetLocation(FusedLocationProviderClient fusedLocationProviderClient, Context context){
 		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 			fusedLocationProviderClient.getLastLocation().addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
@@ -2813,6 +3143,162 @@ public class SurveyActivity extends Activity {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_FINE_LOCATION);
 			}
+		}
+	}
+
+	public void Save(){
+        List<Questions> questions= SurveyQuestions.get(j);
+        //Save questions
+        sharedpreferences=getSharedPreferences(MyPREFERENCES,
+                Context.MODE_PRIVATE);
+        Editor editor = sharedpreferences.edit();
+        editor.putInt("savequestions", questions.get(0).SurveyID);
+        editor.putInt("saveindex", j);
+        editor.putInt("Flag", 1);
+        editor.commit();
+        MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
+        for(Questions questionstosave: questions)
+        {
+            sqlite.updateQuestion(questionstosave);
+        }
+	}
+
+
+	public void Saves(){
+		int ErrorQuestion = 0;
+		try
+		{
+			lm = (LinearLayout) findViewById(R.id.activity_survey);
+			Validations validations= new Validations();
+			if(j>=SurveyQuestions.size())
+			{
+				return;
+			}
+			Boolean EmptyControls= false;
+			List<Questions> questions= SurveyQuestions.get(j);
+			int i=0;
+			for(Questions question: questions)
+			{
+
+				ErrorQuestion = question.QuestionID;
+				View control =(View) findViewById(question.QuestionID+idKey);
+				if(control != null && !control.isEnabled()){
+					Questions Q2 = db.getQuestion(question.QuestionID);
+					Q2.Blocked = 1;
+					db.updateQuestionBlocked(Q2);
+					question.Blocked = 1;
+				}
+				String other = null;
+				if(question.QuestionTypeID == 10){
+					int lastdigit = (question.QuestionID%1000)*1000;
+					int seekBarID = question.QuestionID + idKey + lastdigit + 2;
+					SeekBar currentSeekBar= (SeekBar)control.findViewById(seekBarID);
+					TextView currentTitle = (TextView)findViewById(currentSeekBar.getId() - (int)1);
+					other = currentTitle.getText().toString();
+				}
+				if(question.QuestionTypeID == 4){
+					Questions Q2 = db.getQuestion(question.QuestionID);
+					if(!question.OtherOption.equals("") && (Q2.Answer.equals(question.OtherOption))){
+						int idLayout = (idLinearLayout + (question.OrderNumber + 1));
+						LinearLayout linearLayoutEdit = (LinearLayout)findViewById(idLayout);
+						int childcount = linearLayoutEdit.getChildCount();
+						for (int x=0; x < childcount; x++){
+							View v = linearLayoutEdit.getChildAt(x);
+							if (v instanceof EditText) {
+								EditText EditText = (EditText)v;
+								other = EditText.getText().toString();
+							}
+						}
+					}
+				}
+				Boolean isVisible = true;
+				View invisibleLayout = (View)findViewById(idLinearLayout + (question.OrderNumber + 1));
+				if(invisibleLayout != null && invisibleLayout.getVisibility() != View.VISIBLE){
+					isVisible = false;
+				}
+				Message validate= validations.ValidateControl(getApplicationContext(),control,question,isTablet(this),other,isVisible);
+				if (validate.ID ==2)
+				{
+					EmptyControls=true;
+					//TextView txtQuestion = (TextView) findViewById(question.QuestionID);
+					//txtQuestion.setBackgroundColor(Color.RED);
+
+					TextView txtError = (TextView) findViewById(question.QuestionID+90000);
+					txtError.setText(validate.Value);
+				}
+				else
+				{
+					TextView txtError = (TextView) findViewById(question.QuestionID+90000);
+					txtError.setText("");
+					// TextView txtQuestion = (TextView) findViewById(question.QuestionID);
+					//txtQuestion.setBackgroundColor(Color.WHITE);
+					question.Answer=validate.Value;
+					questions.set(i, question);
+				}
+				i++;
+			}
+
+			SurveyQuestions.set(j, questions);
+			if (EmptyControls==true)
+			{
+				Button btnNext = (Button) findViewById(R.id.btnNext);
+				btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
+				//btnNext.setBackgroundColor(Color.RED);
+
+				Button btnSections = (Button) findViewById(R.id.btnSections);
+				btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.red_button));
+				//btnSections.setBackgroundColor(Color.RED);
+
+				return;
+			}
+			else
+			{
+				Button btnNext = (Button) findViewById(R.id.btnNext);
+				btnNext.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+				//btnNext.setBackgroundColor(Color.GRAY);
+
+				Button btnSections = (Button) findViewById(R.id.btnSections);
+				btnSections.setBackgroundDrawable(getResources().getDrawable(R.drawable.green_button));
+				//btnSections.setBackgroundColor(Color.GRAY);
+			}
+			if (SurveyQuestions.size()>j+1)
+			{
+				List<Questions> nextQuestions= SurveyQuestions.get(j);
+				TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+				//Save questions
+				MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
+				for(Questions questionstosave: questions)
+				{
+					sqlite.updateQuestion(questionstosave);
+				}
+
+				sharedpreferences = getSharedPreferences(MyPREFERENCES,
+						Context.MODE_PRIVATE);
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("savequestions", nextQuestions.get(0).SurveyID);
+				editor.putInt("saveindex", j);
+				editor.putInt("Flag", 1);
+				editor.commit();
+
+			}
+			else
+			{
+				MySQLiteHelper sqlite = new MySQLiteHelper(getApplicationContext());
+				for(Questions questionstosave: questions)
+				{
+					sqlite.updateQuestion(questionstosave);
+				}
+				sharedpreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("savequestions", questions.get(0).SurveyID);
+				editor.putInt("saveindex", j);
+				editor.putInt("Flag", 1);
+				editor.commit();
+			}
+		}
+		catch(Exception ex){
+			Toast.makeText(getApplicationContext(), "E006: Q:" + String.valueOf(ErrorQuestion) + " " + ex.toString(),Toast.LENGTH_LONG).show();
+
 		}
 	}
 }

@@ -29,7 +29,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     // Global Variables
     //================================================================================
 	
-    private static final int DATABASE_VERSION = 46;
+    private static final int DATABASE_VERSION = 47;
     private static final String DATABASE_NAME = "SurveysDB";
  
     public MySQLiteHelper(Context context) {
@@ -58,6 +58,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     		"ImageWareRegister INTEGER, " +
     		"BiometricID INTEGER, " +
     		"Account TEXT)";
+
+		String CREATE_ActualUbicheck= "CREATE TABLE ActualUbicheck ( " +
+				"UbicheckID INTEGER )";
     	
     	String CREATE_TRACKERS_TABLE = "CREATE TABLE trackers ( " +
 			"TrackerID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " + 
@@ -189,6 +192,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         	db.execSQL(CREATE_TRACKERS_TABLE);
             db.execSQL(CREATE_BIOMETRICS_TABLE);
             db.execSQL(CREATE_DataUsed_TABLE);
+            db.execSQL(CREATE_ActualUbicheck);
         }
         catch(Exception e)
         {
@@ -197,9 +201,19 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
  
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    	if(oldVersion < 46){
+			db.execSQL("CREATE TABLE IF NOT EXISTS ActualUbicheck ( " +
+					"UbicheckID INTEGER )");
+
+			db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
+					"LastMonth INTEGER, " +
+					"Data INTEGER)");
+		}
+
     	if(oldVersion == 45){
-			db.execSQL("CREATE TABLE DataUsed ( " +
-					"LastMonth INTEGER, "+
+			db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
+					"LastMonth INTEGER, " +
 					"Data INTEGER)");
 		}
     	if(oldVersion < 24){
@@ -459,8 +473,91 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 "LastMonth INTEGER, "+
                 "Data INTEGER)");
 	}
+	/*////////////////////) ANSWERS WITHOUT UBICHECK METHODS (///////////////////////////////*/
 
-    public int  GetDataUsage() {
+	public int GetUbicheckID(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		String query = "SELECT ubicheckID FROM selectedSurveys ";
+		Cursor cursor = db.rawQuery(query, null);
+		int UbicheckID = 0;
+		try {
+			if (cursor.moveToFirst()) {
+				if(cursor.getString(0)!=null)
+				{
+					UbicheckID =  Integer.parseInt(cursor.getString(0));
+				}
+			}
+			if(cursor != null){
+				cursor.close();
+			}
+
+			if(UbicheckID == 0){
+				UbicheckID = GetUbicheckIDFromActualUbicheck();
+			}
+			return UbicheckID;
+		}catch (Exception e){
+			return 0;
+		}
+	}
+
+	public boolean CheckUbicheckID(){
+		if(GetUbicheckID() != 0){
+			return true;
+		}else {
+			return false;
+		}
+	};
+
+	public int GetUbicheckIDFromActualUbicheck(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.execSQL("CREATE TABLE IF NOT EXISTS ActualUbicheck ( " +
+				"UbicheckID INTEGER )");
+		String query = "SELECT ubicheckID FROM ActualUbicheck ";
+		Cursor cursor = db.rawQuery(query, null);
+		int UbicheckID = 0;
+		try {
+			if (cursor.moveToFirst()) {
+				if(cursor.getString(0)!=null)
+				{
+					UbicheckID =  Integer.parseInt(cursor.getString(0));
+				}
+			}
+			if(cursor != null){
+				cursor.close();
+			}
+			return UbicheckID;
+		}catch (Exception e){
+			return 0;
+		}
+	}
+	public void AppendUbicheckID(int UbicheckID) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		if(GetUbicheckIDFromActualUbicheck() != 0){
+			String sql = "UPDATE ActualUbicheck" +
+					"SET UbicheckID = " + UbicheckID +
+					"WHERE UbicheckID";
+			db.execSQL(sql);
+		}else {
+			String sql = "insert into ActualUbicheck(UbicheckID) "
+					+ "values(?)";
+			Object[] args = new Object[]{UbicheckID};
+			db.execSQL(sql, args);
+		}
+	}
+
+	public void AddUbicheckIDToSurveys( int UbicheckID) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String sql = "UPDATE selectedSurveys" +
+				"SET UbicheckID = " + UbicheckID +
+				"WHERE UbicheckID";
+		db.execSQL(sql);
+		db.close();
+	}
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public int  GetDataUsage() {
         String query = "SELECT Data FROM DataUsed ";
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
@@ -1732,6 +1829,5 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM biometrics WHERE BiometricID=" + BiometricID);
         db.close();
     }
-    
 }
 

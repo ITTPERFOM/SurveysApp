@@ -151,13 +151,13 @@ public class Controls {
 			 control = CreateInformationImageControl(context,question,focusflag);
          break;
 		 case 13:
-			 control=CreateDateTimeControl(context,question,focusflag);
+			 control = CreateDateTimeControl(context,question,focusflag);
 			 break;
 		 case 14:
-			 control=CreateSignatureControl(context,question,focusflag);
+			 control = CreateSignatureControl(context,question,focusflag);
 			 break;
 		 case 15:
-			 control=CreateImageControl(context,question,focusflag);
+			 control = CreateImageControl(context,question,focusflag);
 			 break;
 		 case 16:  
 			 control = CreateBarcodeReaderControl(context,question,focusflag);

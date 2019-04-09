@@ -93,6 +93,7 @@ public class HomeActivity extends Activity {
 	private LocationRequest locationRequest;
 	private LocationCallback locationCallback;
 	private Location lc;
+	private Button CheckIn;
 	
 	
 	//================================================================================
@@ -108,6 +109,8 @@ public class HomeActivity extends Activity {
 		db.InitTableDataUsage();
 		setContentView(R.layout.activity_home);
 		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+		CheckIn = (Button)findViewById(R.id.btnCheckIn);
 
 		GetLocation(fusedLocationProviderClient,this);
 		try
@@ -360,6 +363,8 @@ public class HomeActivity extends Activity {
 
 	public void CheckIn(final View view){
         db.Data(140);
+		CheckIn.setText("Enviando Ubicacion");
+		CheckIn.setBackgroundColor(ContextCompat.getColor(this, R.color.Neutra));
 		if(lc == null){
 			final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
 			if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
@@ -377,6 +382,7 @@ public class HomeActivity extends Activity {
 						} else {
 							if (lc != null) {
 								Buttons(false);
+
 								String message = "Registrando Ubicacion";
 								Message msg = Message.obtain();
 								msg.obj = message;
@@ -439,11 +445,14 @@ public class HomeActivity extends Activity {
         	{
         		db.deleteTrackersByID(Tracker.TrackerID);
         		DialogMethods.showInformationDialog(HomeActivity.this, "Ubicacion enviada", "Ubicacion enviada exitosamente.", null);
-        		
+				CheckIn.setText("Enviar Posicion");
+				CheckIn.setBackgroundResource(R.drawable.btn_checkin);
         	}
         	else
         	{
         		DialogMethods.showErrorDialog(HomeActivity.this, "Ocurrio un error al momento de enviar ubicacion. Info: " + result, "Activity:Home | Method:AsynTrackerCreate | Result:" + result);
+				CheckIn.setText("Enviar Posicion");
+				CheckIn.setBackgroundResource(R.drawable.btn_checkin);
         	}
         	Buttons(true);
        }
