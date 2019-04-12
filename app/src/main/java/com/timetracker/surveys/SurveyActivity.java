@@ -148,6 +148,7 @@ public class SurveyActivity extends Activity {
     protected int idFooterLayout = 90000;
 
 	private String FinishUbicheck ="1";
+    private int UbicheckID = 0;
 
     protected List<String> oldListSentTo = new ArrayList<String>();
     private MySQLiteHelper db = new MySQLiteHelper(SurveyActivity.this);
@@ -867,7 +868,8 @@ public class SurveyActivity extends Activity {
 				lm.addView(controls);
 
 				if(db.CheckUbicheckID()){
-					final int UbicheckID = db.GetUbicheckID();
+					UbicheckID = db.GetUbicheckID();
+					db.AppendUbicheckID(UbicheckID);
 					final CheckBox cb = new CheckBox(getApplicationContext());
 					cb.setText("Finalizar sin marcar ubicheck");
 					cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
@@ -1060,36 +1062,37 @@ public class SurveyActivity extends Activity {
 				lm.removeAllViews();
 				View controls=control.CreateControls(this,listitems);
 				lm.addView(controls);
-				if(db.CheckUbicheckID()){
-					final int UbicheckID = db.GetUbicheckID();
-					final CheckBox cb = new CheckBox(getApplicationContext());
-					cb.setText("Finalizar sin marcar ubicheck");
-					cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
-					cb.setTextColor(ContextCompat.getColor(this, R.color.white));
-					cb.setBackgroundResource(R.drawable.btn_form);
-					cb.setGravity(Gravity.CENTER);
-					cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
-					cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                if(db.CheckUbicheckID()){
+                    UbicheckID = db.GetUbicheckID();
+                    db.AppendUbicheckID(UbicheckID);
+                    final CheckBox cb = new CheckBox(getApplicationContext());
+                    cb.setText("Finalizar sin marcar ubicheck");
+                    cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+                    cb.setTextColor(ContextCompat.getColor(this, R.color.white));
+                    cb.setBackgroundResource(R.drawable.btn_form);
+                    cb.setGravity(Gravity.CENTER);
+                    cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
+                    cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-						// checkbox status is changed from uncheck to checked.
-						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        // checkbox status is changed from uncheck to checked.
+                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-							int btnDrawable = android.R.drawable.checkbox_off_background;
+                            int btnDrawable = android.R.drawable.checkbox_off_background;
 
-							if (isChecked)
-							{
-								FinishUbicheck = "0";
-								btnDrawable = android.R.drawable.checkbox_on_background;
-							}else {
-								FinishUbicheck  = "1";
-							}
+                            if (isChecked)
+                            {
+                                FinishUbicheck = "0";
+                                btnDrawable = android.R.drawable.checkbox_on_background;
+                            }else {
+                                FinishUbicheck  = "1";
+                            }
 
-							cb.setButtonDrawable(btnDrawable);
+                            cb.setButtonDrawable(btnDrawable);
 
-						}
-					});
-					lm.addView(cb);
-				}
+                        }
+                    });
+                    lm.addView(cb);
+                }
 				CreateListeners(listitems,false);
 			}
 		}
@@ -1244,36 +1247,37 @@ public class SurveyActivity extends Activity {
 					lm.removeAllViews();
 					View controls=control.CreateControls(this,listitems);
 					lm.addView(controls);
-					if(db.CheckUbicheckID()){
-						final int UbicheckID = db.GetUbicheckID();
-						final CheckBox cb = new CheckBox(getApplicationContext());
-						cb.setText("Finalizar sin marcar ubicheck");
-						cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
-						cb.setTextColor(ContextCompat.getColor(this, R.color.white));
-						cb.setBackgroundResource(R.drawable.btn_form);
-						cb.setGravity(Gravity.CENTER);
-						cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
-						cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    if(db.CheckUbicheckID()){
+                       UbicheckID = db.GetUbicheckID();
+                        db.AppendUbicheckID(UbicheckID);
+                        final CheckBox cb = new CheckBox(getApplicationContext());
+                        cb.setText("Finalizar sin marcar ubicheck");
+                        cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+                        cb.setTextColor(ContextCompat.getColor(this, R.color.white));
+                        cb.setBackgroundResource(R.drawable.btn_form);
+                        cb.setGravity(Gravity.CENTER);
+                        cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
+                        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-							// checkbox status is changed from uncheck to checked.
-							public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                            // checkbox status is changed from uncheck to checked.
+                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-								int btnDrawable = android.R.drawable.checkbox_off_background;
+                                int btnDrawable = android.R.drawable.checkbox_off_background;
 
-								if (isChecked)
-								{
-									FinishUbicheck = "0";
-									btnDrawable = android.R.drawable.checkbox_on_background;
-								}else {
-									FinishUbicheck  = "1";
-								}
+                                if (isChecked)
+                                {
+                                    FinishUbicheck = "0";
+                                    btnDrawable = android.R.drawable.checkbox_on_background;
+                                }else {
+                                    FinishUbicheck  = "1";
+                                }
 
-								cb.setButtonDrawable(btnDrawable);
+                                cb.setButtonDrawable(btnDrawable);
 
-							}
-						});
-						lm.addView(cb);
-					}
+                            }
+                        });
+                        lm.addView(cb);
+                    }
 					CreateListeners(listitems,false);
 				}
 	    	}
@@ -1357,26 +1361,52 @@ public class SurveyActivity extends Activity {
      		   	}
         		List<Answers> Answers = db.getAnswersByIdentifier(Identifier);
         		JSONArray jsArray = new JSONArray();
-	    		for(Answers row: Answers)
-	    		{
-	    			JSONObject item = new JSONObject();
-	    			item.put("QuestionID", row.QuestionID);
-	    			row.Value = row.Value.replace('�', ' ');
-	    			String Valor = Normalizer.normalize(row.Value,Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+","");
-	    			Valor = Valor.replace("�", "");
-	    			item.put("Value", Valor);
-	    			item.put("QuestionTypeID", row.QuestionTypeID);
-	    			item.put("Latitude", row.Latitude);
-	    			item.put("Longitude", row.Longitude);
-	    			item.put("DeviceMac", row.DeviceMac);
-	    			item.put("Identifier", row.Identifier);
-	    			item.put("DateFormStart", row.DateFormStart);
-   		   			item.put("DateFormFinish", row.DateFormFinish);
-   		   			item.put("UbicheckID", row.Ubicheck);
-   		   			item.put("DeviceID", DeviceID);
-					item.put("FinishUbicheck", FinishUbicheck);
-	    			jsArray.put(item);
-	    		}
+        		if( UbicheckID != 0){
+                    for(Answers row: Answers)
+                    {
+                        JSONObject item = new JSONObject();
+                        item.put("QuestionID", row.QuestionID);
+                        row.Value = row.Value.replace('�', ' ');
+                        String Valor = Normalizer.normalize(row.Value,Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+","");
+                        Valor = Valor.replace("�", "");
+                        item.put("Value", Valor);
+                        item.put("QuestionTypeID", row.QuestionTypeID);
+                        item.put("Latitude", row.Latitude);
+                        item.put("Longitude", row.Longitude);
+                        item.put("DeviceMac", row.DeviceMac);
+                        item.put("Identifier", row.Identifier);
+                        item.put("DateFormStart", row.DateFormStart);
+                        item.put("DateFormFinish", row.DateFormFinish);
+                        item.put("UbicheckID", UbicheckID);
+                        item.put("DeviceID", DeviceID);
+                        item.put("FinishUbicheck", FinishUbicheck);
+                        jsArray.put(item);
+                    }
+                }else {
+                    for(Answers row: Answers)
+                    {
+                        JSONObject item = new JSONObject();
+                        item.put("QuestionID", row.QuestionID);
+                        row.Value = row.Value.replace('�', ' ');
+                        String Valor = Normalizer.normalize(row.Value,Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+","");
+                        Valor = Valor.replace("�", "");
+                        item.put("Value", Valor);
+                        item.put("QuestionTypeID", row.QuestionTypeID);
+                        item.put("Latitude", row.Latitude);
+                        item.put("Longitude", row.Longitude);
+                        item.put("DeviceMac", row.DeviceMac);
+                        item.put("Identifier", row.Identifier);
+                        item.put("DateFormStart", row.DateFormStart);
+                        item.put("DateFormFinish", row.DateFormFinish);
+                        item.put("UbicheckID", row.Ubicheck);
+                        item.put("DeviceID", DeviceID);
+                        item.put("FinishUbicheck", FinishUbicheck);
+                        jsArray.put(item);
+                    }
+                }
+				if(FinishUbicheck.equals("1")){
+					db.DeleteUbicheckIDFromActualUbicheck();
+				}
 	    		resultado = ConnectionMethods.Post(SurveyActivity.this,jsArray.toString() , params[0],true);
 	    		if(resultado.equals("")){
 	    			return resultado;

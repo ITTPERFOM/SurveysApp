@@ -843,6 +843,7 @@ public class UbicheckActivity extends Activity {
 		super.onResume();
 		startLocationUpdates(this);
 	}
+	@SuppressLint("MissingPermission")
 	private void startLocationUpdates(Context context) {
 		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 			fusedLocationProviderClient.requestLocationUpdates(InicializeLR(), InicializeLC(), null);
@@ -886,6 +887,7 @@ public class UbicheckActivity extends Activity {
 		return locationCallback;
 	}
 
+	@SuppressLint("MissingPermission")
 	private void  GetLocation(FusedLocationProviderClient fusedLocationProviderClient, Context context){
 		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 			fusedLocationProviderClient.getLastLocation().addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
@@ -941,7 +943,7 @@ public class UbicheckActivity extends Activity {
 
 	protected boolean isOnline() {
 		ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo netInfo = cm.getActiveNetworkInfo();
+		@SuppressLint("MissingPermission") NetworkInfo netInfo = cm.getActiveNetworkInfo();
 		if (netInfo != null && netInfo.isConnectedOrConnecting()) {
 			return true;
 		} else {

@@ -2,7 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.timetracker.surveys.UbicheckActivity" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.timetracker.surveys.UbicheckActivity">
 
     <RelativeLayout
       android:id="@+id/header"
@@ -54,8 +55,32 @@
 		         	android:onClick="Refresh"
 		         	android:text="@string/option_refresh"
 		         	android:textSize="18sp" />
-	 		    
-    		</LinearLayout>
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/searchAni"
+                    android:layout_width="280dp"
+                    android:layout_height="144dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.34"
+                    app:lottie_autoPlay="true"
+                    app:lottie_fileName="wait.json"
+                    app:lottie_imageAssetsFolder="assets"
+                    app:lottie_loop="true" />
+
+                <TextView
+                    android:id="@+id/Sucursal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/BusquedaSucursal"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
+                    android:gravity="center"/>
+
+            </LinearLayout>
 		    
 		    <LinearLayout
     			android:id="@+id/AddNewBranch"

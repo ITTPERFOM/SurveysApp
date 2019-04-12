@@ -32,12 +32,16 @@ public class SelectSurvey extends Activity {
 	        if (extras != null) {
 	            if (extras.containsKey("UbicheckID")) {
 	            	UbicheckID = extras.getInt("UbicheckID", 0);
-	            	db.AppendUbicheckID(UbicheckID);
+	            	//db.AppendUbicheckID(UbicheckID);
 	            }
 	            if (extras.containsKey("DistributionChannel")) {
 	            	DistributionChannel = extras.getString("DistributionChannel", "");
 	            }
-	        }
+	        }else {
+	        	if(db.GetFormSettings()){
+	        		UbicheckID = db.GetUbicheckID();
+				}
+			}
 	        List<Surveys> list = db.getAllsurveys(DistributionChannel);
 	        lyButtons = (LinearLayout) findViewById(R.id.Buttons);
       	  	if(list == null || list.size() == 0){

@@ -444,11 +444,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     // Data Used Methods
     //================================================================================
     public int  LastMonth() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
+				"LastMonth INTEGER, "+
+				"Data INTEGER)");
         String query = "SELECT LastMonth FROM DataUsed ";
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
-                "LastMonth INTEGER, "+
-                "Data INTEGER)");
         Cursor cursor = db.rawQuery(query, null);
         int lastMonth = 0;
         try {
@@ -474,6 +474,32 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 "Data INTEGER)");
 	}
 	/*////////////////////) ANSWERS WITHOUT UBICHECK METHODS (///////////////////////////////*/
+
+	public boolean GetFormSettings() {
+		boolean Settings = false;
+		String query = "SELECT UsesFormWithUbicheck FROM Devices ";
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(query, null);
+		int UsesFormWithUbicheck = 0;
+		try {
+			if (cursor.moveToFirst()) {
+				if(cursor.getString(0)!=null)
+				{
+					UsesFormWithUbicheck =  Integer.parseInt(cursor.getString(0));
+				}
+			}
+			if(cursor != null){
+				cursor.close();
+			}
+		}catch (Exception e){
+
+		}
+
+		if(UsesFormWithUbicheck != 0){
+			Settings = true;
+		}
+		return Settings;
+	}
 
 	public int GetUbicheckID(){
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -532,17 +558,17 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	}
 	public void AppendUbicheckID(int UbicheckID) {
 		SQLiteDatabase db = this.getWritableDatabase();
-		if(GetUbicheckIDFromActualUbicheck() != 0){
-			String sql = "UPDATE ActualUbicheck" +
-					"SET UbicheckID = " + UbicheckID +
-					"WHERE UbicheckID";
-			db.execSQL(sql);
-		}else {
+		String query = "DELETE FROM ActualUbicheck";
+		db.execSQL(query);
 			String sql = "insert into ActualUbicheck(UbicheckID) "
 					+ "values(?)";
 			Object[] args = new Object[]{UbicheckID};
 			db.execSQL(sql, args);
-		}
+	}
+	public void DeleteUbicheckIDFromActualUbicheck(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		String query = "DELETE FROM ActualUbicheck";
+		db.execSQL(query);
 	}
 
 	public void AddUbicheckIDToSurveys( int UbicheckID) {
@@ -558,11 +584,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public int  GetDataUsage() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
+				"LastMonth INTEGER, "+
+				"Data INTEGER)");
         String query = "SELECT Data FROM DataUsed ";
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
-                "LastMonth INTEGER, "+
-                "Data INTEGER)");
         Cursor cursor = db.rawQuery(query, null);
         int data = 0;
         try {
@@ -590,10 +616,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
     public void  Data(int data) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
+				"LastMonth INTEGER, "+
+				"Data INTEGER)");
         int trueData = GetDataUsage() + data;
         String query = "UPDATE DataUsed " +
                 "SET Data = " + Integer.toString(trueData);
-        SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(query);
     }
     public void insertCurrentDate(Date date){
@@ -1829,5 +1858,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM biometrics WHERE BiometricID=" + BiometricID);
         db.close();
     }
+
+
 }
 
