@@ -867,37 +867,6 @@ public class SurveyActivity extends Activity {
 				View controls=control.CreateControls(this,listitems);
 				lm.addView(controls);
 
-				if(db.CheckUbicheckID()){
-					UbicheckID = db.GetUbicheckID();
-					db.AppendUbicheckID(UbicheckID);
-					final CheckBox cb = new CheckBox(getApplicationContext());
-					cb.setText("Finalizar sin marcar ubicheck");
-					cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
-					cb.setTextColor(ContextCompat.getColor(this, R.color.white));
-					cb.setBackgroundResource(R.drawable.btn_form);
-					cb.setGravity(Gravity.CENTER);
-					cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
-					cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-						// checkbox status is changed from uncheck to checked.
-						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-							int btnDrawable = android.R.drawable.checkbox_off_background;
-
-							if (isChecked)
-							{
-								FinishUbicheck = "0";
-								btnDrawable = android.R.drawable.checkbox_on_background;
-							}else {
-								FinishUbicheck  = "1";
-							}
-
-							cb.setButtonDrawable(btnDrawable);
-
-						}
-					});
-					lm.addView(cb);
-				}
 				CreateListeners(listitems,false);
 			}
 		}
@@ -1062,37 +1031,6 @@ public class SurveyActivity extends Activity {
 				lm.removeAllViews();
 				View controls=control.CreateControls(this,listitems);
 				lm.addView(controls);
-                if(db.CheckUbicheckID()){
-                    UbicheckID = db.GetUbicheckID();
-                    db.AppendUbicheckID(UbicheckID);
-                    final CheckBox cb = new CheckBox(getApplicationContext());
-                    cb.setText("Finalizar sin marcar ubicheck");
-                    cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
-                    cb.setTextColor(ContextCompat.getColor(this, R.color.white));
-                    cb.setBackgroundResource(R.drawable.btn_form);
-                    cb.setGravity(Gravity.CENTER);
-                    cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
-                    cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-                        // checkbox status is changed from uncheck to checked.
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                            int btnDrawable = android.R.drawable.checkbox_off_background;
-
-                            if (isChecked)
-                            {
-                                FinishUbicheck = "0";
-                                btnDrawable = android.R.drawable.checkbox_on_background;
-                            }else {
-                                FinishUbicheck  = "1";
-                            }
-
-                            cb.setButtonDrawable(btnDrawable);
-
-                        }
-                    });
-                    lm.addView(cb);
-                }
 				CreateListeners(listitems,false);
 			}
 		}
@@ -1247,37 +1185,7 @@ public class SurveyActivity extends Activity {
 					lm.removeAllViews();
 					View controls=control.CreateControls(this,listitems);
 					lm.addView(controls);
-                    if(db.CheckUbicheckID()){
-                       UbicheckID = db.GetUbicheckID();
-                        db.AppendUbicheckID(UbicheckID);
-                        final CheckBox cb = new CheckBox(getApplicationContext());
-                        cb.setText("Finalizar sin marcar ubicheck");
-                        cb.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
-                        cb.setTextColor(ContextCompat.getColor(this, R.color.white));
-                        cb.setBackgroundResource(R.drawable.btn_form);
-                        cb.setGravity(Gravity.CENTER);
-                        cb.setButtonDrawable(android.R.drawable.checkbox_off_background);
-                        cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-                            // checkbox status is changed from uncheck to checked.
-                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                                int btnDrawable = android.R.drawable.checkbox_off_background;
-
-                                if (isChecked)
-                                {
-                                    FinishUbicheck = "0";
-                                    btnDrawable = android.R.drawable.checkbox_on_background;
-                                }else {
-                                    FinishUbicheck  = "1";
-                                }
-
-                                cb.setButtonDrawable(btnDrawable);
-
-                            }
-                        });
-                        lm.addView(cb);
-                    }
 					CreateListeners(listitems,false);
 				}
 	    	}
@@ -1981,92 +1889,297 @@ public class SurveyActivity extends Activity {
 	 public class ButtonSendSurvey implements View.OnClickListener
 	    {
 			public void onClick(final View view ){
-				progress.setMessage("Guardando respuestas, por favor espere...");
-				progress.show();
-	    		try
-	    		{
-					Handler handler = new Handler();
-					handler.postDelayed(new Runnable() {
-						public void run() {
-							view.setEnabled(false);
-							view.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_button));
-							List<Answers> listAnswers = new ArrayList<Answers>();
+
+				if(db.CheckUbicheckID()){
+					UbicheckID = db.GetUbicheckID();
+					db.AppendUbicheckID(UbicheckID);
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(SurveyActivity.this);
+					builder.setMessage("Desea registrar salida al terminar forma ?")
+							.setCancelable(false)
+							.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+
+									FinishUbicheck = "1";
+
+									progress.setMessage("Guardando respuestas, por favor espere...");
+									progress.show();
+
+									try
+									{
+										Handler handler = new Handler();
+										handler.postDelayed(new Runnable() {
+											public void run() {
+												view.setEnabled(false);
+												view.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_button));
+												List<Answers> listAnswers = new ArrayList<Answers>();
 
 
-							if(lc != null)
-							{
-								latitude = lc.getLatitude();
-								longitude = lc.getLongitude();
-							}
-							else
-							{
-								Toast.makeText(getApplicationContext(), "GPS deshabilitado", Toast.LENGTH_LONG).show();
-							}
-							Devices Device = db.GetDevice();
-							String DeviceMac = Device.Name;
-							if(DeviceMac == null){
-								DeviceMac = "";
-							}
-							Calendar c = Calendar.getInstance();
-							int year = c.get(Calendar.YEAR);
-							int month = c.get(Calendar.MONTH);
-							int day = c.get(Calendar.DAY_OF_MONTH);
-							int hour = c.get(Calendar.HOUR_OF_DAY);
-							int seconds = c.get(Calendar.SECOND);
-							int milliseccons = c.get(Calendar.MILLISECOND);
-							String randomID = UUID.randomUUID().toString();
-							int SurveyID = 0;
-							String Identifier = "";
-							SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
-							SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
-							String DateFormFinish = ft.format(new Date());
-							for(List<Questions> listrow: SurveyQuestions)
-							{
-								for(Questions row: listrow)
+												if(lc != null)
+												{
+													latitude = lc.getLatitude();
+													longitude = lc.getLongitude();
+												}
+												else
+												{
+													Toast.makeText(getApplicationContext(), "GPS deshabilitado", Toast.LENGTH_LONG).show();
+												}
+												Devices Device = db.GetDevice();
+												String DeviceMac = Device.Name;
+												if(DeviceMac == null){
+													DeviceMac = "";
+												}
+												Calendar c = Calendar.getInstance();
+												int year = c.get(Calendar.YEAR);
+												int month = c.get(Calendar.MONTH);
+												int day = c.get(Calendar.DAY_OF_MONTH);
+												int hour = c.get(Calendar.HOUR_OF_DAY);
+												int seconds = c.get(Calendar.SECOND);
+												int milliseccons = c.get(Calendar.MILLISECOND);
+												String randomID = UUID.randomUUID().toString();
+												int SurveyID = 0;
+												String Identifier = "";
+												SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
+												SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
+												String DateFormFinish = ft.format(new Date());
+												for(List<Questions> listrow: SurveyQuestions)
+												{
+													for(Questions row: listrow)
+													{
+														if(row.Answer == null){
+															row.Answer = "_.";
+														}
+														SurveyID = row.SurveyID;
+														if((row.QuestionTypeID == 15 ||  row.QuestionTypeID == 20) && row.Answer.equals("1")){
+															row.Answer = db.getPhoto(row.QuestionID);
+														}
+														Identifier = randomID + String.valueOf(year) + String.valueOf(month) + String.valueOf(day) + String.valueOf(hour) + String.valueOf(seconds) + String.valueOf(milliseccons);
+														Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID);
+														listAnswers.add(item);
+													}
+												}
+												sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+												Editor editor = sharedpreferences.edit();
+												editor.remove("savequestions");
+												editor.remove("saveindex");
+												editor.commit();
+												db.updateQuestionAnswers(SurveyID);
+												db.deletePhotos();
+												for(Answers row: listAnswers)
+												{
+													db.addAnswers(row);
+												}
+												SelectedSurvey.UbicheckID = 0;
+												SelectedSurvey.DateFormStart = "";
+												db.UpdateSelectedSurvey(SelectedSurvey);
+												if (ConnectionMethods.isInternetConnected(SurveyActivity.this,false).equals(""))
+												{
+													HttpAsyncTask httpAsyncTask = new HttpAsyncTask(SurveyID,Identifier,Device.DeviceID);
+													httpAsyncTask.execute("/Answers");
+												}
+												else
+												{
+													progress.dismiss();
+													TakeSurveyAgain(SurveyID,true);
+												}
+											}
+										}, 1000);
+									}
+									catch (Exception e)
+									{
+										progress.dismiss();
+										Toast.makeText(getBaseContext(), "E008:" + e.toString(), Toast.LENGTH_LONG).show();
+									}
+									dialog.cancel();
+								}
+							})
+							.setNegativeButton("No", new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+
+									FinishUbicheck = "0";
+
+									progress.setMessage("Guardando respuestas, por favor espere...");
+									progress.show();
+
+									try
+									{
+										Handler handler = new Handler();
+										handler.postDelayed(new Runnable() {
+											public void run() {
+												view.setEnabled(false);
+												view.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_button));
+												List<Answers> listAnswers = new ArrayList<Answers>();
+
+
+												if(lc != null)
+												{
+													latitude = lc.getLatitude();
+													longitude = lc.getLongitude();
+												}
+												else
+												{
+													Toast.makeText(getApplicationContext(), "GPS deshabilitado", Toast.LENGTH_LONG).show();
+												}
+												Devices Device = db.GetDevice();
+												String DeviceMac = Device.Name;
+												if(DeviceMac == null){
+													DeviceMac = "";
+												}
+												Calendar c = Calendar.getInstance();
+												int year = c.get(Calendar.YEAR);
+												int month = c.get(Calendar.MONTH);
+												int day = c.get(Calendar.DAY_OF_MONTH);
+												int hour = c.get(Calendar.HOUR_OF_DAY);
+												int seconds = c.get(Calendar.SECOND);
+												int milliseccons = c.get(Calendar.MILLISECOND);
+												String randomID = UUID.randomUUID().toString();
+												int SurveyID = 0;
+												String Identifier = "";
+												SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
+												SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
+												String DateFormFinish = ft.format(new Date());
+												for(List<Questions> listrow: SurveyQuestions)
+												{
+													for(Questions row: listrow)
+													{
+														if(row.Answer == null){
+															row.Answer = "_.";
+														}
+														SurveyID = row.SurveyID;
+														if((row.QuestionTypeID == 15 ||  row.QuestionTypeID == 20) && row.Answer.equals("1")){
+															row.Answer = db.getPhoto(row.QuestionID);
+														}
+														Identifier = randomID + String.valueOf(year) + String.valueOf(month) + String.valueOf(day) + String.valueOf(hour) + String.valueOf(seconds) + String.valueOf(milliseccons);
+														Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID);
+														listAnswers.add(item);
+													}
+												}
+												sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+												Editor editor = sharedpreferences.edit();
+												editor.remove("savequestions");
+												editor.remove("saveindex");
+												editor.commit();
+												db.updateQuestionAnswers(SurveyID);
+												db.deletePhotos();
+												for(Answers row: listAnswers)
+												{
+													db.addAnswers(row);
+												}
+												SelectedSurvey.UbicheckID = 0;
+												SelectedSurvey.DateFormStart = "";
+												db.UpdateSelectedSurvey(SelectedSurvey);
+												if (ConnectionMethods.isInternetConnected(SurveyActivity.this,false).equals(""))
+												{
+													HttpAsyncTask httpAsyncTask = new HttpAsyncTask(SurveyID,Identifier,Device.DeviceID);
+													httpAsyncTask.execute("/Answers");
+												}
+												else
+												{
+													progress.dismiss();
+													TakeSurveyAgain(SurveyID,true);
+												}
+											}
+										}, 1000);
+									}
+									catch (Exception e)
+									{
+										progress.dismiss();
+										Toast.makeText(getBaseContext(), "E008:" + e.toString(), Toast.LENGTH_LONG).show();
+									}
+
+									dialog.cancel();
+								}
+							});
+					AlertDialog alert = builder.create();
+					alert.show();
+				}else {
+					progress.setMessage("Guardando respuestas, por favor espere...");
+					progress.show();
+					try
+					{
+						Handler handler = new Handler();
+						handler.postDelayed(new Runnable() {
+							public void run() {
+								view.setEnabled(false);
+								view.setBackgroundDrawable(getResources().getDrawable(R.drawable.gray_button));
+								List<Answers> listAnswers = new ArrayList<Answers>();
+
+
+								if(lc != null)
 								{
-									if(row.Answer == null){
-										row.Answer = "_.";
+									latitude = lc.getLatitude();
+									longitude = lc.getLongitude();
+								}
+								else
+								{
+									Toast.makeText(getApplicationContext(), "GPS deshabilitado", Toast.LENGTH_LONG).show();
+								}
+								Devices Device = db.GetDevice();
+								String DeviceMac = Device.Name;
+								if(DeviceMac == null){
+									DeviceMac = "";
+								}
+								Calendar c = Calendar.getInstance();
+								int year = c.get(Calendar.YEAR);
+								int month = c.get(Calendar.MONTH);
+								int day = c.get(Calendar.DAY_OF_MONTH);
+								int hour = c.get(Calendar.HOUR_OF_DAY);
+								int seconds = c.get(Calendar.SECOND);
+								int milliseccons = c.get(Calendar.MILLISECOND);
+								String randomID = UUID.randomUUID().toString();
+								int SurveyID = 0;
+								String Identifier = "";
+								SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
+								SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss", Locale.US);
+								String DateFormFinish = ft.format(new Date());
+								for(List<Questions> listrow: SurveyQuestions)
+								{
+									for(Questions row: listrow)
+									{
+										if(row.Answer == null){
+											row.Answer = "_.";
+										}
+										SurveyID = row.SurveyID;
+										if((row.QuestionTypeID == 15 ||  row.QuestionTypeID == 20) && row.Answer.equals("1")){
+											row.Answer = db.getPhoto(row.QuestionID);
+										}
+										Identifier = randomID + String.valueOf(year) + String.valueOf(month) + String.valueOf(day) + String.valueOf(hour) + String.valueOf(seconds) + String.valueOf(milliseccons);
+										Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID);
+										listAnswers.add(item);
 									}
-									SurveyID = row.SurveyID;
-									if((row.QuestionTypeID == 15 ||  row.QuestionTypeID == 20) && row.Answer.equals("1")){
-										row.Answer = db.getPhoto(row.QuestionID);
-									}
-									Identifier = randomID + String.valueOf(year) + String.valueOf(month) + String.valueOf(day) + String.valueOf(hour) + String.valueOf(seconds) + String.valueOf(milliseccons);
-									Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID);
-									listAnswers.add(item);
+								}
+								sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+								Editor editor = sharedpreferences.edit();
+								editor.remove("savequestions");
+								editor.remove("saveindex");
+								editor.commit();
+								db.updateQuestionAnswers(SurveyID);
+								db.deletePhotos();
+								for(Answers row: listAnswers)
+								{
+									db.addAnswers(row);
+								}
+								SelectedSurvey.UbicheckID = 0;
+								SelectedSurvey.DateFormStart = "";
+								db.UpdateSelectedSurvey(SelectedSurvey);
+								if (ConnectionMethods.isInternetConnected(SurveyActivity.this,false).equals(""))
+								{
+									HttpAsyncTask httpAsyncTask = new HttpAsyncTask(SurveyID,Identifier,Device.DeviceID);
+									httpAsyncTask.execute("/Answers");
+								}
+								else
+								{
+									progress.dismiss();
+									TakeSurveyAgain(SurveyID,true);
 								}
 							}
-							sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-							Editor editor = sharedpreferences.edit();
-							editor.remove("savequestions");
-							editor.remove("saveindex");
-							editor.commit();
-							db.updateQuestionAnswers(SurveyID);
-							db.deletePhotos();
-							for(Answers row: listAnswers)
-							{
-								db.addAnswers(row);
-							}
-							SelectedSurvey.UbicheckID = 0;
-							SelectedSurvey.DateFormStart = "";
-							db.UpdateSelectedSurvey(SelectedSurvey);
-							if (ConnectionMethods.isInternetConnected(SurveyActivity.this,false).equals(""))
-							{
-								HttpAsyncTask httpAsyncTask = new HttpAsyncTask(SurveyID,Identifier,Device.DeviceID);
-								httpAsyncTask.execute("/Answers");
-							}
-							else
-							{
-								progress.dismiss();
-								TakeSurveyAgain(SurveyID,true);
-							}
-						}
-					}, 1000);
-		        }
-	    		catch (Exception e)
-		        {
-	    			progress.dismiss();
-		        	Toast.makeText(getBaseContext(), "E008:" + e.toString(), Toast.LENGTH_LONG).show();
+						}, 1000);
+					}
+					catch (Exception e)
+					{
+						progress.dismiss();
+						Toast.makeText(getBaseContext(), "E008:" + e.toString(), Toast.LENGTH_LONG).show();
+					}
 				}
 			}
 	    }
