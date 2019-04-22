@@ -298,7 +298,7 @@ public class UbicheckActivity extends Activity {
 		UbicheckRequest UbicheckRequest = new UbicheckRequest(1,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(), CheckInBranchID,BiometricID,GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,true);
 		AsyncUbicheck.execute("/Ubicheck");
-		db.Data(140);
+		//db.Data(140);
 	}
 	
 	public void DoUbicheckCheckOut(){
@@ -307,7 +307,7 @@ public class UbicheckActivity extends Activity {
 		UbicheckRequest UbicheckRequest = new UbicheckRequest(2,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),0,BiometricID,GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,false);
 		AsyncUbicheck.execute("/Ubicheck");
-		db.Data(140);
+		//db.Data(140);
 	}
 	
 	public void DoActivityCheckIn(){
@@ -318,7 +318,7 @@ public class UbicheckActivity extends Activity {
 		UbicheckDetailsRequest UbicheckDetailsRequest = new UbicheckDetailsRequest(0,ElementID,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),BiometricID);
 		AsyncUbicheckDetails AsyncUbicheckDetails = new AsyncUbicheckDetails(UbicheckDetailsRequest);
 		AsyncUbicheckDetails.execute("/UbicheckDetails");
-		db.Data(140);
+		//db.Data(140);
 	}
 	
 	public void DoActivityCheckOut(){
@@ -328,7 +328,7 @@ public class UbicheckActivity extends Activity {
 		UbicheckDetailsRequest UbicheckDetailsRequest = new UbicheckDetailsRequest(UbicheckDetailID,0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),BiometricID);
 		AsyncUbicheckDetails AsyncUbicheckDetails = new AsyncUbicheckDetails(UbicheckDetailsRequest);
 		AsyncUbicheckDetails.execute("/UbicheckDetails");
-		db.Data(140);
+		//db.Data(140);
 	}
 	
 	//================================================================================

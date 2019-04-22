@@ -612,7 +612,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         String query = "DELETE FROM DataUsed ";
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(query);
-        db.close();
     }
 
     public void  Data(int data) {
@@ -621,8 +620,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 				"LastMonth INTEGER, "+
 				"Data INTEGER)");
         int trueData = GetDataUsage() + data;
-        String query = "UPDATE DataUsed " +
-                "SET Data = " + Integer.toString(trueData);
+        EraseDatausageTable();
+		String query = "insert into DataUsed(Data,LastMonth) "
+				+ "values(?,?)";
+		int currentdate = Integer.parseInt(new SimpleDateFormat("MM").format(new Date()));
+		Object[] args = new Object[]{trueData,currentdate};
         db.execSQL(query);
     }
     public void insertCurrentDate(Date date){

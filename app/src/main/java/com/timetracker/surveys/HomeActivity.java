@@ -362,7 +362,7 @@ public class HomeActivity extends Activity {
     //================================================================================
 
 	public void CheckIn(final View view){
-        db.Data(140);
+        //db.Data(140);
 		CheckIn.setText("Enviando Ubicacion");
 		CheckIn.setBackgroundColor(ContextCompat.getColor(this, R.color.Neutra));
 		if(lc == null){
@@ -646,7 +646,7 @@ public class HomeActivity extends Activity {
             	}
 			} 
             catch (Exception ex) {
-            	DialogMethods.showErrorDialog(HomeActivity.this, "Ocurrio un error al momento de checar dispositivo. Info: " + ex.toString(), "Activity:Home | Method:AsyncCheckDevice | Error:" + ex.toString());
+            //	DialogMethods.showErrorDialog(HomeActivity.this, "Ocurrio un error al momento de checar dispositivo. Info: " + ex.toString(), "Activity:Home | Method:AsyncCheckDevice | Error:" + ex.toString());
 			} 
        }
    }
@@ -1128,6 +1128,7 @@ public class HomeActivity extends Activity {
 		return locationCallback;
 	}
 
+	@SuppressLint("MissingPermission")
 	private void  GetLocation(FusedLocationProviderClient fusedLocationProviderClient, Context context){
 		if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 			fusedLocationProviderClient.getLastLocation().addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
@@ -1182,7 +1183,7 @@ public class HomeActivity extends Activity {
 
     protected boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        @SuppressLint("MissingPermission") NetworkInfo netInfo = cm.getActiveNetworkInfo();
         if (netInfo != null && netInfo.isConnectedOrConnecting()) {
             return true;
         } else {
