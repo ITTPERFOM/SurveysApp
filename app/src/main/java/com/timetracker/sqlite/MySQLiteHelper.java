@@ -527,6 +527,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	}
 
 	public boolean CheckUbicheckID(){
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.execSQL("CREATE TABLE IF NOT EXISTS ActualUbicheck ( " +
+				"UbicheckID INTEGER )");
 		if(GetUbicheckID() != 0){
 			return true;
 		}else {
