@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -88,6 +89,7 @@ public class UbicheckActivity extends Activity {
 	private int OpenUbicheckDetailID;
 	private MySQLiteHelper db = new MySQLiteHelper(UbicheckActivity.this);
 	private int UbicheckOption = 0;
+	String[] Img = null;
 	private int CheckInBranchID = 0;
 	private boolean UsesBiometric = false;
 	private int BiometricID = 0;
@@ -106,6 +108,7 @@ public class UbicheckActivity extends Activity {
 	private LocationCallback locationCallback;
 	private Location lc;
     private Button btnRefresh;
+	private int idempotence = 0;
 	//	//================================================================================
     // Activity Events
     //================================================================================
@@ -653,18 +656,41 @@ public class UbicheckActivity extends Activity {
 		}
 		@Override
 		protected void onPostExecute(String result) {
-			try
-			{
-				if(result.startsWith("\"http://timetrackerstorage.blob.core.windows.net/")){
-					new AsyncComparePictures().execute(result.replace("\"", ""));
-				}else{
-					hideSpinner();
-					Toast.makeText(getBaseContext(), "No se encontro imagen de Biometrico " + BiometricID + " Mensaje:" + result, Toast.LENGTH_LONG).show();
+ 			if(result != "null"){
+				try {
+					JSONArray jsonArray = new JSONArray(result);
+					Img = new String[jsonArray.length()];
+					for (int i = 0; i < jsonArray.length(); i++) {
+						Img[i] = jsonArray.getString(i);
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
-			}
-			catch (Exception ex) {
+				try
+				{
+					if ( Img.length> 0) {
+						for (int i = 0; i < Img.length; i++) {
+//							if(result.startsWith("\"http://timetrackerstorage.blob.core.windows.net/")){
+									new AsyncComparePictures().execute(Img[i]);
+//							}
+						}
+						hideSpinner();
+					}else {
+						hideSpinner();
+						Toast.makeText(getBaseContext(), "No se encontro imagen de Biometrico " + BiometricID + " Mensaje:" + result, Toast.LENGTH_LONG).show();
+					}
+
+
+				}
+				catch (Exception ex) {
+					hideSpinner();
+					DialogMethods.showErrorDialog(UbicheckActivity.this, "Ocurrio un error al momento de traer imagen. Info: " + ex.toString(), "Activity:Ubicheck | Method:AsyncGetPicture | Error:" + ex.toString());
+				}
+			}else{
 				hideSpinner();
-				DialogMethods.showErrorDialog(UbicheckActivity.this, "Ocurrio un error al momento de traer imagen. Info: " + ex.toString(), "Activity:Ubicheck | Method:AsyncGetPicture | Error:" + ex.toString());
+				Toast.makeText(getBaseContext(), "          Ubicheck no registrado usted no cuenta con fotografia biometrica", Toast.LENGTH_LONG).show();
+				Intent HomeIntent = new Intent(UbicheckActivity.this, HomeActivity.class);
+				startActivity(HomeIntent);
 			}
 		}
 	}
@@ -735,20 +761,7 @@ public class UbicheckActivity extends Activity {
 						hideSpinner();
 						float simil = Similarity[0];
 						if(Similarity[0] > MatchingThreshold[0]){
-							switch(UbicheckOption){
-								case 1:
-									DoUbicheckCheckIn();
-									break;
-								case 2:
-									DoUbicheckCheckOut();
-									break;
-								case 3:
-									DoActivityCheckIn();
-									break;
-								case 4:
-									DoActivityCheckOut();
-									break;
-							}
+
 						}else{
 							hideSpinner();
 							lyCheckOut = (LinearLayout) findViewById(R.id.CheckOut);
@@ -951,4 +964,20 @@ public class UbicheckActivity extends Activity {
 		}
 	}
 
+	private void  FaceDoUbicheck(int option){
+			switch (option) {
+				case 1:
+					DoUbicheckCheckIn();
+					break;
+				case 2:
+					DoUbicheckCheckOut();
+					break;
+				case 3:
+					DoActivityCheckIn();
+					break;
+				case 4:
+					DoActivityCheckOut();
+					break;
+			}
+	}
 }

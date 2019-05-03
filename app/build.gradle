@@ -6,9 +6,15 @@ android {
         applicationId "com.timetracker.surveys"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 255
-        versionName "2.55"
+        versionCode 257
+        versionName "2.57"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+
+        checkReleaseBuilds false
+
     }
     buildTypes {
         release {
@@ -19,6 +25,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support:multidex:1.0.3'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'

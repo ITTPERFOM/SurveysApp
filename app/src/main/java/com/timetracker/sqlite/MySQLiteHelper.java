@@ -29,7 +29,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     // Global Variables
     //================================================================================
 	
-    private static final int DATABASE_VERSION = 47;
+    private static final int DATABASE_VERSION = 48;
     private static final String DATABASE_NAME = "SurveysDB";
  
     public MySQLiteHelper(Context context) {
@@ -202,15 +202,17 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-    	if(oldVersion < 46){
+    	if(!tableExists(db,"ActualUbicheck")){
 			db.execSQL("CREATE TABLE IF NOT EXISTS ActualUbicheck ( " +
 					"UbicheckID INTEGER )");
+		}
+		if(!tableExists(db,"DataUsed")){
 
 			db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
 					"LastMonth INTEGER, " +
 					"Data INTEGER)");
-		}
 
+		}
     	if(oldVersion == 45){
 			db.execSQL("CREATE TABLE IF NOT EXISTS DataUsed ( " +
 					"LastMonth INTEGER, " +
@@ -357,7 +359,29 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         	cursor.close();
         }  
     }
-    
+
+
+	//================================================================================
+	// Table Exist
+	//================================================================================
+
+	boolean tableExists(SQLiteDatabase db, String tableName)
+	{
+		if (tableName == null || db == null || !db.isOpen())
+		{
+			return false;
+		}
+		Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM sqlite_master WHERE type = ? AND name = ?", new String[] {"table", tableName});
+		if (!cursor.moveToFirst())
+		{
+			cursor.close();
+			return false;
+		}
+		int count = cursor.getInt(0);
+		cursor.close();
+		return count > 0;
+	}
+
     //================================================================================
     // Device Methods
     //================================================================================

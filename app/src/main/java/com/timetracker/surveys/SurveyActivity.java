@@ -125,7 +125,7 @@ public class SurveyActivity extends Activity {
 	private int progressStatus = 0;
 	private int increase = 0;
 	protected String _tempDir;
-	protected String _path;
+	public String _path = Environment.getExternalStorageDirectory() + "/Survey_Photo.jpg";
 	protected boolean _taken;
 	protected boolean _signed;
 	protected boolean _Scanned;
@@ -181,7 +181,7 @@ public class SurveyActivity extends Activity {
 			setContentView(R.layout.activity_survey);
 			setupUI(findViewById(R.id.rlMain));
 			_tempDir = Environment.getExternalStorageDirectory() + "/Survey_Signature.png";
-			_path = Environment.getExternalStorageDirectory() + "/Survey_Photo.jpg";
+			//_path = Environment.getExternalStorageDirectory() + "/Survey_Photo.jpg";
 			if(savedInstanceState == null || !savedInstanceState.containsKey("listQuestions")) {
 				Intent myIntent = getIntent();
 				String SurveyID = myIntent.getStringExtra("SurveyID");
@@ -2562,10 +2562,7 @@ public class SurveyActivity extends Activity {
 	    	}
 	    	oldListSentTo = new ArrayList<String>();
 	    	CheckFlowFromControl(controlid - idKey,0,0,true);
-	    	//Save();
-			//Nexto();
-			//Backto();
-			//Saves();
+
     	}
     	catch(Exception ex){
     		Toast.makeText(getApplicationContext(), "E010:" + ex.toString(),Toast.LENGTH_SHORT).show();
