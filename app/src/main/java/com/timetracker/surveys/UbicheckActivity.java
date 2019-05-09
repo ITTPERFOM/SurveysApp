@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -109,6 +110,9 @@ public class UbicheckActivity extends Activity {
 	private Location lc;
     private Button btnRefresh;
 	private int idempotence = 0;
+	public LottieAnimationView ScanAnimation;
+	public LinearLayout Animation,Ui;
+
 	//	//================================================================================
     // Activity Events
     //================================================================================
@@ -119,6 +123,17 @@ public class UbicheckActivity extends Activity {
 		setContentView(R.layout.activity_ubicheck);
 
 		btnRefresh = (Button) findViewById(R.id.btnRefresh);
+
+		ScanAnimation = (LottieAnimationView) findViewById(R.id.Scan);
+
+		Animation = (LinearLayout)findViewById(R.id.Animation);
+
+		Ui = (LinearLayout)findViewById(R.id.Ui);
+
+		Animation.setVisibility(View.GONE);
+
+
+
 
 			GPSTracker = new GPSTracker(getApplicationContext());
 			//NEW GPS
@@ -658,6 +673,8 @@ public class UbicheckActivity extends Activity {
 		protected void onPostExecute(String result) {
  			if(result != "null"){
 				try {
+					Animation.setVisibility(View.VISIBLE);
+					Ui.setVisibility(View.INVISIBLE);
 					JSONArray jsonArray = new JSONArray(result);
 					Img = new String[jsonArray.length()];
 					for (int i = 0; i < jsonArray.length(); i++) {
@@ -669,11 +686,9 @@ public class UbicheckActivity extends Activity {
 				try
 				{
 					if ( Img.length> 0) {
-						for (int i = 0; i < Img.length; i++) {
-//							if(result.startsWith("\"http://timetrackerstorage.blob.core.windows.net/")){
-									new AsyncComparePictures().execute(Img[i]);
+//							if(Img[1].startsWith("\"http://timetrackerstorage.blob.core.windows.net/")){
+									new AsyncComparePictures().execute();
 //							}
-						}
 						hideSpinner();
 					}else {
 						hideSpinner();
@@ -695,16 +710,16 @@ public class UbicheckActivity extends Activity {
 		}
 	}
 
-	private class AsyncComparePictures extends AsyncTask<String, Void, String> {
+	private class AsyncComparePictures extends AsyncTask<Void, Void, String> {
 		protected FSDK_Features features;
 		protected TFacePosition faceCoords;
 		protected String picturePath;
 		protected HImage picture;
 		protected int result;
-		protected Bitmap DataBaseBitmap;
+		protected boolean FinishFacialCheck = false;
+		ArrayList<Bitmap> DataBaseBitmap = new ArrayList<Bitmap>();
 		@Override
-		protected String doInBackground(String... args) {
-			String log = new String();
+		protected String doInBackground(Void... args) {
 			picturePath =_CameraImagePath;
 			faceCoords = new TFacePosition();
 			faceCoords.w = 0;
@@ -725,11 +740,11 @@ public class UbicheckActivity extends Activity {
 					//Log.d("TT", "TIME: " + ((System.currentTimeMillis()-t0)/10.0f));
 				}
 			}
-			//return log;
-			DataBaseBitmap = null;
 			String resultString = "exito";
 			try {
-				DataBaseBitmap = BitmapFactory.decodeStream((InputStream)new URL(args[0]).getContent());
+				for (int i = 0; i < Img.length; i++) {
+					DataBaseBitmap.add(BitmapFactory.decodeStream((InputStream)new URL(Img[i]).getContent()));
+				}
 			} catch (Exception e) {
 				resultString = "error";
 			}
@@ -742,6 +757,8 @@ public class UbicheckActivity extends Activity {
 				if (result != FSDK.FSDKE_OK){
 					DeleteImageFile(_CameraImagePath);
 					hideSpinner();
+					Animation.setVisibility(View.GONE);
+					Ui.setVisibility(View.VISIBLE);
 					Toast.makeText(UbicheckActivity.this, "No se encontro rostro en foto tomada" , Toast.LENGTH_LONG).show();
 				}else{
 					HImage CameraImage = new HImage();
@@ -749,40 +766,57 @@ public class UbicheckActivity extends Activity {
 					FSDK_FaceTemplate template1 = new FSDK_FaceTemplate();
 					result = FSDK.GetFaceTemplate(CameraImage, template1);
 					if(template1 != null){
-						ImageMethods.CreateImageFile(DataBaseBitmap,_DataBaseImagePath);
-						HImage DataBaseImage = new HImage();
-						FSDK.LoadImageFromFile(DataBaseImage, _DataBaseImagePath);
-						FSDK_FaceTemplate template2 = new FSDK_FaceTemplate();
-						FSDK.GetFaceTemplate(DataBaseImage, template2);
-						float Similarity[] = new float[1];
-						float MatchingThreshold[] = new float[1];
-						FSDK.GetMatchingThresholdAtFAR((float)0.25,MatchingThreshold);
-						int Success = FSDK.MatchFaces(template1, template2, Similarity);
-						hideSpinner();
-						float simil = Similarity[0];
-						if(Similarity[0] > MatchingThreshold[0]){
-
-						}else{
-							hideSpinner();
-							lyCheckOut = (LinearLayout) findViewById(R.id.CheckOut);
-							if(lyCheckOut.getVisibility() == View.GONE){
-								LinearLayout layoutRefresh = (LinearLayout)findViewById(R.id.layoutRefresh);
-								layoutRefresh.setVisibility(View.VISIBLE);
+						for (int i = 0; i < DataBaseBitmap.size(); i++) {
+							Ui.setVisibility(View.INVISIBLE);
+							if(!FinishFacialCheck){
+								ImageMethods.CreateImageFile(DataBaseBitmap.get(i),_DataBaseImagePath);
+								HImage DataBaseImage = new HImage();
+								FSDK.LoadImageFromFile(DataBaseImage, _DataBaseImagePath);
+								FSDK_FaceTemplate template2 = new FSDK_FaceTemplate();
+								FSDK.GetFaceTemplate(DataBaseImage, template2);
+								float Similarity[] = new float[1];
+								float MatchingThreshold[] = new float[1];
+								FSDK.GetMatchingThresholdAtFAR((float)0.25,MatchingThreshold);
+								int Success = FSDK.MatchFaces(template1, template2, Similarity);
+								float simil = Similarity[0];
+								if(Similarity[0] > MatchingThreshold[0]){
+									FaceDoUbicheck(UbicheckOption);
+									FinishFacialCheck = true;
+									hideSpinner();
+								}else{
+									hideSpinner();
+									lyCheckOut = (LinearLayout) findViewById(R.id.CheckOut);
+									if(lyCheckOut.getVisibility() == View.GONE){
+										LinearLayout layoutRefresh = (LinearLayout)findViewById(R.id.layoutRefresh);
+										layoutRefresh.setVisibility(View.VISIBLE);
+									}
+									/*Intent intent = new Intent(UbicheckActivity.this, SimilarityPreview.class);
+									Bundle b = new Bundle();
+									b.putString("Similitud", (Math.round(simil * 100) + "%")); //Your id
+									intent.putExtras(b); //Put your id to your next Intent
+									startActivity(intent);*/
+									//Toast.makeText(getBaseContext(), "Biometrico no coincide. Similitud: " + Math.round(simil * 100) + "%", Toast.LENGTH_LONG).show();
+								}
 							}
-							Intent intent = new Intent(UbicheckActivity.this, SimilarityPreview.class);
-							Bundle b = new Bundle();
-							b.putString("Similitud", (Math.round(simil * 100) + "%")); //Your id
-							intent.putExtras(b); //Put your id to your next Intent
-							startActivity(intent);
-							//Toast.makeText(getBaseContext(), "Biometrico no coincide. Similitud: " + Math.round(simil * 100) + "%", Toast.LENGTH_LONG).show();
 						}
+
+						if(!FinishFacialCheck){
+                            Toast.makeText(getBaseContext(), "No se pudo marcar Ubicheck los Datos biometricos no corresponden" , Toast.LENGTH_LONG).show();
+							Ui.setVisibility(View.VISIBLE);
+							Animation.setVisibility(View.GONE);
+							LinearLayout layoutRefresh = (LinearLayout)findViewById(R.id.layoutRefresh);
+							layoutRefresh.setVisibility(View.GONE);
+
+                        }
 					}else{
 						hideSpinner();
+						Ui.setVisibility(View.VISIBLE);
 						Toast.makeText(UbicheckActivity.this, "Foto tomada no valida" , Toast.LENGTH_LONG).show();
 					}
 				}
 			}else{
 				hideSpinner();
+				Ui.setVisibility(View.VISIBLE);
 				Toast.makeText(UbicheckActivity.this, "Foto obtenida no valida" , Toast.LENGTH_LONG).show();
 			}
 		}

@@ -94,6 +94,7 @@ public class HomeActivity extends Activity {
 	private LocationCallback locationCallback;
 	private Location lc;
 	private Button CheckIn;
+	private Devices Device = null;
 	
 	
 	//================================================================================
@@ -115,7 +116,7 @@ public class HomeActivity extends Activity {
 		GetLocation(fusedLocationProviderClient,this);
 		try
 		{
-			Devices Device = db.GetDevice();
+			Device = db.GetDevice();
 			if(Device == null){
 				if(isConnected()){
 				   Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.RegisterActivity.class);
@@ -916,6 +917,9 @@ public class HomeActivity extends Activity {
   	  		btnCheckIn.setEnabled(false);
   	  		btnStartSurvey.setEnabled(false);
   	  	}
+		if(db.CheckUbicheckID() && Device.UsesFormWithUbicheck == 1 ){
+			btnSelectSurvey.setEnabled(true);
+		}
    	}
 	   
 	private class LoadImage extends AsyncTask<String, String, Bitmap> {

@@ -1613,15 +1613,15 @@ public class SurveyActivity extends Activity {
 				 				if(currentRadioButton.getText().toString().equals(QO.Name))
 								{
 									if(currentRadioButton.isChecked()){
-										if(!listSentTo.contains(QO.SendTo)){
+										//if(!listSentTo.contains(QO.SendTo)){
 											listSentTo.add(ShowLayout(QO.SendTo));
-										}
+										//}
 										showedQuestions.add(QO.SendTo);
 									}else{
 										if(!showedQuestions.contains(QO.SendTo)){
-											if(!listSentTo.contains(QO.SendTo)){
+											//if(!listSentTo.contains(QO.SendTo)){
 												listSentTo.add(HideLayout(QO.SendTo,Q.SurveyID));
-											}
+											//}
 										}
 									}
 									break;
@@ -1638,9 +1638,9 @@ public class SurveyActivity extends Activity {
 									{
 										if(currentRadioButton.isChecked()){
 											ShowLayout(QO.SendTo);
-											if(!listSentTo.contains(QO.SendTo)){
+											//if(!listSentTo.contains(QO.SendTo)){
 												listSentTo.add(QO.SendTo);
-											}
+											//}
 											showedQuestions.add(QO.SendTo);
 										}
 										break;
@@ -1659,24 +1659,24 @@ public class SurveyActivity extends Activity {
 			 					if(isListener){
 			 						if(currentCheckBox.isChecked()){
 										ShowLayout(QO.SendTo);
-										if(!listSentTo.contains(QO.SendTo)){
+										//if(!listSentTo.contains(QO.SendTo)){
 											listSentTo.add(QO.SendTo);
-										}
+										//}
 										showedQuestions.add(QO.SendTo);
 									}else{
 										if(!showedQuestions.contains(QO.SendTo)){
 											HideLayout(QO.SendTo,Q.SurveyID);
-											if(!listSentTo.contains(QO.SendTo)){
+											//if(!listSentTo.contains(QO.SendTo)){
 												listSentTo.add(QO.SendTo);
-											}
+											//}
 										}
 									}
 					 			}else{
 					 				if(currentCheckBox.isChecked()){
 										ShowLayout(QO.SendTo);
-										if(!listSentTo.contains(QO.SendTo)){
+										//if(!listSentTo.contains(QO.SendTo)){
 											listSentTo.add(QO.SendTo);
-										}
+										//}
 									}
 					 			}
 								break;
@@ -1694,24 +1694,24 @@ public class SurveyActivity extends Activity {
 	 					if(isListener){
 	 						if(currentProgress == currentSeekBar.getProgress() && currentTitle.getText().toString().equals(QO.Name)){
 								 ShowLayout(QO.SendTo);
-								 if(!listSentTo.contains(QO.SendTo)){
+								// if(!listSentTo.contains(QO.SendTo)){
 									 listSentTo.add(QO.SendTo);
-								 }
+								// }
 								 showedQuestions.add(QO.SendTo);
 							 }else{
 								 if(!showedQuestions.contains(QO.SendTo)){
 									 HideLayout(QO.SendTo,Q.SurveyID);
-									 if(!listSentTo.contains(QO.SendTo)){
+									// if(!listSentTo.contains(QO.SendTo)){
 										listSentTo.add(QO.SendTo);
-									 }
+									// }
 								 }
 							 }
 	 					}else{
 	 						if(currentProgress == currentSeekBar.getProgress() && currentTitle.getText().toString().equals(QO.Name)){
 								 ShowLayout(QO.SendTo);
-								 if(!listSentTo.contains(QO.SendTo)){
+								 //if(!listSentTo.contains(QO.SendTo)){
 									 listSentTo.add(QO.SendTo);
-								 }
+								 //}
 							 }
 	 					}
 						currentProgress++;

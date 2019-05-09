@@ -19,9 +19,9 @@
             android:layout_height="wrap_content"
             android:text="@string/option_ubicheck"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-               
+
  	</RelativeLayout>
- 	
+
  	<ScrollView
       android:id="@+id/scrollableContents"
       android:layout_width="match_parent"
@@ -29,178 +29,223 @@
       android:layout_below="@id/header"
       android:layout_above="@+id/tr_options"
       android:background="#ffffff" >
+
 		<LinearLayout
 	      android:layout_width="fill_parent"
 	      android:layout_height="wrap_content"
 	      android:gravity="center_horizontal"
 	      android:orientation="vertical"
-	      android:layout_marginLeft="40dp"
-	      android:layout_marginStart="40dp"
-	      android:layout_marginRight="40dp"
-	      android:layout_marginEnd="40dp">
- 			
-		    <LinearLayout
-    			android:id="@+id/layoutRefresh"
-    			android:layout_width="fill_parent"
-       			android:layout_height="wrap_content"
-       			android:orientation="vertical" 
-       			android:paddingLeft="@dimen/activity_horizontal_margin"
-	    		android:paddingRight="@dimen/activity_horizontal_margin">
-	    		
-	 		    <Button
-	   			    android:id="@+id/btnRefresh"
-		         	style="@style/button_text"
-		         	android:layout_marginTop="43dp"
-		         	android:background="@drawable/btn_download"
-		         	android:onClick="Refresh"
-		         	android:text="@string/option_refresh"
-		         	android:textSize="18sp" />
+	      android:layout_marginLeft="10dp"
+	      android:layout_marginStart="10dp"
+	      android:layout_marginRight="10dp"
+	      android:layout_marginEnd="10dp">
 
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/searchAni"
-                    android:layout_width="280dp"
-                    android:layout_height="144dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.34"
-                    app:lottie_autoPlay="true"
-                    app:lottie_fileName="wait.json"
-                    app:lottie_imageAssetsFolder="assets"
-                    app:lottie_loop="true" />
+			<LinearLayout
+				android:id="@+id/Animation"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginStart="40dp"
+				android:layout_marginLeft="40dp"
+				android:layout_marginEnd="40dp"
+				android:layout_marginRight="40dp"
+				android:gravity="center_horizontal"
+				android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/Sucursal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/BusquedaSucursal"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/colorPrimary"
-                    android:gravity="center"/>
+				<com.airbnb.lottie.LottieAnimationView
+					android:id="@+id/Scan"
+					android:layout_width="297dp"
+					android:layout_height="272dp"
+					app:layout_constraintVertical_bias="0.34"
+					app:lottie_autoPlay="true"
+					app:lottie_fileName="scan.json"
+					app:lottie_imageAssetsFolder="assets"
+					app:lottie_loop="true" />
 
-            </LinearLayout>
-		    
-		    <LinearLayout
-    			android:id="@+id/AddNewBranch"
-    			android:layout_width="fill_parent"
-       			android:layout_height="wrap_content"
-       			android:orientation="vertical" 
-       			android:paddingLeft="@dimen/activity_horizontal_margin"
-	    		android:paddingRight="@dimen/activity_horizontal_margin">
-	    		
-	 		    <Button
-	   			    android:id="@+id/btnAddBranch"
-		         	style="@style/button_text"
-		         	android:layout_marginTop="43dp"
-		         	android:background="@drawable/btn_upload"
-		         	android:onClick="AddBranch"
-		         	android:text="@string/option_add_branch"
-		         	android:textSize="18sp" />
-	 		    
-    		</LinearLayout>
-		    
-	 		<LinearLayout
-    			android:id="@+id/Buttons"
-    			android:layout_width="fill_parent"
-       			android:layout_height="wrap_content"
-       			android:orientation="vertical" 
-       			android:paddingLeft="@dimen/activity_horizontal_margin"
-	    		android:paddingRight="@dimen/activity_horizontal_margin"
-	    		android:visibility="gone">
-	    		
-	 		    <TextView
-	            	style="@style/textview_Text"
-	            	android:layout_width="wrap_content"
-	            	android:layout_height="wrap_content"
-	            	android:text="@string/option_select_branch" />
-	 		    
-    		</LinearLayout>
-    		
-    		<LinearLayout
-    			android:id="@+id/CheckOut"
-    			android:layout_width="fill_parent"
-       			android:layout_height="wrap_content"
-       			android:orientation="vertical" 
-       			android:paddingLeft="@dimen/activity_horizontal_margin"
-	    		android:paddingRight="@dimen/activity_horizontal_margin"
-	    		android:visibility="gone">
+				<TextView
+					android:id="@+id/bioMessage"
+					style="@style/textview_Title"
+					android:layout_width="351dp"
+					android:layout_height="51dp"
+					android:text="Checando Biometria"
+					android:gravity="center"
+					android:textAlignment="center"
+					android:textAppearance="?android:attr/textAppearanceLarge" />
 
-	   			<TextView
-	   			    android:id="@+id/CheckOutMessage"
-	            	style="@style/textview_Text"
-	            	android:layout_width="wrap_content"
-	            	android:layout_height="wrap_content"/>
+			</LinearLayout>
+			<LinearLayout
+				android:id="@+id/Ui"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginStart="40dp"
+				android:layout_marginLeft="40dp"
+				android:layout_marginEnd="40dp"
+				android:layout_marginRight="40dp"
+				android:gravity="center_horizontal"
+				android:orientation="vertical">
 
-	   			<Button
-	   			    android:id="@+id/btnCheckOut"
-		         	style="@style/button_text"
-		         	android:background="@drawable/btn_checkin"
-		         	android:onClick="CheckOut"
-		         	android:text="@string/CheckOut"
-		         	android:textSize="18sp" />
+				<LinearLayout
+					android:id="@+id/layoutRefresh"
+					android:layout_width="310dp"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:paddingLeft="@dimen/activity_horizontal_margin"
+					android:paddingRight="@dimen/activity_horizontal_margin">
 
-				
-    		</LinearLayout>
- 		
-    		<LinearLayout
-    			android:id="@+id/ActivityCheckOut"
-    			android:layout_width="fill_parent"
-       			android:layout_height="wrap_content"
-       			android:orientation="vertical" 
-       			android:paddingLeft="@dimen/activity_horizontal_margin"
-	    		android:paddingRight="@dimen/activity_horizontal_margin"
-	    		android:visibility="gone">
+					<Button
+						android:id="@+id/btnRefresh"
+						style="@style/button_text"
+						android:layout_marginTop="43dp"
+						android:background="@drawable/btn_download"
+						android:onClick="Refresh"
+						android:text="@string/option_refresh"
+						android:textSize="18sp" />
 
-	   			<TextView
-	   			    android:id="@+id/ActivityCheckOutMessage"
-	            	style="@style/textview_Text"
-	            	android:layout_width="wrap_content"
-	            	android:layout_height="wrap_content"/>
+					<com.airbnb.lottie.LottieAnimationView
+						android:id="@+id/searchAni"
+						android:layout_width="280dp"
+						android:layout_height="144dp"
+						app:layout_constraintBottom_toBottomOf="parent"
+						app:layout_constraintEnd_toEndOf="parent"
+						app:layout_constraintStart_toStartOf="parent"
+						app:layout_constraintTop_toTopOf="parent"
+						app:layout_constraintVertical_bias="0.34"
+						app:lottie_autoPlay="true"
+						app:lottie_fileName="wait.json"
+						app:lottie_imageAssetsFolder="assets"
+						app:lottie_loop="true" />
 
-	   			<Button
-	   			    android:id="@+id/btnActivityCheckOut"
-		         	style="@style/button_text"
-		         	android:background="@drawable/btn_activity_checkout"
-		         	android:onClick="ActivityCheckOut"
-		         	android:text="@string/ActivityCheckOut" />
+					<TextView
+						android:id="@+id/Sucursal"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:gravity="center"
+						android:text="@string/BusquedaSucursal"
+						android:textColor="@color/colorPrimary"
+						android:textSize="24sp"
+						android:textStyle="bold" />
 
-				
-    		</LinearLayout>
-    		
-    		<LinearLayout
-    			android:id="@+id/ActivityCheckIn"
-    			android:layout_width="fill_parent"
-       			android:layout_height="wrap_content"
-       			android:orientation="vertical" 
-       			android:paddingLeft="@dimen/activity_horizontal_margin"
-	    		android:paddingRight="@dimen/activity_horizontal_margin"
-	    		android:layout_marginTop="20dip"
-	    		android:visibility="gone">
-	   			
-    		    <TextView
-	            	style="@style/textview_Text"
-	            	android:layout_width="wrap_content"
-	            	android:layout_height="wrap_content"
-	            	android:text="@string/ActivitySelection"/>
-    		    
-				<Spinner
-			        android:id="@+id/ActivityCheckInSpinner"
-			        android:background="@drawable/spinner_gray"
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:prompt="@string/CheckOut"/>
-	   			<Button
-	   			    android:id="@+id/btnActivityCheckIn"
-	   			    android:layout_marginTop="20dp"
-		         	style="@style/button_text"
-		         	android:background="@drawable/btn_activity_checkin"
-		         	android:onClick="ActivityCheckIn"
-		         	android:text="@string/ActivityCheckIn" />
+				</LinearLayout>
 
-				
-    		</LinearLayout>
+				<LinearLayout
+					android:id="@+id/AddNewBranch"
+					android:layout_width="314dp"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:paddingLeft="@dimen/activity_horizontal_margin"
+					android:paddingRight="@dimen/activity_horizontal_margin">
+
+					<Button
+						android:id="@+id/btnAddBranch"
+						style="@style/button_text"
+						android:layout_marginTop="43dp"
+						android:background="@drawable/btn_upload"
+						android:onClick="AddBranch"
+						android:text="@string/option_add_branch"
+						android:textSize="18sp" />
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/Buttons"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:paddingLeft="@dimen/activity_horizontal_margin"
+					android:paddingRight="@dimen/activity_horizontal_margin"
+					android:visibility="gone">
+
+					<TextView
+						style="@style/textview_Text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/option_select_branch" />
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/CheckOut"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:paddingLeft="@dimen/activity_horizontal_margin"
+					android:paddingRight="@dimen/activity_horizontal_margin"
+					android:visibility="gone">
+
+					<TextView
+						android:id="@+id/CheckOutMessage"
+						style="@style/textview_Text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content" />
+
+					<Button
+						android:id="@+id/btnCheckOut"
+						style="@style/button_text"
+						android:background="@drawable/btn_checkin"
+						android:onClick="CheckOut"
+						android:text="@string/CheckOut"
+						android:textSize="18sp" />
+
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/ActivityCheckOut"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:orientation="vertical"
+					android:paddingLeft="@dimen/activity_horizontal_margin"
+					android:paddingRight="@dimen/activity_horizontal_margin"
+					android:visibility="gone">
+
+					<TextView
+						android:id="@+id/ActivityCheckOutMessage"
+						style="@style/textview_Text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content" />
+
+					<Button
+						android:id="@+id/btnActivityCheckOut"
+						style="@style/button_text"
+						android:background="@drawable/btn_activity_checkout"
+						android:onClick="ActivityCheckOut"
+						android:text="@string/ActivityCheckOut" />
+
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:id="@+id/ActivityCheckIn"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginTop="20dip"
+					android:orientation="vertical"
+					android:paddingLeft="@dimen/activity_horizontal_margin"
+					android:paddingRight="@dimen/activity_horizontal_margin"
+					android:visibility="gone">
+
+					<TextView
+						style="@style/textview_Text"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="@string/ActivitySelection" />
+
+					<Spinner
+						android:id="@+id/ActivityCheckInSpinner"
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:background="@drawable/spinner_gray"
+						android:prompt="@string/CheckOut" />
+
+					<Button
+						android:id="@+id/btnActivityCheckIn"
+						style="@style/button_text"
+						android:layout_marginTop="20dp"
+						android:background="@drawable/btn_activity_checkin"
+						android:onClick="ActivityCheckIn"
+						android:text="@string/ActivityCheckIn" />
+
+				</LinearLayout>
+			</LinearLayout>
  	    </LinearLayout>
  	    
     </ScrollView>
