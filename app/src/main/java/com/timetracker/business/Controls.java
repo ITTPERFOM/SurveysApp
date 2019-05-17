@@ -21,9 +21,11 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.text.Html;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.LinkMovementMethod;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -228,7 +230,13 @@ public class Controls {
 		    txtEnding.setLayoutParams(td);
 		    linLayout.addView(txtEnding);
 		}
-		linLayout.addView(button);
+		if(question.SurveyID == 3453){
+			button.setVisibility(View.INVISIBLE);
+			linLayout.addView(button);
+		}else {
+			linLayout.addView(button);
+		}
+
         return linLayout;
 	}
 	
@@ -246,41 +254,40 @@ public class Controls {
 	    {
 	    	linLayout.setVisibility(View.GONE);
 	    }
-		EditText editText = new EditText(context);
-		editText.setSingleLine(true);
-		int id = question.QuestionID+idKey;
-		editText.setId(id);
-		editText.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.edittext));
-		editText.setText(question.Answer);
-		if (focusflag==true)
-		{
-			editText.requestFocus();
-		}
-		if(question.QuestionID == 82591){
-			editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-		}
-		linLayout.addView(editText);
-		if(question.ProcedureID > 0){
-			Button button = new Button(context);
-			button.setId(question.QuestionID+idKey2);
-			button.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.green_button));
-			button.setTextColor(Color.parseColor("#ffffff"));
-			button.setText("Enviar");
-			linLayout.addView(button);
-			HorizontalScrollView horizontalView = new HorizontalScrollView(context);
-			TableLayout GridTable = new TableLayout(context);
-    		TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
-    		GridTable.setLayoutParams(tableParams);
-    		GridTable.setColumnStretchable(0, true);
-    		GridTable.setId(question.QuestionID+idKey3);
-    		horizontalView.addView(GridTable);
-			linLayout.addView(horizontalView);
-		}
-		if(question.Blocked == 1 || question.QuestionID == 22279 || question.QuestionID == 22287 
-				|| question.QuestionID == 22280 || question.QuestionID == 22281 || question.QuestionID == 22282 || question.QuestionID == 22283){
-			editText.setEnabled(false);
-		}
-		linLayout=AddFooter(linLayout,question,context);
+			EditText editText = new EditText(context);
+			editText.setSingleLine(true);
+			int id = question.QuestionID + idKey;
+			editText.setId(id);
+			editText.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.edittext));
+			editText.setText(question.Answer);
+			if (focusflag == true) {
+				editText.requestFocus();
+			}
+			if (question.QuestionID == 82591) {
+				editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+			}
+			linLayout.addView(editText);
+			if (question.ProcedureID > 0  ) {
+				Button button = new Button(context);
+				button.setId(question.QuestionID + idKey2);
+				button.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.green_button));
+				button.setTextColor(Color.parseColor("#ffffff"));
+				button.setText("Enviar");
+				linLayout.addView(button);
+				HorizontalScrollView horizontalView = new HorizontalScrollView(context);
+				TableLayout GridTable = new TableLayout(context);
+				TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
+				GridTable.setLayoutParams(tableParams);
+				GridTable.setColumnStretchable(0, true);
+				GridTable.setId(question.QuestionID + idKey3);
+				horizontalView.addView(GridTable);
+				linLayout.addView(horizontalView);
+			}
+			if (question.Blocked == 1 || question.QuestionID == 22279 || question.QuestionID == 22287
+					|| question.QuestionID == 22280 || question.QuestionID == 22281 || question.QuestionID == 22282 || question.QuestionID == 22283) {
+				editText.setEnabled(false);
+			}
+			linLayout = AddFooter(linLayout, question, context);
         return linLayout;
 	}
 	
@@ -687,8 +694,12 @@ public class Controls {
 					EditText editQuestion = new EditText(context);
 					if(QuestionOptions.get(j).Type.equals("Numerico")){
 						editQuestion.setInputType(InputType.TYPE_CLASS_NUMBER);
+						if(question.SurveyID == 3439 && question.Question1.equals("Competencia")) {
+							editQuestion.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "32",context)});
+						}
 					}else if(QuestionOptions.get(j).Type.equals("Decimal")){
 						editQuestion.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
 					}
 					editQuestion.setLayoutParams(rowParams);
 					if(!question.Answer.equals("")){
@@ -1119,6 +1130,9 @@ public class Controls {
 		linLayout.setBackgroundColor(Color.parseColor("#eaeaea"));
 		linLayout=AddHeader(linLayout,question,context);
 		linLayout.setId(idLinearLayout + (question.OrderNumber + 1));
+
+
+
 	    if(question.Hidden)
 	    {
 	    	linLayout.setVisibility(View.GONE);
@@ -1134,9 +1148,7 @@ public class Controls {
 		button.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.green_button));
 		button.setTextAppearance(context, R.style.button_text);
 		button.setText("Tomar La foto");
-        
-		
-    	
+
 		ImageView  imageView = new ImageView(context);
 		imageView.setId(question.QuestionID+idKey);
 		if (question.Answer.length()>0)

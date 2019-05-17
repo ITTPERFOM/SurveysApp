@@ -157,7 +157,7 @@ public class UbicheckActivity extends Activity {
 			Devices Device = db.GetDevice();
 			//Luxand
 			try {
-				int res = FSDK.ActivateLibrary("HRYh6MxLk7gGq0LTpKjXuoyzyH10895TLYW9mcQ971upyg43e4hahTnepztBB1c2pF1aGdRj5H+aHrj4+J/SpyGBiXADZ1/ZCaU3yHzdXErmION80bHnNxoEBB7bb5aIX4P/rTN4IhHOkTYay/p3xfRFts9URUWZxdayezIcvws=");
+				int res = FSDK.ActivateLibrary("r+SutpWhDEDrYMnlgN+RHkAqGTl5MXDm9wwLO/t+glu1hX6OWo0Yb5j8E33vgUZ5Q9jIDVFN8B0FWd4G6qzZV/uLhEirVamEvJHVyTfoT+nwl2U/FJPVmX8G5u5cnf45wkntz2b1i743/79QhSoqa8OmyL89sLp8okwxd2s56F4=");
 				FSDK.Initialize();
 				FSDK.SetFaceDetectionParameters(false, false, 100);
 				FSDK.SetFaceDetectionThreshold(5);

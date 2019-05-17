@@ -6,6 +6,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.timetracker.business.DialogMethods;
 import com.timetracker.sqlite.MySQLiteHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -146,7 +147,7 @@ public class SurveyActivity extends Activity {
     protected int idDatePicker = 70000;
     protected int idTimePicker = 80000;
     protected int idFooterLayout = 90000;
-
+	public  boolean dialogFlag = true;
 	private String FinishUbicheck ="1";
     private int UbicheckID = 0;
 
@@ -1350,11 +1351,13 @@ public class SurveyActivity extends Activity {
 	{
 		for(Questions question: questions)
 		{
+			//Log.d("Prueba",question.Question1);
 			ChooseControl(question.QuestionID,question.QuestionTypeID,question.Answer);
 		}
 		if(HasValues){
 			for(Questions question: questions)
 			{
+
 				oldListSentTo = new ArrayList<String>();
 				CheckFlowFromControl(question.QuestionID,0,0,false);
 			}
@@ -1894,6 +1897,7 @@ public class SurveyActivity extends Activity {
 					UbicheckID = db.GetUbicheckID();
 					db.AppendUbicheckID(UbicheckID);
 
+
 					AlertDialog.Builder builder = new AlertDialog.Builder(SurveyActivity.this);
 					builder.setMessage("Desea registrar salida al terminar forma ?")
 							.setCancelable(false)
@@ -1991,6 +1995,14 @@ public class SurveyActivity extends Activity {
 										Toast.makeText(getBaseContext(), "E008:" + e.toString(), Toast.LENGTH_LONG).show();
 									}
 									dialog.cancel();
+                                    DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener(){
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    };
+                                    DialogMethods.showSuccessDialog(SurveyActivity.this, "Mensaje Ubicheck", "Salida Registrada" + "\n\nFecha:" + new Date() ,onClickListener);
+                                    dialogFlag = false;
 								}
 							})
 							.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -2216,7 +2228,12 @@ public class SurveyActivity extends Activity {
 		             }
 		         });
 		         if(isSuccessful){
-		        	 builder.setMessage("Forma enviada. �Le gustar�a contestar la forma de nuevo?");
+					 if(dialogFlag){
+						 builder.setMessage("Forma enviada. �Le gustar�a contestar la forma de nuevo?");
+					 }else {
+						 Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
+						 startActivity(intent);
+					 }
 		         }else{
 		        	 builder.setMessage("Forma guardada de manera local. �Le gustar�a contestar la forma de nuevo?")
 		        	 .setIcon(android.R.drawable.ic_dialog_alert);
@@ -2273,6 +2290,14 @@ public class SurveyActivity extends Activity {
 				 }
 			 }
 		 });
+		 if(QuestionID == 92854){
+			 Devices Device = db.GetDevice();
+		 	 editText.setText(Integer.toString(Device.DeviceID) );
+			 button.performClick();
+			 editText.setVisibility(View.GONE);
+			 button.setVisibility(View.GONE);
+		 }
+
      }
 
 	 //================================================================================
@@ -3181,7 +3206,8 @@ public class SurveyActivity extends Activity {
 				}
 			}
             catch (Exception e) {
-				 Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
+				 //Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
+				Log.d("Error de envio",e.toString());
 			}
        }
    }
@@ -3433,5 +3459,8 @@ public class SurveyActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "E006: Q:" + String.valueOf(ErrorQuestion) + " " + ex.toString(),Toast.LENGTH_LONG).show();
 
 		}
+	}
+	public void CreateReportDDI(){
+
 	}
 }
