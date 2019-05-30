@@ -1,6 +1,8 @@
 package com.timetracker.surveys;
 
 import java.util.List;
+
+import com.timetracker.data.Devices;
 import com.timetracker.data.Surveys;
 import com.timetracker.sqlite.MySQLiteHelper;
 
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
@@ -19,15 +22,31 @@ public class SelectSurvey extends Activity {
 	private int UbicheckID = 0;
 	LinearLayout lyButtons;
 	private MySQLiteHelper db = new MySQLiteHelper(SelectSurvey.this);
+	private TableRow tr_options;
 	
 	@Override
 	 protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_survey);
-        try
+
+		Devices Device = db.GetDevice();
+
+		tr_options = (TableRow)findViewById(R.id.tr_options);
+		Intent MyIntent = getIntent();
+		Bundle extras = MyIntent.getExtras();
+		boolean extra = false;
+
+		if (extras != null) {
+			extra = extras.getBoolean("extra");
+		}
+
+		if(Device.UsesFormWithUbicheck == 1  && db.CheckUbicheckID()){
+			if(!extra){
+				tr_options.setVisibility(View.INVISIBLE);
+			}
+		}
+		try
         {
-	        Intent MyIntent = getIntent();
-	        Bundle extras = MyIntent.getExtras();
 	        String DistributionChannel = "";
 	        if (extras != null) {
 	            if (extras.containsKey("UbicheckID")) {

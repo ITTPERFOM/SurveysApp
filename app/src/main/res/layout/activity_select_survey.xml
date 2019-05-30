@@ -1,60 +1,60 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.timetracker.surveys.SelectSurvey" >
-    
-    <RelativeLayout
-      android:id="@+id/header"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_alignParentTop="true"
-      android:gravity="center" >
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context="com.timetracker.surveys.SelectSurvey" >
 
-        <TextView
-            android:id="@+id/txtTitle"
-            style="@style/textview_Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/option_select_survey"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-               
- 	</RelativeLayout>
-
-     <ScrollView
-        	android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:stretchColumns="1"
-            android:layout_below="@id/header"
-     	 	android:layout_above="@+id/tr_options"
-        	android:background="#ffffff">
-        	<LinearLayout
-    			android:id="@+id/Buttons"
-    			android:layout_width="fill_parent"
-       			android:layout_height="wrap_content"
-       			android:orientation="vertical" 
-       			android:paddingLeft="@dimen/activity_horizontal_margin"
-	    		android:paddingRight="@dimen/activity_horizontal_margin">
-    		</LinearLayout>
-  	</ScrollView>
-     <TableRow
-		android:id="@+id/tr_options"
-     	android:layout_width="match_parent"
-     	android:layout_height="wrap_content" 
-     	android:background="#00467f"
-		android:layout_alignParentBottom="true" 
+	<RelativeLayout
+		android:id="@+id/header"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentTop="true"
 		android:gravity="center" >
 
-     <ImageButton
-         android:id="@+id/btnHome"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:onClick="SendHome"
-         android:contentDescription="@string/option_home"
-         android:layout_weight=".25"
-         android:background="@drawable/btn_tiles"
-         android:src="@drawable/tile_back" />
- </TableRow>
+		<TextView
+			android:id="@+id/txtTitle"
+			style="@style/textview_Title"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/option_select_survey"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	</RelativeLayout>
+
+	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:stretchColumns="1"
+		android:layout_below="@id/header"
+		android:layout_above="@+id/tr_options"
+		android:background="#ffffff">
+		<LinearLayout
+			android:id="@+id/Buttons"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:paddingLeft="@dimen/activity_horizontal_margin"
+			android:paddingRight="@dimen/activity_horizontal_margin">
+		</LinearLayout>
+	</ScrollView>
+	<TableRow
+		android:id="@+id/tr_options"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="#00467f"
+		android:layout_alignParentBottom="true"
+		android:gravity="center" >
+
+		<ImageButton
+			android:id="@+id/btnHome"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:onClick="SendHome"
+			android:contentDescription="@string/option_home"
+			android:layout_weight=".25"
+			android:background="@drawable/btn_tiles"
+			android:src="@drawable/tile_back" />
+	</TableRow>
 
 </RelativeLayout>

@@ -257,6 +257,9 @@ public class HomeActivity extends Activity {
 
 	public void SelectSurvey(View view){
 		Intent intent = new Intent(this,com.timetracker.surveys.SelectSurvey.class);
+		if(Device.UsesFormWithUbicheck == 1){
+			intent.putExtra("extra", true);
+		}
    		startActivity(intent);
    		finish();
 	} 
@@ -917,8 +920,17 @@ public class HomeActivity extends Activity {
   	  		btnCheckIn.setEnabled(false);
   	  		btnStartSurvey.setEnabled(false);
   	  	}
-		if(db.CheckUbicheckID() && Device.UsesFormWithUbicheck == 1 ){
+		if( Device.UsesFormWithUbicheck == 1  && db.CheckUbicheckID() ){
+            btnStartSurvey.setEnabled(false);
 			btnSelectSurvey.setEnabled(true);
+            TextView txtSelectedSurveyHeader = (TextView) findViewById(R.id.txtSelectedSurveyHeader);
+            TextView txtSelectedSurveyText = (TextView) findViewById(R.id.txtSelectedSurveyText);
+            txtSelectedSurveyHeader.setText("");
+            txtSelectedSurveyText.setText("");
+		}
+
+		if( Device.UsesFormWithUbicheck == 1 ){
+			btnStartSurvey.setEnabled(false);
 		}
    	}
 	   

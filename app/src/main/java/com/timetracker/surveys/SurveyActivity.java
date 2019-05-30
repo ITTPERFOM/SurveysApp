@@ -1892,8 +1892,8 @@ public class SurveyActivity extends Activity {
 	 public class ButtonSendSurvey implements View.OnClickListener
 	    {
 			public void onClick(final View view ){
-
-				if(db.CheckUbicheckID()){
+				Devices Device = db.GetDevice();
+				if( Device.UsesFormWithUbicheck == 1  && db.CheckUbicheckID() ){
 					UbicheckID = db.GetUbicheckID();
 					db.AppendUbicheckID(UbicheckID);
 
@@ -2208,40 +2208,45 @@ public class SurveyActivity extends Activity {
 				 Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
 	        	 startActivity(intent);
 			 }else{
-				 AlertDialog.Builder builder = new AlertDialog.Builder(SurveyActivity.this);
-		         builder.setTitle("Forma Terminada")
-		         .setCancelable(false)
-		         .setPositiveButton("Si",new DialogInterface.OnClickListener() {
-		             public void onClick(DialogInterface dialog, int id) {
-		                 dialog.dismiss();
-		                 Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.StartSurvey.class);
-		                 startActivity(intent);
-		                 finish();
-		             }
-		         })
-		         .setNegativeButton("No",new DialogInterface.OnClickListener() {
-		             public void onClick(DialogInterface dialog, int id) {
-		            	 dialog.dismiss();
-		            	 Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
-		            	 startActivity(intent);
-		            	 finish();
-		             }
-		         });
-		         if(isSuccessful){
-					 if(dialogFlag){
-						 builder.setMessage("Forma enviada. �Le gustar�a contestar la forma de nuevo?");
-					 }else {
-						 Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
-						 startActivity(intent);
-					 }
-		         }else{
-		        	 builder.setMessage("Forma guardada de manera local. �Le gustar�a contestar la forma de nuevo?")
-		        	 .setIcon(android.R.drawable.ic_dialog_alert);
-		         }
-		         AlertDialog alert = builder.create();
-		         if(!((Activity)SurveyActivity.this).isFinishing()){
-		        	 alert.show();
-		         }
+			 	if(Device.UsesFormWithUbicheck != 1){
+					AlertDialog.Builder builder = new AlertDialog.Builder(SurveyActivity.this);
+					builder.setTitle("Forma Terminada")
+							.setCancelable(false)
+							.setPositiveButton("Si",new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									dialog.dismiss();
+									Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.StartSurvey.class);
+									startActivity(intent);
+									finish();
+								}
+							})
+							.setNegativeButton("No",new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									dialog.dismiss();
+									Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
+									startActivity(intent);
+									finish();
+								}
+							});
+					if(isSuccessful){
+						if(dialogFlag){
+							builder.setMessage("Forma enviada. Le gustaría contestar la forma de nuevo?");
+						}else {
+							Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
+							startActivity(intent);
+						}
+					}else{
+						builder.setMessage("Forma guardada de manera local. Le gustaría contestar la forma de nuevo?")
+								.setIcon(android.R.drawable.ic_dialog_alert);
+					}
+					AlertDialog alert = builder.create();
+					if(!((Activity)SurveyActivity.this).isFinishing()){
+						alert.show();
+					}
+				}else{
+					Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
+					startActivity(intent);
+				}
 			 }
 		 }catch (Exception e) {
 			 Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();

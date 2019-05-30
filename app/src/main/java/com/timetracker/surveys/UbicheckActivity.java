@@ -316,16 +316,20 @@ public class UbicheckActivity extends Activity {
 		UbicheckRequest UbicheckRequest = new UbicheckRequest(1,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(), CheckInBranchID,BiometricID,GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,true);
 		AsyncUbicheck.execute("/Ubicheck");
-		//db.Data(140);
 	}
-	
+
+	public void DoUbicheckStatus(){
+		Devices Device = db.GetDevice();
+		UbicheckRequest UbicheckRequest = new UbicheckRequest(0,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),0,BiometricID,GPSTracker.usesMockLocation);
+		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,false);
+		AsyncUbicheck.execute("/Ubicheck");
+	}
 	public void DoUbicheckCheckOut(){
 		showSpinner("Registrando Salida");
 		Devices Device = db.GetDevice();
 		UbicheckRequest UbicheckRequest = new UbicheckRequest(2,Device.DeviceID,lc.getLatitude(),lc.getLongitude(),new Date(),0,BiometricID,GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest,false);
 		AsyncUbicheck.execute("/Ubicheck");
-		//db.Data(140);
 	}
 	
 	public void DoActivityCheckIn(){
@@ -390,6 +394,7 @@ public class UbicheckActivity extends Activity {
             	{
         			final JSONObject JO = new JSONObject(result);
         			final int Status = JO.getInt("Status");
+					final String message = JO.getString("Message");
     				if(Status == 0 || Status == 3)
     	        	{
     					DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener(){
@@ -503,7 +508,7 @@ public class UbicheckActivity extends Activity {
     		      	  		}
     		      	  		lyButtons.setVisibility(View.VISIBLE);
     		      	  	}
-    		      	  	
+
     	        	}
     	        	else if(Status == 2)
     	        	{
@@ -539,7 +544,19 @@ public class UbicheckActivity extends Activity {
         	        			OpenUbicheckDetailID = JO.getInt("OpenUbicheckDetailID");
         	        		}
     	        		}
+
     	        	}
+					if(Status == 3)
+					{
+						if(message.equalsIgnoreCase("Entrada Registrada"))
+						{
+							db.AppendUbicheckID(JO.getInt("UbicheckID"));
+						}
+						if(message.equalsIgnoreCase("Salida Registrada"))
+						{
+							db.DeleteUbicheckIDFromActualUbicheck();
+						}
+					}
             	}
         	} catch (Exception ex) {
         		DialogMethods.showErrorDialog(UbicheckActivity.this, "Ocurrio un error al momento de utilizar Ubicheck. Result:" + result + " Info: " + ex.toString()," Result:" + result + " Activity:Ubicheck | Method:AsyncUbicheck | Error:" + ex.toString());
