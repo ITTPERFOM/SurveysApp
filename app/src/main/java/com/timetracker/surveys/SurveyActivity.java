@@ -230,7 +230,7 @@ public class SurveyActivity extends Activity {
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle("Encuesta incompleta")
-						.setMessage("�le gustar�a completar la encuesta?")
+						.setMessage("le gustaría completar la encuesta?")
 						.setCancelable(false)
 						.setPositiveButton("Si",new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
@@ -1988,6 +1988,7 @@ public class SurveyActivity extends Activity {
 												}
 											}
 										}, 1000);
+										db.DeleteUbicheckIDFromActualUbicheck();
 									}
 									catch (Exception e)
 									{
@@ -2295,7 +2296,10 @@ public class SurveyActivity extends Activity {
 				 }
 			 }
 		 });
-		 if(QuestionID == 92854){
+
+		Questions question = db.getQuestion(QuestionID);
+
+		 if(question.Options.equals("Preload")){
 			 Devices Device = db.GetDevice();
 		 	 editText.setText(Integer.toString(Device.DeviceID) );
 			 button.performClick();

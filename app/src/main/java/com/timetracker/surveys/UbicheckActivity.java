@@ -188,17 +188,7 @@ public class UbicheckActivity extends Activity {
 					KioskBranchID = Device.KioskBranchID;
 				}
 			}
-			boolean isFormUbicheckActive = false;
-			SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
-			if(SelectedSurvey != null){
-				if(SelectedSurvey.UbicheckID != 0){
-					isFormUbicheckActive = true;
-				}
-			}
-			if(isFormUbicheckActive){
-				DialogMethods.showInformationDialog(UbicheckActivity.this, "Ubicheck-Forma Activa", "Entrada registrada con forma. Favor de terminar forma para registrar salida.",onClickListener);
-				return;
-			}
+
 			if (!ConnectionMethods.isInternetConnected(UbicheckActivity.this, false).equals("")){
 				DialogMethods.showInformationDialog(UbicheckActivity.this, "Sin Conexion", "No se detecto una conexion a internet. Favor de conectarse a una red antes de volver a intentar.",onClickListener);
 				return;
@@ -441,7 +431,11 @@ public class UbicheckActivity extends Activity {
 							SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
 							DialogMethods.showSuccessDialog(UbicheckActivity.this, "Mensaje Ubicheck", JO.getString("Message") + "\n\nFecha:" + ft.format(UbicheckRequest.Date) ,onClickListener);
 						}else{
-							DialogMethods.showInformationDialog(UbicheckActivity.this, "Mensaje Ubicheck", JO.getString("Message"),onClickListener);
+    						if(JO.getString("Message").equals("No se encontraron Sucursales")){
+								buildAlertnobranch();
+							}else {
+								DialogMethods.showInformationDialog(UbicheckActivity.this, "Mensaje Ubicheck", JO.getString("Message"),onClickListener);
+							}
 						}
     				}
     	        	else if(Status == 1)
@@ -563,6 +557,19 @@ public class UbicheckActivity extends Activity {
         	}
        }
     }
+
+	private void buildAlertnobranch() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("         Sucursales no encontradas")
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						SendHome(null);
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
 	
 	@SuppressLint("SimpleDateFormat")
 	private class AsyncUbicheckDetails extends AsyncTask<String, Void, String> {
@@ -677,7 +684,13 @@ public class UbicheckActivity extends Activity {
 			new AsyncGetPicture().execute("/Biometrics?BiometricID=" + BiometricID + "&Provider=Luxand");
 		}
 		catch(Exception ex){
-			Toast.makeText(getApplicationContext(), "E010:" + ex.toString(),Toast.LENGTH_SHORT).show();
+			if(isOnline()){
+				Toast.makeText(getApplicationContext(), "Parece que usted No cuenta con ninguna fotografia en el sietema",Toast.LENGTH_SHORT).show();
+			}else{
+				Toast.makeText(getApplicationContext(), "Usted No se encuentra conectado a internet ",Toast.LENGTH_SHORT).show();
+			}
+			Ui.setVisibility(View.VISIBLE);
+			Animation.setVisibility(View.GONE);
 		}
 	}
 

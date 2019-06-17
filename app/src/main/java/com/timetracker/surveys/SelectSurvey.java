@@ -7,6 +7,8 @@ import com.timetracker.data.Surveys;
 import com.timetracker.sqlite.MySQLiteHelper;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -23,6 +25,7 @@ public class SelectSurvey extends Activity {
 	LinearLayout lyButtons;
 	private MySQLiteHelper db = new MySQLiteHelper(SelectSurvey.this);
 	private TableRow tr_options;
+	boolean extra = false;
 	
 	@Override
 	 protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +37,8 @@ public class SelectSurvey extends Activity {
 		tr_options = (TableRow)findViewById(R.id.tr_options);
 		Intent MyIntent = getIntent();
 		Bundle extras = MyIntent.getExtras();
-		boolean extra = false;
+
+
 
 		if (extras != null) {
 			extra = extras.getBoolean("extra");
@@ -99,6 +103,36 @@ public class SelectSurvey extends Activity {
 			 Toast.makeText(getBaseContext(), ex.toString(), Toast.LENGTH_LONG).show();
 		}
     }
+
+	@Override
+	public void onBackPressed() {
+		Devices Device = db.GetDevice();
+		if(!extra){
+			buildAlertBackToHome();
+		}else {
+			super.onBackPressed();
+		}
+
+	}
+
+	private void buildAlertBackToHome() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("¿Desea continuar con la seleccion de forma?")
+				.setCancelable(false)
+				.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+					public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+						dialog.cancel();
+					}
+				})
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+						Intent intent = new Intent(SelectSurvey.this,HomeActivity.class);
+						startActivity(intent);
+					}
+				});
+		final AlertDialog alert = builder.create();
+		alert.show();
+	}
 	
 	public void onDestroy() {
 	    super.onDestroy();

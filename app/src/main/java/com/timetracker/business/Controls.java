@@ -230,12 +230,7 @@ public class Controls {
 		    txtEnding.setLayoutParams(td);
 		    linLayout.addView(txtEnding);
 		}
-		if(question.SurveyID == 3453){
-			button.setVisibility(View.INVISIBLE);
 			linLayout.addView(button);
-		}else {
-			linLayout.addView(button);
-		}
 
         return linLayout;
 	}
@@ -695,7 +690,7 @@ public class Controls {
 					if(QuestionOptions.get(j).Type.equals("Numerico")){
 						editQuestion.setInputType(InputType.TYPE_CLASS_NUMBER);
 						if(question.SurveyID == 3439 && question.Question1.equals("Competencia")) {
-							editQuestion.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "32",context)});
+							editQuestion.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "35",context)});
 						}
 					}else if(QuestionOptions.get(j).Type.equals("Decimal")){
 						editQuestion.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);

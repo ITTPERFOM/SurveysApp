@@ -6,8 +6,8 @@ android {
         applicationId "com.timetracker.surveys"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 261
-        versionName "2.61"
+        versionCode 265
+        versionName "2.65"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
