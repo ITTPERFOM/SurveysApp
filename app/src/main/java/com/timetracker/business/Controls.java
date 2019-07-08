@@ -276,6 +276,7 @@ public class Controls {
 				GridTable.setColumnStretchable(0, true);
 				GridTable.setId(question.QuestionID + idKey3);
 				horizontalView.addView(GridTable);
+
 				linLayout.addView(horizontalView);
 			}
 			if (question.Blocked == 1 || question.QuestionID == 22279 || question.QuestionID == 22287

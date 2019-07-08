@@ -32,10 +32,10 @@ import android.widget.Toast;
 
 public class StartSurvey extends Activity {
 	ProgressDialog progress;
-    int SurveyID;
-    TextView tvIsConnected;
-    private MySQLiteHelper db = new MySQLiteHelper(StartSurvey.this);
-    
+	int SurveyID;
+	TextView tvIsConnected;
+	private MySQLiteHelper db = new MySQLiteHelper(StartSurvey.this);
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,19 +44,19 @@ public class StartSurvey extends Activity {
 		setContentView(R.layout.activity_start_survey);
 		TextView txtIntroduction = (TextView) findViewById(R.id.txtIntroduction);
 		ImageView imgIntroduction = (ImageView) findViewById(R.id.imgIntroduction);
-		
+
 		SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
 		Surveys survey = db.getSurvey(SelectedSurvey.SurveyID);
 		txtIntroduction.setText(survey.IntroductionText);
 		Bitmap bitmap = StringToBitMap(survey.IntroductionImage);
 		imgIntroduction.setImageBitmap(bitmap);
 	}
-	
+
 	public void onDestroy() {
-	    super.onDestroy();
-	    db.close();
+		super.onDestroy();
+		db.close();
 	}
-	
+
 	public void Start(View view){
 		try
 		{
@@ -88,47 +88,47 @@ public class StartSurvey extends Activity {
 			}
 		}
 		catch(Exception ex){
-    	   Toast.makeText(getApplicationContext(), ex.toString(),Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), ex.toString(),Toast.LENGTH_LONG).show();
 		}
 	}
-	
+
 	private class AsyncOptions extends AsyncTask<String, Void, String> {
 		int intSurveyID;
-        public AsyncOptions(int intSurveyID) {
-        	this.intSurveyID = intSurveyID;
+		public AsyncOptions(int intSurveyID) {
+			this.intSurveyID = intSurveyID;
 		}
-        @Override
-        protected String doInBackground(String... urls) {
-            return ConnectionMethods.GET(StartSurvey.this,urls[0]);
-        }
-        @Override
-        protected void onPostExecute(String result) {
-        	progress.dismiss();
-            try {
-            	if(!result.equals("\"\""))
-            	{
-            		JSONArray catalogs = new JSONArray(result);
-            		for(int i=0; i< catalogs.length(); i++)
-                    {
-                		JSONObject jCatalog = (JSONObject)catalogs.getJSONObject(i);
-                		int QuestionID = jCatalog.getInt("QuestionID");
-                		String CatalogElements = jCatalog.getString("CatalogElements");
-                		Questions Q = db.getQuestion(QuestionID);
-                		Q.CatalogElements =  CatalogElements;
-                		db.updateQuestionElements(Q);
-                		Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.SurveyActivity.class);
-                		intent.putExtra("SurveyID",Integer.toString(intSurveyID));
-        				intent.putExtra("Index","0");
-        				startActivity(intent);
-        				finish();
-                    }
-            	}
+		@Override
+		protected String doInBackground(String... urls) {
+			return ConnectionMethods.GET(StartSurvey.this,urls[0]);
+		}
+		@Override
+		protected void onPostExecute(String result) {
+			progress.dismiss();
+			try {
+				if(!result.equals("\"\""))
+				{
+					JSONArray catalogs = new JSONArray(result);
+					for(int i=0; i< catalogs.length(); i++)
+					{
+						JSONObject jCatalog = (JSONObject)catalogs.getJSONObject(i);
+						int QuestionID = jCatalog.getInt("QuestionID");
+						String CatalogElements = jCatalog.getString("CatalogElements");
+						Questions Q = db.getQuestion(QuestionID);
+						Q.CatalogElements =  CatalogElements;
+						db.updateQuestionElements(Q);
+						Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.SurveyActivity.class);
+						intent.putExtra("SurveyID",Integer.toString(intSurveyID));
+						intent.putExtra("Index","0");
+						startActivity(intent);
+						finish();
+					}
+				}
 			} catch (Exception ex) {
 				Toast.makeText(getBaseContext(), "Ocurrio un error al momento de sincronizar objectos. Info: " + ex.toString(), Toast.LENGTH_LONG).show();
 			}
-       }
-    }
-	
+		}
+	}
+
 	public void SendHome(View view){
 		Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
 		startActivity(intent);
@@ -136,15 +136,15 @@ public class StartSurvey extends Activity {
 	}
 
 	public Bitmap StringToBitMap(String encodedString){
-      try{
-        byte [] encodeByte=Base64.decode(encodedString,Base64.DEFAULT);
-        Bitmap bitmap=BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-        return bitmap;
-      }catch(Exception e){
-        e.getMessage();
-        return null;
-      }
+		try{
+			byte [] encodeByte=Base64.decode(encodedString,Base64.DEFAULT);
+			Bitmap bitmap=BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+			return bitmap;
+		}catch(Exception e){
+			e.getMessage();
+			return null;
+		}
 	}
-	
-	
+
+
 }

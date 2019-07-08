@@ -8,4 +8,6 @@
     <color name="white">#fff</color>
     <color name="black">#000</color>
     <color name="Neutra">#d1d1d1</color>
+    <color name="bRed">#DC3545</color>
+    <color name="bGreen">#28A745</color>
 </resources>

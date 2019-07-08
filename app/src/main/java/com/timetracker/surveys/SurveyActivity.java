@@ -118,7 +118,7 @@ public class SurveyActivity extends Activity {
 	//================================================================================
     // Global Variables
     //================================================================================
-
+	int Count= 1;
 	int j=0;
 	List<List<Questions>> SurveyQuestions;
 	LinearLayout lm;
@@ -162,8 +162,10 @@ public class SurveyActivity extends Activity {
 	private LocationCallback locationCallback;
 	private Location lc;
 	private double latitude,longitude;
+    private boolean MaulecSurvey = false;
 
-	//================================================================================
+
+    //================================================================================
     // Activity Events
     //================================================================================
 
@@ -222,57 +224,6 @@ public class SurveyActivity extends Activity {
 		}
 	}
 
-	public void  ContinueSurvey(){
-		sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-		if(sharedpreferences.contains("savequestions")){
-			int Flag= sharedpreferences.getInt("Flag", 0);
-			if (Flag==1)
-			{
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle("Encuesta incompleta")
-						.setMessage("le gustaría completar la encuesta?")
-						.setCancelable(false)
-						.setPositiveButton("Si",new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-							}
-						})
-						.setNegativeButton("No",new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int id) {
-								dialog.cancel();
-								Editor editor = sharedpreferences.edit();
-								editor.remove("savequestions");
-								editor.remove("saveindex");
-								editor.commit();
-								Devices Device = db.GetDevice();
-								db.deletePhotos();
-								if(Device.UsesFormWithUbicheck == 1 && Device.UsesClientValidation == 1){
-									db.deleteSelectedSurveys();
-									Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
-									startActivity(intent);
-									finish();
-								}else{
-									SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
-									if(SelectedSurvey != null){
-										db.updateQuestionAnswers(SelectedSurvey.SurveyID);
-									}
-									Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.StartSurvey.class);
-									startActivity(intent);
-									finish();
-								}
-							}
-						});
-				AlertDialog alert = builder.create();
-				alert.show();
-			}
-			else
-			{
-				Editor editor = sharedpreferences.edit();
-				editor.putInt("Flag", 1);
-				editor.commit();
-			}
-		}
-	}
 
 	@Override
   	protected void onResume() {
@@ -497,7 +448,7 @@ public class SurveyActivity extends Activity {
 
 
 					        TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
-				            txtTitle.setText("Seleccione Secci�n");
+				            txtTitle.setText("Seleccione sección");
 				            Button btnNext = (Button) findViewById(R.id.btnNext);
 				            Button btnBack = (Button) findViewById(R.id.btnBack);
 				            Button btnSections1 = (Button) findViewById(R.id.btnSections);
@@ -608,6 +559,76 @@ public class SurveyActivity extends Activity {
 		       catch(Exception ex){
 		    	   Toast.makeText(getApplicationContext(), "E004:" + ex.toString(),Toast.LENGTH_LONG).show();
 	       }
+	}
+
+
+	public void  ContinueSurvey(){
+		sharedpreferences=getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+		if(sharedpreferences.contains("savequestions")){
+			int Flag= sharedpreferences.getInt("Flag", 0);
+			if (Flag==1)
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle("Encuesta incompleta")
+						.setMessage("le gustaría completar la encuesta?")
+						.setCancelable(false)
+						.setPositiveButton("Si",new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						})
+						.setNegativeButton("No",new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+								Editor editor = sharedpreferences.edit();
+								editor.remove("savequestions");
+								editor.remove("saveindex");
+								editor.commit();
+								Devices Device = db.GetDevice();
+								db.deletePhotos();
+								if(Device.UsesFormWithUbicheck == 1 && Device.UsesClientValidation == 1){
+									db.deleteSelectedSurveys();
+									try{
+										Questions question = db.getQuestion( 93744);
+										if(question.Options.equals("Preload")){
+											new AsyncGetTable(question.QuestionID).execute("/Procedures?value=" + URLEncoder.encode(String.valueOf(question.QuestionID) + "|" + Device.DeviceID));
+										}
+									}catch (Exception e){
+
+									}
+									Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
+									startActivity(intent);
+									finish();
+								}else{
+									SelectedSurvey SelectedSurvey = db.GetSelectedSurvey();
+									if(SelectedSurvey != null){
+										db.updateQuestionAnswers(SelectedSurvey.SurveyID);
+									}
+									try{
+										Questions question = db.getQuestion(93744);
+										if(question.Options.equals("Preload")){
+											new AsyncGetTable(93744).execute("/Procedures?value=" + URLEncoder.encode(String.valueOf(93744) + "|" + Device.DeviceID));
+										}
+									}catch (Exception e){
+
+									}
+
+									Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.StartSurvey.class);
+									startActivity(intent);
+									finish();
+								}
+							}
+						});
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
+			else
+			{
+				Editor editor = sharedpreferences.edit();
+				editor.putInt("Flag", 1);
+				editor.commit();
+			}
+		}
 	}
 
 	//================================================================================
@@ -857,7 +878,7 @@ public class SurveyActivity extends Activity {
 				editor.putInt("saveindex", j);
 				editor.putInt("Flag", 1);
 				editor.commit();
-				Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma ",0,0);
+				Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma ",0,0,0);
 				List<Questions> listitems = new ArrayList<Questions>();
 				listitems.add(item);
 				j=j+1;
@@ -866,6 +887,9 @@ public class SurveyActivity extends Activity {
 				Controls control= new Controls();
 				lm.removeAllViews();
 				View controls=control.CreateControls(this,listitems);
+				if (questions.get(0).SurveyID == 3453){
+					controls.setVisibility(View.INVISIBLE);
+				}
 				lm.addView(controls);
 
 				CreateListeners(listitems,false);
@@ -1022,7 +1046,7 @@ public class SurveyActivity extends Activity {
 				editor.putInt("saveindex", j);
 				editor.putInt("Flag", 1);
 				editor.commit();
-				Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma ",0,0);
+				Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma ",0,0,0);
 				List<Questions> listitems = new ArrayList<Questions>();
 				listitems.add(item);
 				j=j+1;
@@ -1031,6 +1055,9 @@ public class SurveyActivity extends Activity {
 				Controls control= new Controls();
 				lm.removeAllViews();
 				View controls=control.CreateControls(this,listitems);
+				if (questions.get(0).SurveyID == 3453){
+					controls.setVisibility(View.INVISIBLE);
+				}
 				lm.addView(controls);
 				CreateListeners(listitems,false);
 			}
@@ -1176,7 +1203,7 @@ public class SurveyActivity extends Activity {
 		            editor.putInt("saveindex", j);
 		            editor.putInt("Flag", 0);
 		            editor.commit();
-		            Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma ",0,0);
+		            Questions item = new Questions(1,questions.get(0).SurveyID,0,1,"","Finalizar","","","",0,"","","",0,0,false,0,"","",false,false,false,1,1,"","",false,"",0,"",0,"","","","","","","",false,"Finalizar Forma ",0,0,0);
 					List<Questions> listitems = new ArrayList<Questions>();
 					listitems.add(item);
 					j=j+1;
@@ -1185,6 +1212,9 @@ public class SurveyActivity extends Activity {
 					Controls control= new Controls();
 					lm.removeAllViews();
 					View controls=control.CreateControls(this,listitems);
+					if (questions.get(0).SurveyID == 3453){
+						controls.setVisibility(View.INVISIBLE);
+					}
 					lm.addView(controls);
 
 					CreateListeners(listitems,false);
@@ -1289,6 +1319,7 @@ public class SurveyActivity extends Activity {
                         item.put("UbicheckID", UbicheckID);
                         item.put("DeviceID", DeviceID);
                         item.put("FinishUbicheck", FinishUbicheck);
+                        item.put("PostProcedureID",row.PostProcedureID);
                         jsArray.put(item);
                     }
                 }else {
@@ -1310,6 +1341,7 @@ public class SurveyActivity extends Activity {
                         item.put("UbicheckID", row.Ubicheck);
                         item.put("DeviceID", DeviceID);
                         item.put("FinishUbicheck", FinishUbicheck);
+						item.put("PostProcedureID",row.PostProcedureID);
                         jsArray.put(item);
                     }
                 }
@@ -1958,7 +1990,7 @@ public class SurveyActivity extends Activity {
 															row.Answer = db.getPhoto(row.QuestionID);
 														}
 														Identifier = randomID + String.valueOf(year) + String.valueOf(month) + String.valueOf(day) + String.valueOf(hour) + String.valueOf(seconds) + String.valueOf(milliseccons);
-														Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID);
+														Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID,row.PostProcedureID);
 														listAnswers.add(item);
 													}
 												}
@@ -2063,7 +2095,7 @@ public class SurveyActivity extends Activity {
 															row.Answer = db.getPhoto(row.QuestionID);
 														}
 														Identifier = randomID + String.valueOf(year) + String.valueOf(month) + String.valueOf(day) + String.valueOf(hour) + String.valueOf(seconds) + String.valueOf(milliseccons);
-														Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID);
+														Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID,row.PostProcedureID);
 														listAnswers.add(item);
 													}
 												}
@@ -2157,7 +2189,7 @@ public class SurveyActivity extends Activity {
 											row.Answer = db.getPhoto(row.QuestionID);
 										}
 										Identifier = randomID + String.valueOf(year) + String.valueOf(month) + String.valueOf(day) + String.valueOf(hour) + String.valueOf(seconds) + String.valueOf(milliseccons);
-										Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID);
+										Answers item = new Answers(0,row.QuestionID,row.Answer,row.QuestionTypeID,latitude,longitude,DeviceMac,Identifier,SelectedSurvey.DateFormStart,DateFormFinish,SelectedSurvey.UbicheckID,row.PostProcedureID);
 										listAnswers.add(item);
 									}
 								}
@@ -2257,7 +2289,7 @@ public class SurveyActivity extends Activity {
 	 }
 
 	 //================================================================================
-	 // Create Text Listener
+	 // Create Text Listener 55
 	 //================================================================================
 
 	 public void CreateListenerText(int controlid) {
@@ -2306,7 +2338,6 @@ public class SurveyActivity extends Activity {
 			 editText.setVisibility(View.GONE);
 			 button.setVisibility(View.GONE);
 		 }
-
      }
 
 	 //================================================================================
@@ -2437,6 +2468,11 @@ public class SurveyActivity extends Activity {
 	 //================================================================================
 
 	 private void CreateListenerGridMultiple(int controlid) {
+		 Questions question = db.getQuestion(controlid);
+		 if(question.Options.equals("Preload")){
+		 	 Devices Device = db.GetDevice();
+			 new AsyncGetTable(controlid).execute("/Procedures?value=" + URLEncoder.encode(String.valueOf(controlid) + "|" + Device.DeviceID));
+		 }
 	 }
 
 	 //================================================================================
@@ -2995,6 +3031,7 @@ public class SurveyActivity extends Activity {
 	   @Override
 	   	protected void onPostExecute(String result) {
 		   	progress.dismiss();
+		   	Questions q = db.getQuestion(QuestionID);
 		   	if(QuestionID == 45917)
 		   	{
 		   		if(!result.equals("\"0\"")){
@@ -3057,7 +3094,18 @@ public class SurveyActivity extends Activity {
 		   			Toast.makeText(getBaseContext(), "No se pudo realizar la conexion", Toast.LENGTH_LONG).show();
 		   		}
 		   		return;
-		   	}
+		   	}else  if ( q.QuestionTypeID == 7 ){
+				if(!result.equals("\"0\"")){
+					//result = result.substring(1, result.length()-1);
+					String[] rows = result.split(Pattern.quote("\\r\\n"));
+					if(rows.length > 1){
+						String[] columns = rows[1].split(Pattern.quote(","));
+						q.Answer = columns[0].toString();
+						db.updateQuestion(q);
+					}
+				}
+				return;
+			}
             try
             {
             	final TableLayout GridTable = (TableLayout) findViewById(QuestionID+idKey3);
@@ -3066,6 +3114,7 @@ public class SurveyActivity extends Activity {
             		result = result.substring(1, result.length()-1);
             		String[] rows = result.split(Pattern.quote("\\r\\n"));
             		boolean isHeader = true;
+					boolean PositivePercentage = false;
             		if(rows.length > 0){
 						String[] columnsTemp = rows[1].split(Pattern.quote(","));
             			if(rows.length == 2 && columnsTemp[columnsTemp.length-1].equals("btn:SelectAllBlockBarcode")){
@@ -3193,16 +3242,57 @@ public class SurveyActivity extends Activity {
             	            					rowText.setTextAppearance(getBaseContext(), R.style.SQLGridText);
             	            				}
         	            				}
-        	            				tableRow.addView(rowText);
+
+
+										try {
+											if(MaulecSurvey){
+											Count++;
+											if (rowText.getText().toString().indexOf("%") >= 1) {
+                                                int porcentage = 0;
+                                                try{
+                                                    porcentage = Integer.parseInt(rowText.getText().toString().substring(0, rowText.getText().toString().indexOf("%")));
+                                                }catch (Exception e){
+											        Log.d("Prueba", e.toString());
+                                                }
+													if (porcentage >= 80) {
+														rowText.setBackgroundColor(getResources().getColor(R.color.bGreen));
+													} else {
+                                                        rowText.setBackgroundColor(getResources().getColor(R.color.bRed));
+													}
+											}
+												if (Count % 7 == 0 ) {
+													if(!rowText.getText().toString().equals("DDI")) {
+														int ddi = Integer.parseInt(rowText.getText().toString());
+
+														if (ddi >= 16) {
+                                                            rowText.setBackgroundColor(getResources().getColor(R.color.bGreen));
+														} else {
+                                                            rowText.setBackgroundColor(getResources().getColor(R.color.bRed));
+														}
+													}
+												}
+										}
+										}catch (Exception e){
+											Log.d("Prueba", e.toString());
+											rowText.setBackgroundColor(Color.RED);
+										}
+
+										if(rowText.getText().toString().equals("Producto Maulec")){
+											rowText.setText("Nombre");
+											tableRow.addView(rowText);
+											MaulecSurvey = true;
+										}else {
+											tableRow.addView(rowText);
+										}
         	            			}
         	            		}
-        	            		if(isHeader){
-        	            			tableRow.setBackgroundColor(Color.parseColor("#126BAD"));
-        	            		}else{
-        	            			tableRow.setBackgroundColor(Color.WHITE);
-        	            		}
+
+								if(isHeader){
+									tableRow.setBackgroundColor(Color.parseColor("#126BAD"));
+								}
         	            		isHeader = false;
-        	            		GridTable.addView(tableRow);
+
+								GridTable.addView(tableRow);
                 			}
             			}
             		}
@@ -3471,5 +3561,16 @@ public class SurveyActivity extends Activity {
 	}
 	public void CreateReportDDI(){
 
+	}
+
+
+	public boolean endsWithPorcentage(String text){
+		boolean result = false;
+		int d = 1-text.length();
+
+		String[] parts = {text.substring(0, d),text.substring(d)};
+		Log.d("Prueba",parts[0]+"   Aquie debe haber un porcentaje : " + parts[1]);
+
+		return result;
 	}
 }

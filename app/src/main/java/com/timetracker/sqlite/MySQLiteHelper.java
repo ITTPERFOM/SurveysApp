@@ -29,7 +29,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     // Global Variables
     //================================================================================
 	
-    private static final int DATABASE_VERSION = 48;
+    private static final int DATABASE_VERSION = 49;
     private static final String DATABASE_NAME = "SurveysDB";
  
     public MySQLiteHelper(Context context) {
@@ -80,7 +80,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	       "Identifier TEXT, " +
    		   "DateFormStart TEXT, " +
 		   "DateFormFinish TEXT," +
-	   	   "UbicheckID INTEGER )";
+	   	   "UbicheckID INTEGER, " +
+		   "PostProcedureID INTEGER)";
 	   	   
 		String CREATE_SURVEYS_TABLE = "CREATE TABLE surveys ( " +
 		        "SurveyID INTEGER PRIMARY KEY , " + 
@@ -141,7 +142,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 "Hidden INTEGER, "+
                 "Answer TEXT, " +
                 "ProcedureID int," +
-        		"Blocked int)";
+        		"Blocked int," +
+				"PostProcedureID INTEGER)";
         
         String CREATE_QUESTIONOPTIONS_TABLE = "CREATE TABLE questionOptions ( " +
 		        "QuestionOptionID INTEGER PRIMARY KEY , " + 
@@ -201,6 +203,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
  
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    	if(newVersion >= 48){
+			db.execSQL("ALTER TABLE questions  ADD PostProcedureID INTEGER");
+			db.execSQL("ALTER TABLE Answers  ADD PostProcedureID INTEGER");
+		}
 
     	if(!tableExists(db,"ActualUbicheck")){
 			db.execSQL("CREATE TABLE IF NOT EXISTS ActualUbicheck ( " +
@@ -699,6 +706,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 		values.put("DateFormStart", Answer.DateFormStart);
 		values.put("DateFormFinish", Answer.DateFormFinish);
 		values.put("UbicheckID", Answer.Ubicheck);
+		values.put("PostProcedureID",Answer.PostProcedureID);
 		db.insert("Answers", null, values); 
 		db.close(); 
 	}
@@ -729,7 +737,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             	if(mac == null){
             		mac = "";
             	}
-            	answer = new Answers(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),cursor.getString(2),Integer.parseInt(cursor.getString(3)),Double.parseDouble(lat),Double.parseDouble(lon),mac,cursor.getString(7),cursor.getString(8),cursor.getString(9),cursor.getInt(10));
+            	answer = new Answers(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),cursor.getString(2),Integer.parseInt(cursor.getString(3)),Double.parseDouble(lat),Double.parseDouble(lon),mac,cursor.getString(7),cursor.getString(8),cursor.getString(9),cursor.getInt(10),cursor.getInt(11));
                 answers.add(answer);
             } while (cursor.moveToNext());
         }
@@ -760,7 +768,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             	if(mac == null){
             		mac = "";
             	}
-            	answer = new Answers(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),cursor.getString(2),Integer.parseInt(cursor.getString(3)),Double.parseDouble(lat),Double.parseDouble(lon),mac,cursor.getString(7),cursor.getString(8),cursor.getString(9),cursor.getInt(10));
+            	answer = new Answers(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),cursor.getString(2),Integer.parseInt(cursor.getString(3)),Double.parseDouble(lat),Double.parseDouble(lon),mac,cursor.getString(7),cursor.getString(8),cursor.getString(9),cursor.getInt(10),cursor.getInt(11));
                 answers.add(answer);
             } while (cursor.moveToNext());
         }
@@ -850,7 +858,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             	if(mac == null){
             		mac = "";
             	}
-            	answer = new Answers(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),cursor.getString(2),Integer.parseInt(cursor.getString(3)),Double.parseDouble(lat),Double.parseDouble(lon),mac,cursor.getString(7),cursor.getString(8),cursor.getString(9),cursor.getInt(10));
+            	answer = new Answers(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),cursor.getString(2),Integer.parseInt(cursor.getString(3)),Double.parseDouble(lat),Double.parseDouble(lon),mac,cursor.getString(7),cursor.getString(8),cursor.getString(9),cursor.getInt(10),cursor.getInt(11));
             } while (cursor.moveToNext());
         }
         if(cursor != null){
@@ -1298,6 +1306,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 		values.put("Answer", question.Answer);
 		values.put("ProcedureID", question.ProcedureID);
 		values.put("Blocked", question.Blocked);
+		values.put("PostProcedureID", question.PostProcedureID);
 		db.insert("questions", null, values);
 		db.close(); 
 	}
@@ -1371,7 +1380,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             	{
     				Hidden=true;
             	}
-            	question = new Questions(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(3)),cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8),Integer.parseInt(cursor.getString(9)),cursor.getString(10),cursor.getString(11),cursor.getString(12),Integer.parseInt(cursor.getString(13)),Integer.parseInt(cursor.getString(14)),required,Integer.parseInt(cursor.getString(16)),cursor.getString(17),cursor.getString(18),Randomize,IncludeScoring,DisplayImages,Integer.parseInt(cursor.getString(22)),Integer.parseInt(cursor.getString(23)),cursor.getString(24),cursor.getString(25),ImageAboveText,cursor.getString(27),Integer.parseInt(cursor.getString(28)),cursor.getString(29),Integer.parseInt(cursor.getString(30)),cursor.getString(31),cursor.getString(32),cursor.getString(33),cursor.getString(34),cursor.getString(35),cursor.getString(36),cursor.getString(37), Hidden,cursor.getString(39),Integer.parseInt(cursor.getString(40)),Integer.parseInt(cursor.getString(41)));
+				question = new Questions(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(3)),cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8),Integer.parseInt(cursor.getString(9)),cursor.getString(10),cursor.getString(11),cursor.getString(12),Integer.parseInt(cursor.getString(13)),Integer.parseInt(cursor.getString(14)),required,Integer.parseInt(cursor.getString(16)),cursor.getString(17),cursor.getString(18),Randomize,IncludeScoring,DisplayImages,Integer.parseInt(cursor.getString(22)),Integer.parseInt(cursor.getString(23)),cursor.getString(24),cursor.getString(25),ImageAboveText,cursor.getString(27),Integer.parseInt(cursor.getString(28)),cursor.getString(29),Integer.parseInt(cursor.getString(30)),cursor.getString(31),cursor.getString(32),cursor.getString(33),cursor.getString(34),cursor.getString(35),cursor.getString(36),cursor.getString(37), Hidden,cursor.getString(39),Integer.parseInt(cursor.getString(40)),Integer.parseInt(cursor.getString(41)),cursor.getInt(42));
             	questions.add(question);
             } while (cursor.moveToNext());
         }
@@ -1424,8 +1433,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             	{
     				Hidden=true;
             	}
-            	question = new Questions(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(3)),cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8),Integer.parseInt(cursor.getString(9)),cursor.getString(10),cursor.getString(11),cursor.getString(12),Integer.parseInt(cursor.getString(13)),Integer.parseInt(cursor.getString(14)),required,Integer.parseInt(cursor.getString(16)),cursor.getString(17),cursor.getString(18),Randomize,IncludeScoring,DisplayImages,Integer.parseInt(cursor.getString(22)),Integer.parseInt(cursor.getString(23)),cursor.getString(24),cursor.getString(25),ImageAboveText,cursor.getString(27),Integer.parseInt(cursor.getString(28)),cursor.getString(29),Integer.parseInt(cursor.getString(30)),cursor.getString(31),cursor.getString(32),cursor.getString(33),cursor.getString(34),cursor.getString(35),cursor.getString(36),cursor.getString(37), Hidden,cursor.getString(39),Integer.parseInt(cursor.getString(40)),Integer.parseInt(cursor.getString(41)));
-            	questions.add(question);
+				question = new Questions(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(3)),cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8),Integer.parseInt(cursor.getString(9)),cursor.getString(10),cursor.getString(11),cursor.getString(12),Integer.parseInt(cursor.getString(13)),Integer.parseInt(cursor.getString(14)),required,Integer.parseInt(cursor.getString(16)),cursor.getString(17),cursor.getString(18),Randomize,IncludeScoring,DisplayImages,Integer.parseInt(cursor.getString(22)),Integer.parseInt(cursor.getString(23)),cursor.getString(24),cursor.getString(25),ImageAboveText,cursor.getString(27),Integer.parseInt(cursor.getString(28)),cursor.getString(29),Integer.parseInt(cursor.getString(30)),cursor.getString(31),cursor.getString(32),cursor.getString(33),cursor.getString(34),cursor.getString(35),cursor.getString(36),cursor.getString(37), Hidden,cursor.getString(39),Integer.parseInt(cursor.getString(40)),Integer.parseInt(cursor.getString(41)),cursor.getInt(42));            	questions.add(question);
             } while (cursor.moveToNext());
         }
         if(cursor != null){
@@ -1476,7 +1484,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             	{
     				Hidden=true;
             	}
-            	question = new Questions(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(3)),cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8),Integer.parseInt(cursor.getString(9)),cursor.getString(10),cursor.getString(11),cursor.getString(12),Integer.parseInt(cursor.getString(13)),Integer.parseInt(cursor.getString(14)),required,Integer.parseInt(cursor.getString(16)),cursor.getString(17),cursor.getString(18),Randomize,IncludeScoring,DisplayImages,Integer.parseInt(cursor.getString(22)),Integer.parseInt(cursor.getString(23)),cursor.getString(24),cursor.getString(25),ImageAboveText,cursor.getString(27),Integer.parseInt(cursor.getString(28)),cursor.getString(29),Integer.parseInt(cursor.getString(30)),cursor.getString(31),cursor.getString(32),cursor.getString(33),cursor.getString(34),cursor.getString(35),cursor.getString(36),cursor.getString(37), Hidden,cursor.getString(39),Integer.parseInt(cursor.getString(40)),Integer.parseInt(cursor.getString(41)));
+            	question = new Questions(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(3)),cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8),Integer.parseInt(cursor.getString(9)),cursor.getString(10),cursor.getString(11),cursor.getString(12),Integer.parseInt(cursor.getString(13)),Integer.parseInt(cursor.getString(14)),required,Integer.parseInt(cursor.getString(16)),cursor.getString(17),cursor.getString(18),Randomize,IncludeScoring,DisplayImages,Integer.parseInt(cursor.getString(22)),Integer.parseInt(cursor.getString(23)),cursor.getString(24),cursor.getString(25),ImageAboveText,cursor.getString(27),Integer.parseInt(cursor.getString(28)),cursor.getString(29),Integer.parseInt(cursor.getString(30)),cursor.getString(31),cursor.getString(32),cursor.getString(33),cursor.getString(34),cursor.getString(35),cursor.getString(36),cursor.getString(37), Hidden,cursor.getString(39),Integer.parseInt(cursor.getString(40)),Integer.parseInt(cursor.getString(41)),cursor.getInt(42));
             } while (cursor.moveToNext());
         }
         if(cursor != null){
@@ -1527,8 +1535,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             	{
     				Hidden=true;
             	}
-            	question = new Questions(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(3)),cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8),Integer.parseInt(cursor.getString(9)),cursor.getString(10),cursor.getString(11),cursor.getString(12),Integer.parseInt(cursor.getString(13)),Integer.parseInt(cursor.getString(14)),required,Integer.parseInt(cursor.getString(16)),cursor.getString(17),cursor.getString(18),Randomize,IncludeScoring,DisplayImages,Integer.parseInt(cursor.getString(22)),Integer.parseInt(cursor.getString(23)),cursor.getString(24),cursor.getString(25),ImageAboveText,cursor.getString(27),Integer.parseInt(cursor.getString(28)),cursor.getString(29),Integer.parseInt(cursor.getString(30)),cursor.getString(31),cursor.getString(32),cursor.getString(33),cursor.getString(34),cursor.getString(35),cursor.getString(36),cursor.getString(37), Hidden,cursor.getString(39),Integer.parseInt(cursor.getString(40)),Integer.parseInt(cursor.getString(41)));
-            } while (cursor.moveToNext());
+				question = new Questions(Integer.parseInt(cursor.getString(0)),Integer.parseInt(cursor.getString(1)),Integer.parseInt(cursor.getString(2)),Integer.parseInt(cursor.getString(3)),cursor.getString(4),cursor.getString(5),cursor.getString(6),cursor.getString(7),cursor.getString(8),Integer.parseInt(cursor.getString(9)),cursor.getString(10),cursor.getString(11),cursor.getString(12),Integer.parseInt(cursor.getString(13)),Integer.parseInt(cursor.getString(14)),required,Integer.parseInt(cursor.getString(16)),cursor.getString(17),cursor.getString(18),Randomize,IncludeScoring,DisplayImages,Integer.parseInt(cursor.getString(22)),Integer.parseInt(cursor.getString(23)),cursor.getString(24),cursor.getString(25),ImageAboveText,cursor.getString(27),Integer.parseInt(cursor.getString(28)),cursor.getString(29),Integer.parseInt(cursor.getString(30)),cursor.getString(31),cursor.getString(32),cursor.getString(33),cursor.getString(34),cursor.getString(35),cursor.getString(36),cursor.getString(37), Hidden,cursor.getString(39),Integer.parseInt(cursor.getString(40)),Integer.parseInt(cursor.getString(41)),cursor.getInt(42));            } while (cursor.moveToNext());
         }
         if(cursor != null){
         	cursor.close();

@@ -61,7 +61,7 @@ public class JsonMethods {
        	     	 Boolean Hidden=Boolean.parseBoolean((String) jb.get("Hidden"));
            	     String Answer="";
            	     int ProcedureID=Integer.parseInt((String) jb.get("ProcedureID"));
-            	Questions item = new Questions(QuestionID,SurveyID,QuestionTypeID,SectionID,SectionName,Title,Text,Value,Comment,OrderNumber,Question1,Instruction,ShortName,Minimum,Maximum,Required,Decimals,Preffix,Suffix,Randomize,IncludeScoring,DisplayImages,MinAnswers,MaxAnswers,LeftLabel,RightLabel,ImageAboveText,DefaultDate,DateTypeID,DateTypeName,CatalogID,CatalogElements,Condition,Valu,SendTo,Image,Options,OtherOption,Hidden,Answer,ProcedureID,0);
+            	Questions item = new Questions(QuestionID,SurveyID,QuestionTypeID,SectionID,SectionName,Title,Text,Value,Comment,OrderNumber,Question1,Instruction,ShortName,Minimum,Maximum,Required,Decimals,Preffix,Suffix,Randomize,IncludeScoring,DisplayImages,MinAnswers,MaxAnswers,LeftLabel,RightLabel,ImageAboveText,DefaultDate,DateTypeID,DateTypeName,CatalogID,CatalogElements,Condition,Valu,SendTo,Image,Options,OtherOption,Hidden,Answer,ProcedureID,0,0);
             	if(max==i+1)
                 {   
                 	data.add(item);

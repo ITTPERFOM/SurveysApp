@@ -753,10 +753,11 @@ public class HomeActivity extends Activity {
 						String OtherOption=(String) jQuestion.get("OtherOption");
 						Boolean Hidden = Boolean.parseBoolean((String) jQuestion.get("Hidden"));
 						int OProcedureID = Integer.parseInt((String) jQuestion.get("ProcedureID"));
+						int PostProcedureID = Integer.parseInt((String) jQuestion.get("PostProcedureID"));
 						String Answer="";
 						if (QuestionTypeID == 12 || QuestionTypeID == 19)
 						{
-							Questions question = new Questions(QuestionID,SurveyID,QuestionTypeID,SectionID,SectionName,Title,Text,Value,Comment,OrderNumber,Question1,Instruction,ShortName,Minimum,Maximum,Required,Decimals,Preffix,Suffix,Randomize,IncludeScoring,DisplayImages,MinAnswers,MaxAnswers,LeftLabel,RightLabel,ImageAboveText,DefaultDate,DateTypeID,DateTypeName,CatalogID,CatalogElements,Condition,Valu,SendTo,Image,Options,OtherOption,Hidden,Answer,OProcedureID,0);
+							Questions question = new Questions(QuestionID,SurveyID,QuestionTypeID,SectionID,SectionName,Title,Text,Value,Comment,OrderNumber,Question1,Instruction,ShortName,Minimum,Maximum,Required,Decimals,Preffix,Suffix,Randomize,IncludeScoring,DisplayImages,MinAnswers,MaxAnswers,LeftLabel,RightLabel,ImageAboveText,DefaultDate,DateTypeID,DateTypeName,CatalogID,CatalogElements,Condition,Valu,SendTo,Image,Options,OtherOption,Hidden,Answer,OProcedureID,0,PostProcedureID);
 							if(!Image.equals("")){
 								new LoadImage(question).execute(Image);
 							}else{
@@ -765,7 +766,7 @@ public class HomeActivity extends Activity {
 						}
 						else
 						{
-							db.addQuestion(new Questions(QuestionID,SurveyID,QuestionTypeID,SectionID,SectionName,Title,Text,Value,Comment,OrderNumber,Question1,Instruction,ShortName,Minimum,Maximum,Required,Decimals,Preffix,Suffix,Randomize,IncludeScoring,DisplayImages,MinAnswers,MaxAnswers,LeftLabel,RightLabel,ImageAboveText,DefaultDate,DateTypeID,DateTypeName,CatalogID,CatalogElements,Condition,Valu,SendTo,Image,Options,OtherOption, Hidden,Answer,OProcedureID,0));
+							db.addQuestion(new Questions(QuestionID,SurveyID,QuestionTypeID,SectionID,SectionName,Title,Text,Value,Comment,OrderNumber,Question1,Instruction,ShortName,Minimum,Maximum,Required,Decimals,Preffix,Suffix,Randomize,IncludeScoring,DisplayImages,MinAnswers,MaxAnswers,LeftLabel,RightLabel,ImageAboveText,DefaultDate,DateTypeID,DateTypeName,CatalogID,CatalogElements,Condition,Valu,SendTo,Image,Options,OtherOption, Hidden,Answer,OProcedureID,0,PostProcedureID));
 						}
 						JSONArray jQuestionOptions = jQuestion.getJSONArray("QuestionOptions");
 						for (int k = 0; k < jQuestionOptions.length(); k++) {

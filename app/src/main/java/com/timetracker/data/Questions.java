@@ -25,6 +25,7 @@ public class Questions implements Parcelable  {
     public int Decimals;
 
     public String Preffix;
+    public int PostProcedureID;
     public String Suffix;
     public Boolean Randomize;
     public Boolean IncludeScoring;
@@ -54,7 +55,7 @@ public class Questions implements Parcelable  {
     public int ProcedureID;
     public int Blocked;
 
-    public Questions(int QuestionID,int SurveyID,int QuestionTypeID,int SectionID,String SectionName,String Title,String Text,String Value,String Comment,int OrderNumber,String Question1,String Instruction,String ShortName,int Minimum,int Maximum,Boolean Required,int Decimals,String Preffix,String Suffix,Boolean Randomize,Boolean IncludeScoring,Boolean DisplayImages,int MinAnswers,int MaxAnswers,String LeftLabel,String RightLabel,Boolean ImageAboveText,String DefaultDate,int DateTypeID,String DateTypeName,int CatalogID,String CatalogElements,String Condition,String Valu,String SendTo,String Image,String Options,String OtherOption,Boolean Hidden,String Answer,int ProcedureID,int Blocked ){
+    public Questions(int QuestionID,int SurveyID,int QuestionTypeID,int SectionID,String SectionName,String Title,String Text,String Value,String Comment,int OrderNumber,String Question1,String Instruction,String ShortName,int Minimum,int Maximum,Boolean Required,int Decimals,String Preffix,String Suffix,Boolean Randomize,Boolean IncludeScoring,Boolean DisplayImages,int MinAnswers,int MaxAnswers,String LeftLabel,String RightLabel,Boolean ImageAboveText,String DefaultDate,int DateTypeID,String DateTypeName,int CatalogID,String CatalogElements,String Condition,String Valu,String SendTo,String Image,String Options,String OtherOption,Boolean Hidden,String Answer,int ProcedureID,int Blocked,int PostProcedureID ){
         this.QuestionID = QuestionID;
         this.SurveyID = SurveyID;
         this.QuestionTypeID = QuestionTypeID;
@@ -98,6 +99,7 @@ public class Questions implements Parcelable  {
         this.Answer = Answer;
         this.ProcedureID = ProcedureID;
         this.Blocked = Blocked;
+        this.PostProcedureID = PostProcedureID;
     }
 
     private Questions(Parcel in) {
