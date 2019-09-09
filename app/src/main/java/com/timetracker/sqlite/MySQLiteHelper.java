@@ -1,5 +1,9 @@
 package com.timetracker.sqlite;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,11 +22,15 @@ import com.timetracker.data.Tracker;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
- 
+import android.util.Base64;
+
 public class MySQLiteHelper extends SQLiteOpenHelper {
  
 	//================================================================================
@@ -31,9 +39,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	
     private static final int DATABASE_VERSION = 49;
     private static final String DATABASE_NAME = "SurveysDB";
+    private final Context mContext;
  
     public MySQLiteHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);  
+         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+         mContext = context;
     }
     
     //================================================================================
@@ -1717,23 +1727,24 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put("PhotoID", ID);
-		values.put("Photo", photo);
+		values.put("Photo",saveToInternalStorage(photo,ID));
 		db.insert("photos", null, values); 
 		db.close(); 
 	}
     
     public int UpdatePhoto(String photo, int ID){		
         SQLiteDatabase db = this.getWritableDatabase();		
-        ContentValues values = new ContentValues();		
-        values.put("Photo", photo);		
-        int i = db.update("photos", values, "PhotoID"+" = ?",new String[] { String.valueOf(ID) });		
+        ContentValues values = new ContentValues();
+        values.put("Photo",saveToInternalStorage(photo,ID));
+        int i = db.update("photos", values, "PhotoID"+" = ?",new String[] { getImagePathByID(ID) });
         db.close();		
         return i;		
     }
     
     public String getPhoto(int ID) {
     	String resultado = "";
-        String query = "SELECT * FROM photos WHERE PhotoID="+ID;
+        String Image= "";
+        String query = "SELECT * FROM photos WHERE PhotoID = " + getImagePathByID(ID) ;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
@@ -1744,15 +1755,50 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         }
         if(cursor != null){
         	cursor.close();
+            Bitmap bm = BitmapFactory.decodeFile(resultado);
+            ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+            bm.compress(Bitmap.CompressFormat.JPEG, 100, bOut);
+            Image = Base64.encodeToString(bOut.toByteArray(), Base64.DEFAULT);
         }
         db.close();
-        return resultado;
+        return Image;
     }
     
     public void deletePhotos() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM photos");
         db.close();
+    }
+
+    private String getImagePathByID(int ID){
+        ContextWrapper cw = new ContextWrapper(mContext);
+        File directory = cw.getDir("imageSurveyDir", Context.MODE_PRIVATE);
+        // Create imageDir
+        File mypath=new File(directory,ID + ".png" );
+        return directory.getAbsolutePath();
+    }
+
+    private String saveToInternalStorage(String photo, int ID){
+        ContextWrapper cw = new ContextWrapper(mContext);
+        File directory = cw.getDir("imageSurveyDir", Context.MODE_PRIVATE);
+        // Create imageDir
+        File mypath=new File(directory,ID + ".png" );
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            byte[] decodedString = android.util.Base64.decode(photo, android.util.Base64.DEFAULT);
+            fos.write(decodedString);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return directory.getAbsolutePath();
     }
     
     //================================================================================
@@ -1895,6 +1941,181 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+
+	public void CreatePhotoTable() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		String CREATE_PHOTO_TABLE = "CREATE TABLE IF NOT EXISTS  nophotos ( " +
+				"PhotoID INTEGER PRIMARY KEY NOT NULL , " +
+				"Photo TEXT )";
+		db.execSQL(CREATE_PHOTO_TABLE);
+	}
+
+
+	public void CheckifAllTableAreCreate(){
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		String CREATE_DEVICE_TABLE = "CREATE TABLE IF NOT EXISTS Devices ( " +
+				"DeviceID INTEGER PRIMARY KEY , " +
+				"Name TEXT, "+
+				"Code TEXT, "+
+				"DeviceTypeID TEXT, "+
+				"Status INTEGER, " +
+				"UsesFormSelection INTEGER, " +
+				"UsesFormWithUbicheck INTEGER, " +
+				"UsesClientValidation INTEGER, " +
+				"UsesCreateBranch INTEGER, " +
+				"UsesUbicheckDetails INTEGER, " +
+				"UsesBiometric INTEGER, " +
+				"UsesKioskMode INTEGER, " +
+				"KioskBranchID INTEGER, " +
+				"ImageWareRegister INTEGER, " +
+				"BiometricID INTEGER, " +
+				"Account TEXT)";
+
+		String CREATE_ActualUbicheck= "CREATE TABLE IF NOT EXISTS ActualUbicheck ( " +
+				"UbicheckID INTEGER )";
+
+		String CREATE_TRACKERS_TABLE = "CREATE TABLE IF NOT EXISTS trackers ( " +
+				"TrackerID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+				"DeviceID INTEGER, "+
+				"Latitude REAL, "+
+				"Longitude REAL, "+
+				"Date TEXT)";
+
+		String CREATE_ANSWERS_TABLE = "CREATE TABLE IF NOT EXISTS Answers ( " +
+				"AnswerID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL ," +
+				"QuestionID INTEGER, " +
+				"Value TEXT, "+
+				"QuestionTypeID INTEGER, "+
+				"Latitude REAL, "+
+				"Longitude REAL, "+
+				"DeviceMac TEXT,"+
+				"Identifier TEXT, " +
+				"DateFormStart TEXT, " +
+				"DateFormFinish TEXT," +
+				"UbicheckID INTEGER, " +
+				"PostProcedureID INTEGER)";
+
+		String CREATE_SURVEYS_TABLE = "CREATE TABLE IF NOT EXISTS surveys ( " +
+				"SurveyID INTEGER PRIMARY KEY , " +
+				"SurveyName TEXT, "+
+				"ClientID INTEGER, "+
+				"ClientName TEXT, "+
+				"TransactionNumber TEXT, "+
+				"StatusID INTEGER, "+
+				"TextSize TEXT, "+
+				"TextColor TEXT, "+
+				"IntroductionText TEXT, "+
+				"IntroductionImage TEXT, "+
+				"EndingText TEXT, "+
+				"EndingImage TEXT, "+
+				"FooterImage TEXT," +
+				"BackgroundImage TEXT," +
+				"ProcedureID int)";
+
+		String CREATE_QUESTIONS_TABLE = "CREATE TABLE IF NOT EXISTS questions ( " +
+				"QuestionID INTEGER PRIMARY KEY , " +
+				"SurveyID INTEGER, "+
+				"QuestionTypeID INTEGER, "+
+				"SectionID INTEGER, "+
+				"SectionName TEXT, "+
+				"Title TEXT, "+
+				"Text TEXT, "+
+				"Value TEXT, "+
+				"Comment TEXT, "+
+				"OrderNumber INTEGER, "+
+				"Question1 TEXT, "+
+				"Instruction TEXT, "+
+				"ShortName TEXT, "+
+				"Minimum INTEGER, "+
+				"Maximum INTEGER, "+
+				"Required INTEGER, "+
+				"Decimals INTEGER, "+
+				"Preffix TEXT, "+
+				"Suffix TEXT, "+
+				"Randomize INTEGER, "+
+				"IncludeScoring INTEGER, "+
+				"DisplayImages INTEGER, "+
+				"MinAnswers INTEGER, "+
+				"MaxAnswers INTEGER, "+
+				"LeftLabel TEXT, "+
+				"RightLabel TEXT, "+
+				"ImageAboveText INTEGER, "+
+				"DefaultDate TEXT, "+
+				"DateTypeID INTEGER, "+
+				"DateTypeName TEXT, "+
+				"CatalogID INTEGER, "+
+				"CatalogElements TEXT, "+
+				"Condition TEXT, "+
+				"Valu TEXT, "+
+				"SendTo TEXT, "+
+				"Image TEXT, "+
+				"Options TEXT, "+
+				"OtherOption TEXT, "+
+				"Hidden INTEGER, "+
+				"Answer TEXT, " +
+				"ProcedureID int," +
+				"Blocked int," +
+				"PostProcedureID INTEGER)";
+
+		String CREATE_QUESTIONOPTIONS_TABLE = "CREATE TABLE IF NOT EXISTS questionOptions ( " +
+				"QuestionOptionID INTEGER PRIMARY KEY , " +
+				"QuestionID INTEGER, "+
+				"Name TEXT, "+
+				"Score REAL, "+
+				"Image TEXT, "+
+				"Condition TEXT, "+
+				"Value TEXT, "+
+				"SendTo TEXT,"+
+				"IsText INTEGER, "+
+				"Type TEXT)";
+
+		String CREATE_QUESTIONSENTENCES_TABLE = "CREATE TABLE IF NOT EXISTS questionSentences ( " +
+				"QuestionSentenceID INTEGER PRIMARY KEY , " +
+				"QuestionID INTEGER, "+
+				"Name TEXT )";
+
+		String CREATE_PHOTO_TABLE = "CREATE TABLE IF NOT EXISTS photos ( " +
+				"PhotoID INTEGER PRIMARY KEY NOT NULL , " +
+				"Photo TEXT )";
+
+		String CREATE_SELECTED_SURVEY_TABLE = "CREATE TABLE IF NOT EXISTS selectedSurveys ( " +
+				"SurveyID INTEGER PRIMARY KEY NOT NULL , " +
+				"SurveyName TEXT, " +
+				"DateFormStart TEXT, " +
+				"UbicheckID INTEGER )";
+
+		String CREATE_BIOMETRICS_TABLE = "CREATE TABLE IF NOT EXISTS biometrics ( " +
+				"BiometricID INTEGER PRIMARY KEY , " +
+				"Name TEXT, " +
+				"LastConecction INTEGER)";
+
+		String CREATE_DataUsed_TABLE = ("CREATE TABLE IF NOT EXISTS DataUsed ( " +
+				"LastMonth INTEGER, "+
+				"Data INTEGER)");
+
+		try
+		{
+			db.execSQL(CREATE_DEVICE_TABLE);
+			db.execSQL(CREATE_ANSWERS_TABLE);
+			db.execSQL(CREATE_SURVEYS_TABLE);
+			db.execSQL(CREATE_QUESTIONS_TABLE);
+			db.execSQL(CREATE_QUESTIONOPTIONS_TABLE);
+			db.execSQL(CREATE_QUESTIONSENTENCES_TABLE);
+			db.execSQL(CREATE_PHOTO_TABLE);
+			db.execSQL(CREATE_SELECTED_SURVEY_TABLE);
+			db.execSQL(CREATE_TRACKERS_TABLE);
+			db.execSQL(CREATE_BIOMETRICS_TABLE);
+			db.execSQL(CREATE_DataUsed_TABLE);
+			db.execSQL(CREATE_ActualUbicheck);
+		}
+		catch(Exception e)
+		{
+		}
+
+
+
+	}
 
 }
 

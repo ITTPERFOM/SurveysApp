@@ -182,7 +182,7 @@ public class SurveyActivity extends Activity {
 		try
 		{
 			setContentView(R.layout.activity_survey);
-			setupUI(findViewById(R.id.rlMain));
+			//setupUI(findViewById(R.id.rlMain));
 			_tempDir = Environment.getExternalStorageDirectory() + "/Survey_Signature.png";
 			//_path = Environment.getExternalStorageDirectory() + "/Survey_Photo.jpg";
 			if(savedInstanceState == null || !savedInstanceState.containsKey("listQuestions")) {
@@ -266,33 +266,6 @@ public class SurveyActivity extends Activity {
 	    Runtime.getRuntime().gc();
 	}
 
-	//================================================================================
-    // Hide Soft Keyboard Methods
-    //================================================================================
-
-	public static void hideSoftKeyboard(Activity activity) {
-	    InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-	    inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
-	}
-
-	public void setupUI(View view) {
-	    if(!(view instanceof EditText)) {
-	        view.setOnTouchListener(new View.OnTouchListener() {
-				@SuppressLint("ClickableViewAccessibility")
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					hideSoftKeyboard(SurveyActivity.this);
-					return false;
-				}
-			});
-	    }
-	    if (view instanceof ViewGroup) {
-	        for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
-	            View innerView = ((ViewGroup) view).getChildAt(i);
-	            setupUI(innerView);
-	        }
-	    }
-	}
 
 	//================================================================================
     // Load Saved Controls

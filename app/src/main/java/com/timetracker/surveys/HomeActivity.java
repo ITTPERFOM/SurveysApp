@@ -117,6 +117,8 @@ public class HomeActivity extends Activity {
 		setContentView(R.layout.activity_home);
 		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+		db.CheckifAllTableAreCreate();
+
 		CheckIn = (Button)findViewById(R.id.btnCheckIn);
 
 		 txtSelectedSurveyHeader = (TextView) findViewById(R.id.txtSelectedSurveyHeader);
