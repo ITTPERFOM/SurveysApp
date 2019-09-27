@@ -361,11 +361,30 @@ public class Controls {
 		 lp2.setMargins(80, 0, 80, 0);
 		 editText.setLayoutParams(lp2);
 		 relativeLayout.addView(editText);
+
+		if (question.ProcedureID > 0  ) {
+			Button button = new Button(context);
+			button.setId(question.QuestionID + idKey2);
+			button.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.green_button));
+			button.setTextColor(Color.parseColor("#ffffff"));
+			button.setText("Enviar");
+			linLayout.addView(button);
+			HorizontalScrollView horizontalView = new HorizontalScrollView(context);
+			TableLayout GridTable = new TableLayout(context);
+			TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
+			GridTable.setLayoutParams(tableParams);
+			GridTable.setColumnStretchable(0, true);
+			GridTable.setId(question.QuestionID + idKey3);
+			horizontalView.addView(GridTable);
+
+			linLayout.addView(horizontalView);
+		}
 		 relativeLayout.addView(Preffix);
 		 relativeLayout.addView(Suffix);
 		 linLayout.addView(relativeLayout);
 		 linLayout=AddFooter(linLayout,question,context);
-		 return linLayout;
+
+			return linLayout;
 	}
 	
 	//================================================================================
@@ -1352,12 +1371,14 @@ public class Controls {
         
 		ImageView  imageView = new ImageView(context);
 		imageView.setId(question.QuestionID+idKey);
+
 		if (question.Answer.length()>0)
 		{
 			MySQLiteHelper db = new MySQLiteHelper(context);
 			Bitmap bitmap = StringToBitMap(db.getPhoto(question.QuestionID));
 			imageView.setImageBitmap(bitmap);
 		}
+
 		linearLayout.addView(imageView);
 		linearLayout.addView(button);
 		

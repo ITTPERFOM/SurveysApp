@@ -16,10 +16,8 @@ import android.Manifest;
 import android.os.Build;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.widget.CompoundButton;
+import androidx.annotation.NonNull;
+
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -36,7 +34,6 @@ import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -53,8 +50,8 @@ import com.timetracker.business.Controls;
 import com.timetracker.business.GPSTracker;
 import com.timetracker.business.Validations;
 
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
@@ -88,8 +85,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.MotionEvent;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AutoCompleteTextView;
@@ -163,6 +158,8 @@ public class SurveyActivity extends Activity {
 	private Location lc;
 	private double latitude,longitude;
     private boolean MaulecSurvey = false;
+
+	static final int REQUEST_IMAGE_CAPTURE = 1;
 
 
     //================================================================================
@@ -1337,8 +1334,14 @@ public class SurveyActivity extends Activity {
         	if(result.equals(""))
         	{
         		 Toast.makeText(getBaseContext(), "Respuestas Subidas", Toast.LENGTH_LONG).show();
+        		 List<Answers> Answers = db.getAnswersByIdentifier(Identifier);
+				 db.deletePhotosFromDirectory();
         		 db.deleteAnswersByIdentifier(Identifier);
-        		 TakeSurveyAgain(SurveyID,true);
+        		 db.deletePhotos();
+				Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.HomeActivity.class);
+				startActivity(intent);
+				finish();
+        		// TakeSurveyAgain(SurveyID,true);
         	}
         	else
         	{
@@ -2275,7 +2278,14 @@ public class SurveyActivity extends Activity {
 		            	if (ConnectionMethods.isInternetConnected(SurveyActivity.this,false).equals("")){
 		            		progress.setMessage("Realizando consulta, por favor espere...");
 		         		   	progress.show();
-		            		new AsyncGetTable(QuestionID).execute("/Procedures?value=" + URLEncoder.encode(String.valueOf(QuestionID) + "|" + editText.getText().toString()));
+
+		         		   	if(QuestionID == 97341 || QuestionID == 97342 || QuestionID == 97343 || QuestionID == 97344 || QuestionID == 97345){
+                                Devices Device = db.GetDevice();
+                                String Content =  editText.getText().toString() + "-" + Device.DeviceID;
+                                new AsyncGetTable(QuestionID).execute("/Procedures?value=" + URLEncoder.encode(String.valueOf(QuestionID) + "|" + Content));
+                            }else {
+                                new AsyncGetTable(QuestionID).execute("/Procedures?value=" + URLEncoder.encode(String.valueOf(QuestionID) + "|" + editText.getText().toString()));
+                            }
 		          		}else{
 		          			Toast.makeText(getApplicationContext(), "Dispositivo no conectado a internet",Toast.LENGTH_LONG).show();
 		          		}
@@ -2602,6 +2612,8 @@ public class SurveyActivity extends Activity {
 	    	}else{
 	    		ImageView _image = (ImageView) findViewById(controlid);
 		    	_image.setImageBitmap(bitmap);
+
+
 	    	}
 	    	oldListSentTo = new ArrayList<String>();
 	    	CheckFlowFromControl(controlid - idKey,0,0,true);
@@ -2704,9 +2716,10 @@ public class SurveyActivity extends Activity {
 					 StrictMode.setVmPolicy(builder.build());
 					 File file = new File(_path);
 					 Uri outputFileUri = Uri.fromFile(file);
-					 Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-					 intent.putExtra(MediaStore.EXTRA_OUTPUT,outputFileUri);
-					 startActivityForResult(intent, 0);
+					 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+					 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+						 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+					 }
 				 }
 			 } catch (Exception e) {
 				 Toast toast = Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG);

@@ -31,6 +31,8 @@ import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 public class MySQLiteHelper extends SQLiteOpenHelper {
  
 	//================================================================================
@@ -1744,7 +1746,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public String getPhoto(int ID) {
     	String resultado = "";
         String Image= "";
-        String query = "SELECT * FROM photos WHERE PhotoID = " + getImagePathByID(ID) ;
+        String query = "SELECT * FROM photos WHERE PhotoID = " + ID ;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
@@ -1753,7 +1755,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             	break;
             } while (cursor.moveToNext());
         }
-        if(cursor != null){
+        if(cursor != null && !resultado.isEmpty()){
         	cursor.close();
             Bitmap bm = BitmapFactory.decodeFile(resultado);
             ByteArrayOutputStream bOut = new ByteArrayOutputStream();
@@ -1768,6 +1770,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM photos");
         db.close();
+
+
     }
 
     private String getImagePathByID(int ID){
@@ -1798,7 +1802,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 e.printStackTrace();
             }
         }
-        return directory.getAbsolutePath();
+        return mypath.getAbsolutePath();
     }
     
     //================================================================================
@@ -1950,6 +1954,40 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 		db.execSQL(CREATE_PHOTO_TABLE);
 	}
 
+
+	public String saveSurveyImage(Bitmap bitmapImage){
+		ContextWrapper cw = new ContextWrapper(mContext);
+		// path to /data/data/yourapp/app_data/imageDir
+		File directory = cw.getDir("imageSurvey", Context.MODE_PRIVATE);
+		// Create Random Name
+        String name = "";
+		for (int i = 0; i < 5; i++) {
+			name = RandomStringUtils.randomNumeric(10) + name ;
+		}
+
+		// Create imageDir
+		File mypath=new File(directory,name+".jpg");
+
+        if(mypath.exists()){
+            saveSurveyImage(bitmapImage);
+        }
+
+		FileOutputStream fos = null;
+		try {
+			fos = new FileOutputStream(mypath);
+			// Use the compress method on the BitMap object to write image to the OutputStream
+			bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				fos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return mypath.toString();
+	}
 
 	public void CheckifAllTableAreCreate(){
 
@@ -2112,10 +2150,19 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 		catch(Exception e)
 		{
 		}
-
-
-
 	}
 
+	public void deletePhotosFromDirectory() {
+		ContextWrapper cw = new ContextWrapper(mContext);
+		File directory = cw.getDir("imageSurveyDir", Context.MODE_PRIVATE);
+		if (directory.isDirectory())
+		{
+			String[] children = directory.list();
+			for (int i = 0; i < children.length; i++)
+			{
+				new File(directory, children[i]).delete();
+			}
+		}
+	}
 }
 

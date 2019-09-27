@@ -51,7 +51,7 @@
 				android:gravity="center_horizontal"
 				android:orientation="vertical">
 
-				<com.airbnb.lottie.LottieAnimationView
+		<!--		<com.airbnb.lottie.LottieAnimationView
 					android:id="@+id/Scan"
 					android:layout_width="297dp"
 					android:layout_height="272dp"
@@ -59,7 +59,7 @@
 					app:lottie_autoPlay="true"
 					app:lottie_fileName="scan.json"
 					app:lottie_imageAssetsFolder="assets"
-					app:lottie_loop="true" />
+					app:lottie_loop="true" /> -->
 
 				<TextView
 					android:id="@+id/bioMessage"
@@ -100,7 +100,7 @@
 						android:text="@string/option_refresh"
 						android:textSize="18sp" />
 
-					<com.airbnb.lottie.LottieAnimationView
+				<!--	<com.airbnb.lottie.LottieAnimationView
 						android:id="@+id/searchAni"
 						android:layout_width="280dp"
 						android:layout_height="144dp"
@@ -112,7 +112,7 @@
 						app:lottie_autoPlay="true"
 						app:lottie_fileName="wait.json"
 						app:lottie_imageAssetsFolder="assets"
-						app:lottie_loop="true" />
+						app:lottie_loop="true" /> -->
 
 					<TextView
 						android:id="@+id/Sucursal"

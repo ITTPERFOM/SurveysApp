@@ -1,13 +1,10 @@
 package com.timetracker.surveys;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -27,7 +23,6 @@ import com.timetracker.business.DialogMethods;
 import com.timetracker.business.GPSTracker;
 import com.timetracker.business.ImageMethods;
 import com.timetracker.data.Devices;
-import com.timetracker.data.SelectedSurvey;
 import com.timetracker.data.UbicheckRequest;
 import com.timetracker.data.UbicheckDetailsRequest;
 import com.timetracker.sqlite.MySQLiteHelper;
@@ -45,7 +40,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -57,10 +51,10 @@ import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
@@ -110,7 +104,7 @@ public class UbicheckActivity extends Activity {
 	private Location lc;
     private Button btnRefresh;
 	private int idempotence = 0;
-	public LottieAnimationView ScanAnimation;
+	//public LottieAnimationView ScanAnimation;
 	public LinearLayout Animation,Ui;
 
 	//	//================================================================================
@@ -124,16 +118,13 @@ public class UbicheckActivity extends Activity {
 
 		btnRefresh = (Button) findViewById(R.id.btnRefresh);
 
-		ScanAnimation = (LottieAnimationView) findViewById(R.id.Scan);
+		//ScanAnimation = (LottieAnimationView) findViewById(R.id.Scan);
 
 		Animation = (LinearLayout)findViewById(R.id.Animation);
 
 		Ui = (LinearLayout)findViewById(R.id.Ui);
 
 		Animation.setVisibility(View.GONE);
-
-
-
 
 			GPSTracker = new GPSTracker(getApplicationContext());
 			//NEW GPS
