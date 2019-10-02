@@ -13,11 +13,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import android.Manifest;
+import android.app.FragmentTransaction;
 import android.os.Build;
 import android.os.Handler;
 import android.os.StrictMode;
 import androidx.annotation.NonNull;
-
+import android.app.Fragment;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -50,8 +51,11 @@ import com.timetracker.business.Controls;
 import com.timetracker.business.GPSTracker;
 import com.timetracker.business.Validations;
 
+import androidx.camera.core.CameraX;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
@@ -108,7 +112,8 @@ import android.widget.TimePicker.OnTimeChangedListener;
 import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
-public class SurveyActivity extends Activity {
+public class SurveyActivity extends Activity implements
+		SurveyPhotoFragment.OnFragmentInteractionListener{
 
 	//================================================================================
     // Global Variables
@@ -174,6 +179,13 @@ public class SurveyActivity extends Activity {
 		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
 		ContinueSurvey();
+
+
+
+		//Fragment Fragment = new SurveyPhotoFragment();
+		//FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+		//fragmentTransaction.replace(R.id.SurveyFragment, Fragment);
+		//fragmentTransaction.commit();
 
 		GetLocation(fusedLocationProviderClient,this);
 		try
@@ -479,6 +491,11 @@ public class SurveyActivity extends Activity {
 		    	   Toast.makeText(getApplicationContext(), "E002:" + ex.toString(), Toast.LENGTH_LONG).show();
 			}
 	  }
+
+	@Override
+	public void onFragmentInteraction(Uri uri) {
+
+	}
 
 	public class ButtonChangeSecion implements View.OnClickListener
 	{

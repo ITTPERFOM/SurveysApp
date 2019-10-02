@@ -1,112 +1,139 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="1dp"
-    android:orientation="horizontal"
-    android:background="#ffffff"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:descendantFocusability="beforeDescendants"
-	android:focusableInTouchMode="true"
-    tools:context="com.timetracker.surveys.SurveyActivity" 
-    android:id="@+id/rlMain">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical">
 
-    <RelativeLayout 
-    	android:id="@+id/HeaderMenu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#ffffff"
-        android:stretchColumns="1">
-	     <Button
-	        android:id="@+id/btnBack"
-	        android:layout_width="wrap_content" 
-	        android:layout_height="wrap_content"
-	        android:text="@string/Back"
-	        android:onClick="Back"
-	        style="@style/button_text"
-	      	android:background="@drawable/green_button"/>
-		<Button
-	        android:id="@+id/btnSections"
-	        android:layout_width="wrap_content" 
-	        android:layout_height="wrap_content" 
-	        android:text="@string/Sections"
-	        android:onClick="Sections" 
-	        style="@style/button_text"
-	      	android:background="@drawable/green_button" 
-	        android:layout_centerHorizontal="true"/>
-	     
-	    <Button
-	        android:id="@+id/btnNext"
-	        android:layout_width="wrap_content" 
-	        android:layout_height="wrap_content" 
-	        android:text="@string/Next"
-	        android:onClick="Next"
-	        android:layout_alignParentRight="true"
-	        android:layout_alignParentEnd="true"
-	        style="@style/button_text"
-	      	android:background="@drawable/green_button"/>
-  	</RelativeLayout>
-         <TextView 
-	    android:id="@+id/txtTitle"
-	     android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
-	     android:layout_marginTop="52dp"
-	      android:layout_alignParentTop="true"
-	    android:layout_centerHorizontal="true"
-	    android:textStyle="bold"
-	    android:background="@drawable/layout_bg"
-	    style="@style/textview_Section"
-	    android:text="@string/Null" /> 
-         
-       
+	<FrameLayout
+		android:id="@+id/SurveyFragment"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_alignParentStart="true"
+		android:layout_alignParentEnd="true"
+		android:translationZ="2dp"
+		app:layout_constraintBottom_toBottomOf="@+id/rlMain"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"></FrameLayout>
 
-    <TableRow
-         android:layout_width="fill_parent"
-           android:layout_height="wrap_content"
-           android:gravity="center"
-           android:stretchColumns="1"
-           android:layout_marginTop="96dp"
-         android:layout_marginBottom="15dip">
-        <LinearLayout
-        android:id="@+id/activity_survey"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-    </LinearLayout> 
-    </TableRow>
-   <RelativeLayout 
-     android:id="@+id/rlFooter"
-       android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true">
-        <ProgressBar
-            android:id="@+id/progressBar1"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:minHeight="20dp" 
-            android:maxHeight="20dp"
-            android:layout_width="fill_parent"
-            android:layout_height="20dp"
-            android:indeterminate="false"
-            android:max="100"
-            android:progress="1" />
-   <TextView 
-    android:id="@+id/txtPercent"
-	android:layout_width="wrap_content" 
-	android:layout_height="wrap_content" 
-	android:layout_centerInParent="true" 
-	android:textColor="#000000" 
-	android:textStyle="bold" ></TextView>
-   <ImageView
-       android:id="@+id/imgFooter"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_centerInParent="true" 
-       android:layout_below="@id/txtPercent"
-       android:visibility="gone"/>
-</RelativeLayout>
+	<RelativeLayout
+		android:id="@+id/rlMain"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="#ffffff"
+		android:descendantFocusability="beforeDescendants"
+		android:focusableInTouchMode="true"
+		android:orientation="horizontal"
+		android:paddingLeft="@dimen/activity_horizontal_margin"
+		android:paddingTop="@dimen/activity_vertical_margin"
+		android:paddingRight="@dimen/activity_horizontal_margin"
+		android:paddingBottom="@dimen/activity_vertical_margin"
+		app:layout_constraintEnd_toEndOf="@+id/SurveyFragment"
+		app:layout_constraintStart_toStartOf="@+id/SurveyFragment"
+		tools:context="com.timetracker.surveys.SurveyActivity">
 
-</RelativeLayout>
+		<RelativeLayout
+			android:id="@+id/HeaderMenu"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="#ffffff"
+			android:stretchColumns="1">
+
+			<Button
+				android:id="@+id/btnBack"
+				style="@style/button_text"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:background="@drawable/green_button"
+				android:onClick="Back"
+				android:text="@string/Back" />
+
+			<Button
+				android:id="@+id/btnSections"
+				style="@style/button_text"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerHorizontal="true"
+				android:background="@drawable/green_button"
+				android:onClick="Sections"
+				android:text="@string/Sections" />
+
+			<Button
+				android:id="@+id/btnNext"
+				style="@style/button_text"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentEnd="true"
+				android:layout_alignParentRight="true"
+				android:background="@drawable/green_button"
+				android:onClick="Next"
+				android:text="@string/Next" />
+		</RelativeLayout>
+
+		<TextView
+			android:id="@+id/txtTitle"
+			style="@style/textview_Section"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentTop="true"
+			android:layout_centerHorizontal="true"
+			android:layout_marginTop="52dp"
+			android:background="@drawable/layout_bg"
+			android:text="@string/Null"
+			android:textStyle="bold" />
+
+
+		<TableRow
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginTop="96dp"
+			android:layout_marginBottom="15dip"
+			android:gravity="center"
+			android:stretchColumns="1">
+
+			<LinearLayout
+				android:id="@+id/activity_survey"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:orientation="vertical"></LinearLayout>
+		</TableRow>
+
+		<RelativeLayout
+			android:id="@+id/rlFooter"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true">
+
+			<ProgressBar
+				android:id="@+id/progressBar1"
+				style="@android:style/Widget.ProgressBar.Horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="20dp"
+				android:indeterminate="false"
+				android:max="100"
+				android:maxHeight="20dp"
+				android:minHeight="20dp"
+				android:progress="1" />
+
+			<TextView
+				android:id="@+id/txtPercent"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_centerInParent="true"
+				android:textColor="#000000"
+				android:textStyle="bold"></TextView>
+
+			<ImageView
+				android:id="@+id/imgFooter"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_below="@id/txtPercent"
+				android:layout_centerInParent="true"
+				android:visibility="gone" />
+		</RelativeLayout>
+
+	</RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

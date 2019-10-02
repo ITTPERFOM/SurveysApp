@@ -42,16 +42,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -78,8 +73,8 @@ import android.widget.Toast;
 
 
 
-public class HomeActivity extends Activity implements
-		SurveyPhotoFragment.OnFragmentInteractionListener{
+
+public class HomeActivity extends Activity {
 
 	//================================================================================
 	// Global Variables
@@ -112,8 +107,9 @@ public class HomeActivity extends Activity implements
 	private Button btnCheckIn;
 	private Button btnStartSurvey;
 
+	public SurveyPhotoFragment surveyPhoto;
+	public android.app.FragmentTransaction fragmentTransaction;
 
-	private FragmentTransaction fragmentTransaction;
 	//================================================================================
 	// Activity Events
 	//================================================================================
@@ -142,14 +138,7 @@ public class HomeActivity extends Activity implements
 		 btnStartSurvey = (Button) findViewById(R.id.btnStartSurvey);
 
 
-		Fragment fragment = new SurveyPhotoFragment();
-
-		FragmentManager manager = this.getFragmentManager();
-		FragmentTransaction transaction = manager.beginTransaction();
-		fragmentTransaction.replace(R.id.SurveyPhoto,fragment);
-		fragmentTransaction.commit();
-
-
+		 
 
 		GetLocation(fusedLocationProviderClient,this);
 		try
@@ -455,11 +444,6 @@ public class HomeActivity extends Activity implements
 				DialogMethods.showErrorDialog(HomeActivity.this, "Ocurrio un error al momento de checar ubicacion. Info: " + ex.toString(), "Activity:Home | CheckIn | Error:" + ex.toString());
 			}
 		}
-	}
-
-	@Override
-	public void onFragmentInteraction(Uri uri) {
-
 	}
 
 	//================================================================================

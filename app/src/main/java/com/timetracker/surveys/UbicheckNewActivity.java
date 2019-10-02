@@ -11,7 +11,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.timetracker.business.ConnectionMethods;
 import com.timetracker.business.DialogMethods;
-import com.timetracker.business.GPSTracker;
 import com.timetracker.data.Devices;
 import com.timetracker.sqlite.MySQLiteHelper;
 

@@ -6,7 +6,7 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.fragment.app.Fragment;
+import android.app.Fragment;
 import android.util.Rational;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -25,8 +25,8 @@ import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
-
 
 import java.io.File;
 
@@ -41,6 +41,7 @@ public class SurveyPhotoFragment extends Fragment {
     final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
     TextureView textureView;
     View view;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -172,7 +173,9 @@ public class SurveyPhotoFragment extends Fragment {
         });
 
         //bind to lifecycle:
-        CameraX.bindToLifecycle((LifecycleOwner) this, preview, imgCap);
+        CameraX.bindToLifecycle((LifecycleOwner) getActivity(), preview, preview, imgCap);
+
+
     }
 
     private void updateTransform() {
