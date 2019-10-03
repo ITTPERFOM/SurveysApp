@@ -1,18 +1,22 @@
 package com.timetracker.surveys;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
+import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Rational;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Toast;
 import android.util.Size;
 
@@ -28,6 +32,8 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.journeyapps.barcodescanner.ViewfinderView;
+
 import java.io.File;
 
 
@@ -38,9 +44,12 @@ public class SurveyPhotoFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     int REQUEST_CODE_PERMISSIONS = 101;
+
     final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
     TextureView textureView;
     View view;
+    Size screenSize;
+    public Fragment f = this;
 
 
     private OnFragmentInteractionListener mListener;
@@ -65,6 +74,7 @@ public class SurveyPhotoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_survey_photo, container, false);
+
 
         textureView = view.findViewById(R.id.view_finder);
 
@@ -145,24 +155,41 @@ public class SurveyPhotoFragment extends Fragment {
                 });
 
 
-        ImageCaptureConfig imageCaptureConfig = new ImageCaptureConfig.Builder().setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
-                .setTargetRotation(getActivity().getWindowManager().getDefaultDisplay().getRotation()).build();
+
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        screenSize   = new Size(metrics.widthPixels, metrics.heightPixels);
+        Rational screenAspectRatio = new Rational(metrics.widthPixels, metrics.heightPixels);
+
+        ImageCaptureConfig imageCaptureConfig = new ImageCaptureConfig.Builder()
+                .setLensFacing(CameraX.LensFacing.BACK)
+                .setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
+                .setTargetAspectRatio(screenAspectRatio)
+                .setTargetRotation(((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE))
+                        .getDefaultDisplay()
+                        .getRotation())
+                .build();
         final ImageCapture imgCap = new ImageCapture(imageCaptureConfig);
 
         view.findViewById(R.id.imgCapture).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File file = new File(Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + ".png");
+                ContextWrapper cw = new ContextWrapper(getActivity());
+                File directory = cw.getDir("imageSurveyDir", Context.MODE_PRIVATE);
+                // Create imageDir
+                File file =new File(directory,"SurveyPhoto" + ".png" );
                 imgCap.takePicture(file, new ImageCapture.OnImageSavedListener() {
                     @Override
                     public void onImageSaved(@NonNull File file) {
-                        String msg = "Pic captured at " + file.getAbsolutePath();
-                        Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+                        //String msg = "Foto Tomada";
+                        //Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+                        getActivity().getFragmentManager().beginTransaction().remove(f).commit();
+                        ((SurveyActivity) getActivity()).onPhotoTaken();
+
                     }
 
                     @Override
-                    public void onError(@NonNull ImageCapture.ImageCaptureError imageCaptureError, @NonNull String message, @Nullable Throwable cause) {
-                        String msg = "Pic capture failed : " + message;
+                    public void onError(@NonNull ImageCapture.UseCaseError useCaseError, @NonNull String message, @Nullable Throwable cause) {
+                        String msg = " Error en captura ";
                         Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
                         if (cause != null) {
                             cause.printStackTrace();
@@ -173,18 +200,16 @@ public class SurveyPhotoFragment extends Fragment {
         });
 
         //bind to lifecycle:
-        CameraX.bindToLifecycle((LifecycleOwner) getActivity(), preview, preview, imgCap);
+        CameraX.bindToLifecycle((LifecycleOwner) getActivity(), preview, imgCap);
 
 
     }
 
     private void updateTransform() {
         Matrix mx = new Matrix();
-        float w = textureView.getMeasuredWidth();
-        float h = textureView.getMeasuredHeight();
 
-        float cX = w / 2f;
-        float cY = h / 2f;
+        float cX = screenSize.getWidth() / 2f ;
+        float cY = screenSize.getHeight() / 2f ;
 
         int rotationDgr;
         int rotation = (int) textureView.getRotation();

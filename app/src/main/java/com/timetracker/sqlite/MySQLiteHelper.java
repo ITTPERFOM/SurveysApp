@@ -1738,7 +1738,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();		
         ContentValues values = new ContentValues();
         values.put("Photo",saveToInternalStorage(photo,ID));
-        int i = db.update("photos", values, "PhotoID"+" = ?",new String[] { getImagePathByID(ID) });
+        int i = db.update("photos", values, "PhotoID"+" = ?",new String[] { getImagePathByID() });
         db.close();		
         return i;		
     }
@@ -1774,11 +1774,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     }
 
-    private String getImagePathByID(int ID){
+    private String getImagePathByID(){
         ContextWrapper cw = new ContextWrapper(mContext);
         File directory = cw.getDir("imageSurveyDir", Context.MODE_PRIVATE);
         // Create imageDir
-        File mypath=new File(directory,ID + ".png" );
         return directory.getAbsolutePath();
     }
 

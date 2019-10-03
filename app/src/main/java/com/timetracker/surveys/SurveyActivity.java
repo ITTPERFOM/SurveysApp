@@ -14,11 +14,13 @@ import java.io.File;
 
 import android.Manifest;
 import android.app.FragmentTransaction;
+import android.content.ContextWrapper;
 import android.os.Build;
 import android.os.Handler;
 import android.os.StrictMode;
 import androidx.annotation.NonNull;
 import android.app.Fragment;
+import android.util.DisplayMetrics;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import java.net.URLEncoder;
 import java.text.DateFormat;
@@ -51,6 +53,7 @@ import com.timetracker.business.Controls;
 import com.timetracker.business.GPSTracker;
 import com.timetracker.business.Validations;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraX;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -112,7 +115,7 @@ import android.widget.TimePicker.OnTimeChangedListener;
 import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
-public class SurveyActivity extends Activity implements
+public class SurveyActivity extends AppCompatActivity implements
 		SurveyPhotoFragment.OnFragmentInteractionListener{
 
 	//================================================================================
@@ -126,7 +129,7 @@ public class SurveyActivity extends Activity implements
 	private int progressStatus = 0;
 	private int increase = 0;
 	protected String _tempDir;
-	public String _path = Environment.getExternalStorageDirectory() + "/Survey_Photo.jpg";
+	public String _path = "";
 	protected boolean _taken;
 	protected boolean _signed;
 	protected boolean _Scanned;
@@ -164,7 +167,7 @@ public class SurveyActivity extends Activity implements
 	private double latitude,longitude;
     private boolean MaulecSurvey = false;
 
-	static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
 
     //================================================================================
@@ -178,8 +181,12 @@ public class SurveyActivity extends Activity implements
 		progress.setCancelable(false);
 		fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+		_path = getSurveyPicturePath();
+
 		ContinueSurvey();
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
 
 		//Fragment Fragment = new SurveyPhotoFragment();
@@ -217,9 +224,9 @@ public class SurveyActivity extends Activity implements
 				List<Questions> ListQuestions = savedInstanceState.getParcelableArrayList("listQuestions");
 				SurveyQuestions = jsonMethods.GetList(ListQuestions);
 				loadSavecontrols();
-				if(savedInstanceState.getBoolean("PHOTO_TAKEN" )) {
-					onPhotoTaken(savedInstanceState.getInt("currentControlID"));
-				}
+				//if(savedInstanceState.getBoolean("PHOTO_TAKEN" )) {
+				//	onPhotoTaken(savedInstanceState.getInt("currentControlID"));
+				//}
 				if(savedInstanceState.getBoolean("signed" )) {
 					onSignatureTaken(savedInstanceState.getInt("currentControlID" ));
 				}
@@ -233,37 +240,44 @@ public class SurveyActivity extends Activity implements
 		}
 	}
 
+    private String getSurveyPicturePath() {
+        ContextWrapper cw = new ContextWrapper(SurveyActivity.this);
+        File directory = cw.getDir("imageSurveyDir", Context.MODE_PRIVATE);
+        // Create imageDir
+        File file =new File(directory,"SurveyPhoto" + ".png" );
 
-	@Override
+        return file.getAbsoluteFile().toString();
+    }
+
+
+    @Override
   	protected void onResume() {
 	      super.onResume();
 	   }
 
 	@Override
     protected void onSaveInstanceState(Bundle outState ) {
-		try
-		{
-			outState.putBoolean("PHOTO_TAKEN", _taken );
-			outState.putBoolean("Scanned", _Scanned );
-			outState.putBoolean("signed", _signed );
-			outState.putString("ScannedValue", _ScannedValue );
-			outState.putInt("currentControlID", _currentControlID -idKey);
+		super.onSaveInstanceState(outState);
+		try {
+			//outState.putBoolean("PHOTO_TAKEN", _taken);
+			outState.putBoolean("Scanned", _Scanned);
+			outState.putBoolean("signed", _signed);
+			outState.putString("ScannedValue", _ScannedValue);
+			outState.putInt("currentControlID", _currentControlID - idKey);
 			outState.putInt("j", j);
 			outState.putInt("progressStatus", progressStatus);
 			outState.putInt("increase", increase);
 			List<Questions> listQuestions = new ArrayList<Questions>();
-			if(SurveyQuestions != null){
-				for(List<Questions> Listquestions: SurveyQuestions)
-				{
-					for(Questions question: Listquestions)
-					{
+			if (SurveyQuestions != null) {
+				for (List<Questions> Listquestions : SurveyQuestions) {
+					for (Questions question : Listquestions) {
 						listQuestions.add(question);
 					}
 				}
-				ArrayList<Questions> arrayquestions=(ArrayList<Questions>) listQuestions;
+				ArrayList<Questions> arrayquestions = (ArrayList<Questions>) listQuestions;
 				outState.putParcelableArrayList("listQuestions", arrayquestions);
 			}
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			Toast.makeText(getApplicationContext(), "E00X:" + ex.toString(), Toast.LENGTH_LONG).show();
 		}
 	}
@@ -2605,8 +2619,10 @@ public class SurveyActivity extends Activity implements
 		 button.setOnClickListener( new ButtonClickHandler() );
 	 }
 
-	 protected void onPhotoTaken(int controlid)
+	 public void onPhotoTaken()
 	 {
+         int controlid = 0;
+        controlid = _currentControlID - 100000;
     	try
     	{
     		sharedpreferences=getSharedPreferences(MyPREFERENCES,Context.MODE_PRIVATE);
@@ -2614,26 +2630,24 @@ public class SurveyActivity extends Activity implements
     		editor.putInt("Flag", 0);
     		editor.commit();
 
-	    	_currentControlID=controlid+idKey;
-	    	_taken = true;
-	        _signed=false;
-	        _Scanned=false;
+	    	_currentControlID = controlid + idKey;
+	    	//_taken = true;
+	        //_signed=false;
+	        //_Scanned=false;
 	    	Bitmap bitmap = decodeFile(_path);
 	    	Questions Question  = db.getQuestion(controlid - idKey);
 	    	if(Question.QuestionTypeID == 20){
 	    		Question.Image = BitMapToString(bitmap);
 	    		db.updateQuestionImage(Question);
 	    		Intent intent = new Intent(SurveyActivity.this, SignatureActivity.class);
-                intent.putExtra("sQuestionID", Integer.toString(controlid - idKey));
+                intent.putExtra("sQuestionID", Integer.toString(controlid - idKey ));
                 startActivityForResult(intent,1);
 	    	}else{
-	    		ImageView _image = (ImageView) findViewById(controlid);
+	    		ImageView _image = (ImageView) findViewById(controlid );
 		    	_image.setImageBitmap(bitmap);
-
-
 	    	}
 	    	oldListSentTo = new ArrayList<String>();
-	    	CheckFlowFromControl(controlid - idKey,0,0,true);
+	    	CheckFlowFromControl(controlid - idKey ,0,0,true);
 
     	}
     	catch(Exception ex){
@@ -2725,18 +2739,13 @@ public class SurveyActivity extends Activity implements
 			    	 int isPermited = 0;
 			         ActivityCompat.requestPermissions(SurveyActivity.this,new String[]{Manifest.permission.CAMERA},isPermited);
 				 }else{
-					 _Scanned=false;
-					 _taken = false;
-					 _signed = false;
-					 _currentControlID=view.getId();
-					 StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-					 StrictMode.setVmPolicy(builder.build());
-					 File file = new File(_path);
-					 Uri outputFileUri = Uri.fromFile(file);
-					 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-					 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-						 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-					 }
+				     _currentControlID=view.getId();
+
+                     Fragment Fragment = new SurveyPhotoFragment();
+                     FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                     fragmentTransaction.replace(R.id.SurveyFragment, Fragment);
+                     fragmentTransaction.commit();
+
 				 }
 			 } catch (Exception e) {
 				 Toast toast = Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG);
@@ -2780,7 +2789,7 @@ public class SurveyActivity extends Activity implements
 		    		case 0:
 		    			break;
 		    		case -1:
-		    			onPhotoTaken(_currentControlID-idKey);
+		    			onPhotoTaken();
 		    			break;
 				 }
 			 }
