@@ -13,13 +13,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import android.Manifest;
-import android.app.FragmentTransaction;
+import androidx.fragment.app.FragmentTransaction;
 import android.content.ContextWrapper;
 import android.os.Build;
 import android.os.Handler;
 import android.os.StrictMode;
 import androidx.annotation.NonNull;
-import android.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.util.DisplayMetrics;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import java.net.URLEncoder;
@@ -115,8 +115,7 @@ import android.widget.TimePicker.OnTimeChangedListener;
 import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
-public class SurveyActivity extends AppCompatActivity implements
-		SurveyPhotoFragment.OnFragmentInteractionListener{
+public class SurveyActivity extends AppCompatActivity {
 
 	//================================================================================
     // Global Variables
@@ -201,7 +200,6 @@ public class SurveyActivity extends AppCompatActivity implements
 			//setupUI(findViewById(R.id.rlMain));
 			_tempDir = Environment.getExternalStorageDirectory() + "/Survey_Signature.png";
 			//_path = Environment.getExternalStorageDirectory() + "/Survey_Photo.jpg";
-			if(savedInstanceState == null || !savedInstanceState.containsKey("listQuestions")) {
 				Intent myIntent = getIntent();
 				String SurveyID = myIntent.getStringExtra("SurveyID");
 				String Index = myIntent.getStringExtra("Index");
@@ -215,25 +213,6 @@ public class SurveyActivity extends AppCompatActivity implements
 					RelativeLayout layout =(RelativeLayout)findViewById(R.id.rlMain);
 					layout.setBackgroundDrawable(DR);
 				}
-			}
-			else{
-				j = savedInstanceState.getInt("j");
-				progressStatus = savedInstanceState.getInt("progressStatus");
-				increase = savedInstanceState.getInt("increase");
-				JsonMethods jsonMethods = new JsonMethods();
-				List<Questions> ListQuestions = savedInstanceState.getParcelableArrayList("listQuestions");
-				SurveyQuestions = jsonMethods.GetList(ListQuestions);
-				loadSavecontrols();
-				//if(savedInstanceState.getBoolean("PHOTO_TAKEN" )) {
-				//	onPhotoTaken(savedInstanceState.getInt("currentControlID"));
-				//}
-				if(savedInstanceState.getBoolean("signed" )) {
-					onSignatureTaken(savedInstanceState.getInt("currentControlID" ));
-				}
-				if(savedInstanceState.getBoolean("Scanned" )) {
-					onScanned(savedInstanceState.getString("ScannedValue" ),savedInstanceState.getInt("currentControlID" ));
-				}
-			}
 		}
 		catch(Exception ex){
 			Toast.makeText(getApplicationContext(), "E001:" + ex.toString(), Toast.LENGTH_LONG).show();
@@ -254,33 +233,6 @@ public class SurveyActivity extends AppCompatActivity implements
   	protected void onResume() {
 	      super.onResume();
 	   }
-
-	@Override
-    protected void onSaveInstanceState(Bundle outState ) {
-		super.onSaveInstanceState(outState);
-		try {
-			//outState.putBoolean("PHOTO_TAKEN", _taken);
-			outState.putBoolean("Scanned", _Scanned);
-			outState.putBoolean("signed", _signed);
-			outState.putString("ScannedValue", _ScannedValue);
-			outState.putInt("currentControlID", _currentControlID - idKey);
-			outState.putInt("j", j);
-			outState.putInt("progressStatus", progressStatus);
-			outState.putInt("increase", increase);
-			List<Questions> listQuestions = new ArrayList<Questions>();
-			if (SurveyQuestions != null) {
-				for (List<Questions> Listquestions : SurveyQuestions) {
-					for (Questions question : Listquestions) {
-						listQuestions.add(question);
-					}
-				}
-				ArrayList<Questions> arrayquestions = (ArrayList<Questions>) listQuestions;
-				outState.putParcelableArrayList("listQuestions", arrayquestions);
-			}
-		} catch (Exception ex) {
-			Toast.makeText(getApplicationContext(), "E00X:" + ex.toString(), Toast.LENGTH_LONG).show();
-		}
-	}
 
 	@Override
 	public void onDestroy() {
@@ -505,11 +457,6 @@ public class SurveyActivity extends AppCompatActivity implements
 		    	   Toast.makeText(getApplicationContext(), "E002:" + ex.toString(), Toast.LENGTH_LONG).show();
 			}
 	  }
-
-	@Override
-	public void onFragmentInteraction(Uri uri) {
-
-	}
 
 	public class ButtonChangeSecion implements View.OnClickListener
 	{
@@ -2741,10 +2688,12 @@ public class SurveyActivity extends AppCompatActivity implements
 				 }else{
 				     _currentControlID=view.getId();
 
-                     Fragment Fragment = new SurveyPhotoFragment();
-                     FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                     Fragment Fragment = new CameraFragment();
+                     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                      fragmentTransaction.replace(R.id.SurveyFragment, Fragment);
                      fragmentTransaction.commit();
+
+					 //detachPhotoFragment();
 
 				 }
 			 } catch (Exception e) {
@@ -3574,7 +3523,6 @@ public class SurveyActivity extends AppCompatActivity implements
 	public void CreateReportDDI(){
 
 	}
-
 
 	public boolean endsWithPorcentage(String text){
 		boolean result = false;

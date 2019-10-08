@@ -707,16 +707,12 @@ public class UbicheckActivity extends Activity {
 				try
 				{
 					if ( Img.length> 0) {
-//							if(Img[1].startsWith("\"http://timetrackerstorage.blob.core.windows.net/")){
-									new AsyncComparePictures().execute();
-//							}
+						new AsyncComparePictures().execute();
 						hideSpinner();
 					}else {
 						hideSpinner();
 						Toast.makeText(getBaseContext(), "No se encontro imagen de Biometrico " + BiometricID + " Mensaje:" + result, Toast.LENGTH_LONG).show();
 					}
-
-
 				}
 				catch (Exception ex) {
 					hideSpinner();
@@ -756,9 +752,7 @@ public class UbicheckActivity extends Activity {
 					//long t0 = System.currentTimeMillis();
 					//for (int i=0; i<10; ++i)
 					//result = FSDK.DetectFacialFeatures(picture, features);
-
 					result = FSDK.DetectFacialFeaturesInRegion(picture, faceCoords, features);
-					//Log.d("TT", "TIME: " + ((System.currentTimeMillis()-t0)/10.0f));
 				}
 			}
 			String resultString = "exito";
@@ -797,7 +791,7 @@ public class UbicheckActivity extends Activity {
 								FSDK.GetFaceTemplate(DataBaseImage, template2);
 								float Similarity[] = new float[1];
 								float MatchingThreshold[] = new float[1];
-								FSDK.GetMatchingThresholdAtFAR((float)0.25,MatchingThreshold);
+								FSDK.GetMatchingThresholdAtFAR((float)0.42,MatchingThreshold);
 								int Success = FSDK.MatchFaces(template1, template2, Similarity);
 								float simil = Similarity[0];
 								if(Similarity[0] > MatchingThreshold[0]){
@@ -827,7 +821,16 @@ public class UbicheckActivity extends Activity {
 							Animation.setVisibility(View.GONE);
 							LinearLayout layoutRefresh = (LinearLayout)findViewById(R.id.layoutRefresh);
 							layoutRefresh.setVisibility(View.GONE);
-
+							Devices Device = db.GetDevice();
+							if(Device != null && Device.UsesBiometric == 1 && Device.UsesKioskMode == 1){
+								Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.SelectBiometricActivity.class);
+								startActivity(intent);
+								finish();
+							}else{
+								Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.UbicheckActivity.class);
+								startActivity(intent);
+								finish();
+							}
                         }
 					}else{
 						hideSpinner();

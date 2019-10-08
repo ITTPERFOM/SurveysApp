@@ -1,24 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".SurveyPhotoFragment">
-
 <androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/camera_ui_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <TextureView
-        android:id="@+id/view_finder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
 
     <ImageView
         android:id="@+id/imgflash"
@@ -34,7 +20,7 @@
 
 
     <Button
-        android:id="@+id/imgCapture"
+        android:id="@+id/camera_capture_button"
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_margin="24dp"
@@ -43,10 +29,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-         />
+        />
 
     <ImageView
-        android:id="@+id/imgSwitch"
+        android:id="@+id/camera_switch_button"
         android:layout_width="52dp"
         android:layout_height="72dp"
         android:layout_margin="24dp"
@@ -57,21 +43,18 @@
         app:layout_constraintStart_toEndOf="@+id/imgCapture"
         app:srcCompat="@drawable/ico_switch" />
 
+
     <ImageView
         android:id="@+id/back"
-        android:layout_width="64dp"
+        android:layout_width="154dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="112dp"
-        android:src="@drawable/back"
-        android:tint="@color/white"
+        android:layout_marginBottom="400dp"
+        android:src="@drawable/back_color"
         app:layout_constraintBottom_toTopOf="@+id/imgflash"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintHorizontal_bias="0.046"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/view_finder"
-        app:layout_constraintVertical_bias="0.037" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.115" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-</FrameLayout>

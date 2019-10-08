@@ -1,5 +1,6 @@
 package com.timetracker.surveys;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.PackageManager;
@@ -9,32 +10,42 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Fragment;
+import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Rational;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import android.util.Size;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.camera.core.CameraInfoUnavailableException;
 import androidx.camera.core.CameraX;
+import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageAnalysisConfig;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureConfig;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.journeyapps.barcodescanner.ViewfinderView;
+import com.timetracker.business.AutoFitPreviewBuilder;
 
 import java.io.File;
+import java.util.HashMap;
+
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 
 public class SurveyPhotoFragment extends Fragment {
@@ -50,6 +61,8 @@ public class SurveyPhotoFragment extends Fragment {
     View view;
     Size screenSize;
     public Fragment f = this;
+    ImageAnalysis imageAnalyzer = null;
+    private CameraX.LensFacing lensFacing = CameraX.LensFacing.BACK;
 
 
     private OnFragmentInteractionListener mListener;
@@ -78,13 +91,33 @@ public class SurveyPhotoFragment extends Fragment {
 
         textureView = view.findViewById(R.id.view_finder);
 
+        view.findViewById(R.id.imgSwitch).setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+                if(CameraX.LensFacing.FRONT == lensFacing) {
+                    lensFacing  =  CameraX.LensFacing.BACK;
+                } else {
+                    lensFacing =    CameraX.LensFacing.FRONT;
+                }
+                try {
+                    CameraX.getCameraWithLensFacing(lensFacing);
+
+
+                    CameraX.unbindAll();
+                } catch (CameraInfoUnavailableException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         if(allPermissionsGranted()){
             startCamera(); //start camera if permission has been granted by user
         } else{
             ActivityCompat.requestPermissions(getActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
 
-        return view;
+        return  view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -133,6 +166,9 @@ public class SurveyPhotoFragment extends Fragment {
 
         CameraX.unbindAll();
 
+
+
+
         Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
         Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
 
@@ -161,7 +197,7 @@ public class SurveyPhotoFragment extends Fragment {
         Rational screenAspectRatio = new Rational(metrics.widthPixels, metrics.heightPixels);
 
         ImageCaptureConfig imageCaptureConfig = new ImageCaptureConfig.Builder()
-                .setLensFacing(CameraX.LensFacing.BACK)
+                .setLensFacing(lensFacing)
                 .setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
                 .setTargetAspectRatio(screenAspectRatio)
                 .setTargetRotation(((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE))
@@ -170,9 +206,34 @@ public class SurveyPhotoFragment extends Fragment {
                 .build();
         final ImageCapture imgCap = new ImageCapture(imageCaptureConfig);
 
+
+        DisplayManager.DisplayListener mDisplayListener = new DisplayManager.DisplayListener() {
+            @Override
+            public void onDisplayAdded(int displayId) {
+
+            }
+
+            @Override
+            public void onDisplayChanged(int displayId) {
+                Log.d(TAG, "Rotation changed: " + view.getDisplay().getRotation() );
+                preview.setTargetRotation(view.getDisplay().getRotation());
+                imgCap.setTargetRotation(view.getDisplay().getRotation());
+                imageAnalyzer.setTargetRotation(view.getDisplay().getRotation());
+            }
+
+            @Override
+            public void onDisplayRemoved(int displayId) {
+
+            }
+        };
+        DisplayManager displayManager = (DisplayManager) getActivity().getSystemService(Context.DISPLAY_SERVICE);
+        displayManager.registerDisplayListener(mDisplayListener, new Handler());
+
         view.findViewById(R.id.imgCapture).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                view.findViewById(R.id.imgCapture).setBackground(ContextCompat.getDrawable(getActivity(),
+                        R.drawable.btn_round_selected));
                 ContextWrapper cw = new ContextWrapper(getActivity());
                 File directory = cw.getDir("imageSurveyDir", Context.MODE_PRIVATE);
                 // Create imageDir
@@ -188,13 +249,10 @@ public class SurveyPhotoFragment extends Fragment {
                     }
 
                     @Override
-                    public void onError(@NonNull ImageCapture.UseCaseError useCaseError, @NonNull String message, @Nullable Throwable cause) {
-                        String msg = " Error en captura ";
-                        Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
-                        if (cause != null) {
-                            cause.printStackTrace();
-                        }
+                    public void onError(@NonNull ImageCapture.ImageCaptureError imageCaptureError, @NonNull String message, @Nullable Throwable cause) {
+
                     }
+
                 });
             }
         });
@@ -202,8 +260,9 @@ public class SurveyPhotoFragment extends Fragment {
         //bind to lifecycle:
         CameraX.bindToLifecycle((LifecycleOwner) getActivity(), preview, imgCap);
 
-
     }
+
+
 
     private void updateTransform() {
         Matrix mx = new Matrix();
@@ -246,4 +305,5 @@ public class SurveyPhotoFragment extends Fragment {
             }
         }
     }
+
 }
