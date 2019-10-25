@@ -48,7 +48,7 @@ public class form extends Fragment {
         View view = inflater.inflate(R.layout.fragment_form, container, false);
 
         RelativeLayout relative= view.findViewById(R.id.table) ;
-        relative.addView(new TableMainLayout(getActivity(),rows,1));
+        relative.addView(new TableMainLayout(getActivity(),rows,option));
 
         return view;
     }

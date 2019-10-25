@@ -282,7 +282,6 @@ public class TableMainLayout extends RelativeLayout {
             switch(option) {
                 case 1:
                     maulecColorPorcentage(textViewB);
-
                     if(x == loopCount - 1 ){
                         maulecColorDDI(textViewB);
                     }
