@@ -29,9 +29,7 @@ import com.timetracker.business.OkHttpMethods;
 
 public class ConnectionMethods {
 
-	//public static final String WebServiceURL  = "http://192.168.2.12/api";
-	//Edgar
-	//public static final String WebServiceURL  = "http://192.168.2.97/api";
+	//public static final String WebServiceURL  = "http://61a92187e7d34e979136e269e9067b8f.cloudapp.net/api";
     public static final String WebServiceURL  = "https://formaxws.com/api";
 	public static String AutToken = "84,96,144,168,153,0,59,242,120,199,144,75,248,58,171,167,154,165,133,59,147,62,134,138,79,172,251,200,106,16,33,135,23,73,15,54,65,32,241,194,134,13,104,6,59,199,57,73,134,45,69,109,159,27,50,28,75,153,211,185,10,245,84,134,190,29,90,16,202,207,181,97,250,124,226,25,188,173,241,130,63,225,234,153,150,31,216,182,24,1,223,60,74,114,193,237,130,16,70,11,93,248,173,17,110,28,149,156,10,208,232,54,254,115,170,150,234,118,30,253,163,69,172,162,101,90,180,82";
 
@@ -95,22 +93,47 @@ public class ConnectionMethods {
     //================================================================================
 
 	public static String Post(Context context, String item, String url, boolean longTimeout){
-		int milliseconds = 5000;
+		int milliseconds = 30000;
 		if(longTimeout){
-			milliseconds = 120000;
+			milliseconds = 600000;
 		}
 		String resultInternet = isInternetConnected(context,true);
 		if(!resultInternet.equals("")){
 			return resultInternet;
 		}
 		String result = "";
+		InputStream inputStream = null;
 		try{
-			OkHttpMethods OkHttpMethods = new OkHttpMethods();
-			String response = OkHttpMethods.post(WebServiceURL + url, item, AutToken);
-			return response;
+			URL vurl = new URL(WebServiceURL + url);
+			HttpURLConnection connection = (HttpURLConnection)vurl.openConnection();
+			connection.setReadTimeout(milliseconds);
+			connection.setConnectTimeout(milliseconds);
+			connection.setRequestMethod("POST");
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			connection.addRequestProperty("Accept", "application/json");
+			connection.addRequestProperty("Content-type", "application/json");
+			connection.addRequestProperty("Authorization-Token", AutToken);
+
+			OutputStream out = new BufferedOutputStream(connection.getOutputStream());
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, "UTF-8"));
+			writer.write(item);
+			writer.close();
+			out.close();
+			System.setProperty("http.keepAlive", "false");
+			connection.connect();
+			if(connection.getResponseCode() == 200){
+				inputStream = connection.getInputStream();
+				result = convertInputStreamToString(inputStream);
+			}else{
+				result = "Error: No se pudo realizar conexion a servicio, codigo:" + connection.getResponseCode();
+			}
+			if (connection != null) {
+				connection.disconnect();
+			}
 		}catch (Exception e) {
-        	result = "Error: " + e.getLocalizedMessage();
-	    }
+			result = "Error: " + e.getLocalizedMessage();
+		}
 		return result;
 	}
 

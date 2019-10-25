@@ -1,42 +1,32 @@
 package com.timetracker.surveys
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.hardware.Camera
 import android.hardware.display.DisplayManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.Rational
-import android.view.LayoutInflater
-import android.view.TextureView
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.CaptureMode
 import androidx.camera.core.ImageCapture.Metadata
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.timetracker.business.ANIMATION_FAST_MILLIS
 import com.timetracker.business.ANIMATION_SLOW_MILLIS
 import com.timetracker.business.AutoFitPreviewBuilder
 import java.io.File
 import java.lang.Exception
 import java.nio.ByteBuffer
-import java.text.SimpleDateFormat
 import java.util.ArrayDeque
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 /** Helper type alias used for analysis use case callbacks */
@@ -48,7 +38,7 @@ typealias LumaListener = (luma: Double) -> Unit
  * - Photo taking
  * - Image analysis
  */
-class CameraFragment : Fragment() {
+class CameraFragment(button: Button) : Fragment() {
 
     private lateinit var container: ConstraintLayout
     private lateinit var viewFinder: TextureView
@@ -107,11 +97,19 @@ class CameraFragment : Fragment() {
     private val imageSavedListener = object : ImageCapture.OnImageSavedListener {
 
         override fun onError(imageCaptureError: ImageCapture.ImageCaptureError, message: String, cause: Throwable?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
         }
         override fun onImageSaved(photoFile: File) {
-            activity?.supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
-            (activity as SurveyActivity).onPhotoTaken()
+
+            try {
+                activity?.supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
+                (activity as SurveyActivity).onPhotoTaken(button)
+            }
+            catch (e: Exception) {
+                val myToast = Toast.makeText(activity ,"No se pudo guardar Fotografia intente de nuevo",Toast.LENGTH_SHORT)
+                myToast.show()
+                activity?.supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
+            }
         }
     }
 
@@ -210,10 +208,14 @@ class CameraFragment : Fragment() {
         // Inflate a new view containing all UI for controlling the camera
         val controls = View.inflate(requireContext(), R.layout.camera_ui_container, container)
 
+        controls.findViewById<Button>(R.id.camera_capture_button).isEnabled = true;
+
         // Listener for button used to capture photo
         controls.findViewById<Button>(R.id.camera_capture_button).setOnClickListener {
             // Get a stable reference of the modifiable image capture use case
             imageCapture?.let { imageCapture ->
+
+                controls.findViewById<Button>(R.id.camera_capture_button).isEnabled = false;
 
                 val cw = ContextWrapper(activity)
                 val directory = cw.getDir("imageSurveyDir", Context.MODE_PRIVATE)

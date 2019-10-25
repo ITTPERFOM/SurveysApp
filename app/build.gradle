@@ -8,8 +8,8 @@ android {
         applicationId "com.timetracker.surveys"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 277
-        versionName "2.77"
+        versionCode 279
+        versionName "2.79"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
@@ -33,6 +33,7 @@ dependencies {
 
     // Common Java Compiler
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
     implementation 'org.apache.commons:commons-lang3:3.9'
 
@@ -41,7 +42,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     // Google play Services
-    implementation 'com.google.android.gms:play-services-vision:18.0.0'
+    implementation 'com.google.android.gms:play-services-vision:19.0.0'
     implementation 'com.google.android.gms:play-services-gcm:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
 

@@ -107,7 +107,7 @@ public class HomeActivity extends Activity {
 	private Button btnCheckIn;
 	private Button btnStartSurvey;
 
-	public SurveyPhotoFragment surveyPhoto;
+	//public SurveyPhotoFragment surveyPhoto;
 	public android.app.FragmentTransaction fragmentTransaction;
 
 	//================================================================================

@@ -3,6 +3,7 @@ package com.timetracker.surveys;
 import org.json.JSONObject;
 
 import com.timetracker.business.ConnectionMethods;
+import com.timetracker.business.LuxandInit;
 import com.timetracker.data.Devices;
 import com.timetracker.sqlite.MySQLiteHelper;
 
@@ -60,6 +61,7 @@ public class SplashScreenActivity extends Activity {
                 }
             }
         }, 1000);
+        LuxandInit.getInstance(getApplicationContext());
     }
 
     //================================================================================
