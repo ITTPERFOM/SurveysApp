@@ -478,31 +478,39 @@ public class TableMainLayout extends RelativeLayout {
     }
 
     public void maulecColorPorcentage(TextView rowText){
-        if (rowText.getText().toString().indexOf("%") >= 1) {
-            int porcentage = 0;
-            try{
-                porcentage = Integer.parseInt(rowText.getText().toString().substring(0, rowText.getText().toString().indexOf("%")));
-            }catch (Exception e){
-                Log.d("Prueba", e.toString());
+        try{
+            if (rowText.getText().toString().indexOf("%") >= 1) {
+                int porcentage = 0;
+                try{
+                    porcentage = Integer.parseInt(rowText.getText().toString().substring(0, rowText.getText().toString().indexOf("%")));
+                }catch (Exception e){
+                    Log.d("Prueba", e.toString());
+                }
+                if (porcentage >= 80) {
+                    rowText.setBackgroundColor(getResources().getColor(R.color.bGreen));
+                    rowText.setTextColor(Color.WHITE);
+                } else {
+                    rowText.setBackgroundColor(getResources().getColor(R.color.bRed));
+                    rowText.setTextColor(Color.WHITE);
+                }
             }
-            if (porcentage >= 80) {
+        }catch (Exception e){
+            Log.d("Tabla error","Fallo");
+        }
+    }
+
+    public void maulecColorDDI(TextView rowText){
+        try{
+            int ddi = Integer.parseInt(rowText.getText().toString());
+            if (ddi >= 16) {
                 rowText.setBackgroundColor(getResources().getColor(R.color.bGreen));
                 rowText.setTextColor(Color.WHITE);
             } else {
                 rowText.setBackgroundColor(getResources().getColor(R.color.bRed));
                 rowText.setTextColor(Color.WHITE);
             }
-        }
-    }
-
-    public void maulecColorDDI(TextView rowText){
-        int ddi = Integer.parseInt(rowText.getText().toString());
-        if (ddi >= 16) {
-            rowText.setBackgroundColor(getResources().getColor(R.color.bGreen));
-            rowText.setTextColor(Color.WHITE);
-        } else {
-            rowText.setBackgroundColor(getResources().getColor(R.color.bRed));
-            rowText.setTextColor(Color.WHITE);
+        }catch (Exception e){
+            Log.d("Tabla error","Fallo");
         }
     }
 }

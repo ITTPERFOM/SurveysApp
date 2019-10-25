@@ -18,12 +18,15 @@ import android.Manifest;
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.FragmentTransaction;
 import android.content.ContextWrapper;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import java.net.URLEncoder;
@@ -3013,7 +3016,7 @@ public class SurveyActivity extends AppCompatActivity  implements form.OnFragmen
         @Override
         protected void onPostExecute(String result) {
             progress.dismiss();
-            Questions q = db.getQuestion(QuestionID);
+             Questions q = db.getQuestion(QuestionID);
             if(QuestionID == 45917)
             {
                 if(!result.equals("\"0\"")){
@@ -3090,36 +3093,155 @@ public class SurveyActivity extends AppCompatActivity  implements form.OnFragmen
             }
             try
             {
-                RelativeLayout layout = new RelativeLayout(SurveyActivity.this);
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
-                layout.setLayoutParams(layoutParams);
+                boolean blockAll = false;
+                if(!result.equals("\"0\"")){
+                    result = result.substring(1, result.length()-1);
+                    String[] rows = result.split(Pattern.quote("\\r\\n"));
+                    if(rows.length > 0){
+                        String[] columnsTemp = rows[1].split(Pattern.quote(","));
+                        if(rows.length == 2 && columnsTemp[columnsTemp.length-1].equals("btn:SelectAllBlockBarcode")){
+                            final Questions Q = db.getQuestion(QuestionID);
+                            int currentOrder = Q.OrderNumber + 1;
+                            if(columnsTemp[columnsTemp.length-1].startsWith("btn:SelectAllBlock")){
+                                blockAll = true;
+                            }
+                            for(int j = 0; j < columnsTemp.length; j++) {
+                                if(!columnsTemp[j].toString().equals("") && !columnsTemp[j].toString().startsWith("btn:Select")){
+                                    Questions newQuestion = db.getQuestionByOrderNumberAndSurveyID(currentOrder, Q.SurveyID);
+                                    if(newQuestion != null){
+                                        currentOrder++;
+                                        View View = (View)findViewById(newQuestion.QuestionID+idKey);
+                                        if(View instanceof EditText){
+                                            EditText editText = (EditText)View;
+                                            if(editText != null){
+                                                editText.setText(columnsTemp[j].toString());
+                                                if(blockAll){
+                                                    editText.setEnabled(false);
+                                                }
+                                            }
+                                        }else if(View instanceof Spinner){
+                                            Spinner Spinner = (Spinner)View;
+                                            if(Spinner != null){
+                                                Spinner.setSelection(getIndex(Spinner, columnsTemp[j].toString()));
+                                                if(blockAll){
+                                                    Spinner.setEnabled(false);
+                                                }
+                                            }
+                                        }
 
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+                                    }
+                                }
+                            }
+                        }else{
+                            for(int i=0;i < rows.length;i++){
+                                TableRow.LayoutParams rowParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+                                TableRow tableRow = new TableRow(getBaseContext());
+                                tableRow.setLayoutParams(rowParams);
+                                String[] columns = rows[i].split(Pattern.quote(","));
+                                if(columns.length > 0){
+                                    for(int j=0;j < columns.length;j++){
+                                        final TextView rowText = new TextView(getBaseContext());
+                                        rowText.setText(columns[j]);
+                                        rowText.setTextColor(Color.BLACK);
+                                        rowText.setLayoutParams(rowParams);
+                                        rowText.setPadding(3, 3, 5, 3);
+                                        if(columns[j].startsWith("btn:Select")){
+                                            rowText.setText("Seleccionar");
+                                            rowText.setTextColor(Color.BLUE);
+                                            rowText.setTypeface(null, Typeface.BOLD);
+                                            if(columns[j].equals("btn:SelectAllBlock")){
+                                                blockAll = true;
+                                            }
+                                            if(columns[j].equals("btn:SelectAll") || columns[j].equals("btn:SelectAllBlock")){
+                                                final boolean finalBlockAll = blockAll;
+                                                rowText.setOnTouchListener(new View.OnTouchListener() {
+                                                    public boolean onTouch(View v, MotionEvent event) {
+                                                            final Questions Q = db.getQuestion(QuestionID);
+                                                            int currentOrder = Q.OrderNumber + 1;
+                                                            String currentValue = "";
+                                                            TableRow SelectedRow = (TableRow)rowText.getParent();
+                                                            if(SelectedRow != null){
+                                                                for(int j = 0; j < SelectedRow.getChildCount(); j++) {
+                                                                    currentValue = ((TextView)SelectedRow.getChildAt(j)).getText().toString();
+                                                                    if(!currentValue.equals("") && !currentValue.equals("Seleccionar")){
+                                                                        Questions newQuestion = db.getQuestionByOrderNumberAndSurveyID(currentOrder, Q.SurveyID);
+                                                                        if(newQuestion != null){
+                                                                            currentOrder++;
+                                                                            View View = (View)findViewById(newQuestion.QuestionID+idKey);
+                                                                            if(View instanceof EditText){
+                                                                                EditText editText = (EditText)View;
+                                                                                if(editText != null){
+                                                                                    editText.setText(currentValue);
+                                                                                    if(finalBlockAll){
+                                                                                        editText.setEnabled(false);
+                                                                                    }
+                                                                                }
+                                                                            }else if(View instanceof Spinner){
+                                                                                Spinner Spinner = (Spinner)View;
+                                                                                if(Spinner != null){
+                                                                                    Spinner.setSelection(getIndex(Spinner, currentValue));
+                                                                                    if(finalBlockAll){
+                                                                                        Spinner.setEnabled(false);
+                                                                                    }
+                                                                                }
+                                                                            }
+
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        return true;
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(!blockAll){
+                        RelativeLayout layout = new RelativeLayout(SurveyActivity.this);
+                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+                        layout.setLayoutParams(layoutParams);
+
+                        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
 
 
-                findViewById(R.id.FragmentReport).setVisibility(View.VISIBLE);
+                        findViewById(R.id.FragmentReport).setVisibility(View.VISIBLE);
 
-                result = result.substring(1, result.length()-1);
 
-                String[] rows = result.split(Pattern.quote("\\r\\n"));
 
-                String[] hardcodedEquations = rows[0].split(Pattern.quote(","));
+                        //result = result.substring(1, result.length()-1);
 
-                switch(hardcodedEquations[0]) {
-                    case "Producto Maulec":
-                        Fragment Fragment = new form( rows , 1 );
-                        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.FragmentReport, Fragment);
-                        fragmentTransaction.commit();
-                        break;
-                    default:
-                        Fragment Fragment2 = new form( rows , 0 );
-                        FragmentTransaction fragmentTransaction2 = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction2.replace(R.id.FragmentReport, Fragment2);
-                        fragmentTransaction2.commit();
+                        String[] Rows = result.split(Pattern.quote("\\r\\n"));
+
+                        String[] hardcodedEquations = Rows[0].split(Pattern.quote(","));
+
+                        switch(hardcodedEquations[0]) {
+                            case "Producto Maulec":
+                                Fragment Fragment = new form( Rows , 1 );
+                                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                                fragmentTransaction.replace(R.id.FragmentReport, Fragment);
+                                fragmentTransaction.commit();
+                                break;
+                            default:
+                                Fragment Fragment2 = new form( Rows , 0 );
+                                FragmentTransaction fragmentTransaction2 = getSupportFragmentManager().beginTransaction();
+                                fragmentTransaction2.replace(R.id.FragmentReport, Fragment2);
+                                fragmentTransaction2.commit();
+                        }
+                    }
+                } else {
+                    Questions Q = db.getQuestion(QuestionID);
+                    if (Q.Options.equals("DeviceID")){
+                        Toast.makeText(getBaseContext(), "No existe ubicheck", Toast.LENGTH_LONG).show();
+                    }
                 }
-            }catch (Exception e){
-                Log.d("Prueba", e.toString());
+            }
+            catch (Exception e) {
+                //Toast.makeText(getBaseContext(), e.toString(), Toast.LENGTH_LONG).show();
+                Log.d("Error de envio",e.toString());
             }
         }
     }
