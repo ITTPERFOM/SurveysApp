@@ -50,16 +50,13 @@ class CameraFragment(button: Button) : Fragment() {
     private var imageCapture: ImageCapture? = null
     private var imageAnalyzer: ImageAnalysis? = null
 
+    private val btn : Button = button;
+
     private var fragment:   Fragment = this;
 
     /** Internal reference of the [DisplayManager] */
     private lateinit var displayManager: DisplayManager
 
-    /**
-     * We need a display listener for orientation changes that do not trigger a configuration
-     * change, for example if we choose to override config change in manifest or for 180-degree
-     * orientation changes.
-     */
     private val displayListener = object : DisplayManager.DisplayListener {
         override fun onDisplayAdded(displayId: Int) = Unit
         override fun onDisplayRemoved(displayId: Int) = Unit
@@ -97,13 +94,13 @@ class CameraFragment(button: Button) : Fragment() {
     private val imageSavedListener = object : ImageCapture.OnImageSavedListener {
 
         override fun onError(imageCaptureError: ImageCapture.ImageCaptureError, message: String, cause: Throwable?) {
-
+            activity?.supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
+            Toast.makeText(activity,"No se pudo capturar Imagen ",Toast.LENGTH_LONG)
         }
         override fun onImageSaved(photoFile: File) {
-
             try {
                 activity?.supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
-                (activity as SurveyActivity).onPhotoTaken(button)
+                (activity as SurveyActivity).onPhotoTaken(btn)
             }
             catch (e: Exception) {
                 val myToast = Toast.makeText(activity ,"No se pudo guardar Fotografia intente de nuevo",Toast.LENGTH_SHORT)
@@ -130,12 +127,11 @@ class CameraFragment(button: Button) : Fragment() {
             displayId = viewFinder.display.displayId
 
             // Build UI controls and bind all camera use cases
-            updateCameraUi()
+            updateCameraUi(btn)
             bindCameraUseCases()
         }
     }
 
-    /** Declare and bind preview, capture and analysis use cases */
     private fun bindCameraUseCases() {
 
         // Get screen metrics used to setup camera for full screen resolution
@@ -198,7 +194,7 @@ class CameraFragment(button: Button) : Fragment() {
 
     /** Method used to re-draw the camera UI controls, called every time configuration changes */
     @SuppressLint("RestrictedApi")
-    private fun updateCameraUi() {
+    private fun updateCameraUi(button: Button) {
 
         // Remove previous UI if any
         container.findViewById<ConstraintLayout>(R.id.camera_ui_container)?.let {
@@ -229,7 +225,12 @@ class CameraFragment(button: Button) : Fragment() {
                 }
 
                 // Setup image capture listener which is triggered after photo has been taken
-                imageCapture.takePicture(photoFile, imageSavedListener, metadata)
+                try{
+                    imageCapture.takePicture(photoFile, imageSavedListener, metadata)
+                }catch(e: Exception){
+                    Toast.makeText(activity,"No se pudo capturar Imagen Intente nuevamente ",Toast.LENGTH_LONG)
+                }
+
 
                 // We can only change the foreground Drawable using API level 23+ API
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -248,6 +249,7 @@ class CameraFragment(button: Button) : Fragment() {
 
         controls.findViewById<ImageView>(R.id.back).setOnClickListener {
             activity?.supportFragmentManager?.beginTransaction()?.remove(fragment)?.commit()
+            (activity as SurveyActivity).EnableButton(button);
         }
 
         // Listener for button used to switch cameras

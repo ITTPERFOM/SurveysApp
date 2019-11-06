@@ -7,16 +7,14 @@
     <string name="option_similarity">Biometrico no coincide </string>
     <string name="option_information">Informacion </string>
     <string name="option_select_biometric">Empleados </string>
-    <string name="information_message">Formax es una herramienta enfocada a la elaboración de formas, recolección de datos y el control de asistencia; con el objetivo de proporcionar información en tiempo real de manera confiable y segura.
-    	\n\n
-    	Contactanos: \n 01 (55) 56 11 18 30 ext. 2103\nsoportecliente@timetracker.com.mx
-	</string>
+    <string name="information_message">Formax es una herramienta enfocada a la elaboración de formas, recolección de datos y el control de asistencia; con el objetivo de proporcionar información en tiempo real de manera confiable y segura.</string>
+    <string name="contactanos"> Contactanos:  01 (55) 56 11 18 30 Opc. 1 \n \n soportecliente@timetracker.com.mx </string>
     <string name="register_device_name">Nombre: </string>
     <string name="register_device_code">Codigo: </string>
     <string name="register_device_biometric">Capturar Biometrico</string>
     <string name="select_device_biometric">Seleccionar Biometrico</string>
     <string name="register_device_reset">Eliminar Datos</string>
-    <string name="register_device_terms">Acepto los <a href="http://ittformax.cloudapp.net/Home/License">Terminos y Condiciones</a></string>
+    <string name="register_device_terms">Acepto los <a href="https://formax.mx/Home/License">Terminos y Condiciones</a></string>
     <string name="option_select_survey">Seleccionar Forma </string>
     <string name="option_select_branch">Seleccionar Sucursal </string>
     <string name="option_add_branch">Agregar Sucursal </string>

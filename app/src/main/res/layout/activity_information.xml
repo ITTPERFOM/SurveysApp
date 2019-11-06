@@ -35,39 +35,37 @@
 
         <TextView
             android:id="@+id/txtMessage"
-            style="@style/textview_Text"
-            android:layout_width="match_parent"
-            android:layout_height="236dp"
+            android:layout_width="0dp"
+            android:layout_height="175dp"
+            android:layout_margin="32dp"
             android:layout_marginTop="40dp"
             android:layout_marginBottom="8dp"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingBottom="@dimen/activity_vertical_margin"
-            android:text="@string/information_message"
             android:textAlignment="center"
+            android:textColor="@color/black"
+            android:text="@string/information_message"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.06" />
+            app:layout_constraintVertical_bias="0.374" />
 
         <TextView
             android:id="@+id/txtTitle"
             style="@style/textview_Title"
-            android:layout_width="405dp"
+            android:layout_width="0dp"
             android:layout_height="58dp"
-            android:layout_marginEnd="6dp"
             android:background="@color/gray"
             android:gravity="center"
             android:text="@string/option_information"
             android:textAlignment="center"
-            android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="32sp"
-            app:layout_constraintBottom_toTopOf="@+id/txtMessage"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -75,58 +73,28 @@
             android:id="@+id/imgLogo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/scrollableContents"
-            android:layout_marginTop="256dp"
-            android:layout_marginBottom="8dp"
             android:contentDescription="@string/app_name"
             android:scaleType="fitCenter"
             android:src="@drawable/ittperformance_logo"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/txtMessage"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/txtTitle"
-            app:layout_constraintVertical_bias="0.127" />
+            app:layout_constraintTop_toBottomOf="@+id/txtTitle" />
 
         <TextView
-            android:id="@+id/dataStatus"
-            android:layout_width="match_parent"
-            android:layout_height="53dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="396dp"
-            android:background="@color/trueblue"
-            android:gravity="center"
-            android:text="@string/dataStatus"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/txtTitle" />
-
-        <TextView
-            android:id="@+id/txtMonth"
-            android:layout_width="match_parent"
-            android:layout_height="57dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="7dp"
-            android:gravity="center"
-            android:text="TextView"
-            android:textAlignment="center"
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/contactanos"
             android:textColor="@color/black"
-            android:textSize="24sp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dataStatus"
-            app:layout_constraintVertical_bias="0.301"
-            tools:visibility="invisible" />
+            app:layout_constraintTop_toBottomOf="@+id/txtMessage"
+            app:layout_constraintVertical_bias="0.0" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </RelativeLayout>

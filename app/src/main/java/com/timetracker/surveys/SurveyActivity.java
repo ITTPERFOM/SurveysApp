@@ -27,6 +27,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import java.net.URLEncoder;
@@ -2710,10 +2712,12 @@ public class SurveyActivity extends AppCompatActivity  implements form.OnFragmen
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         public void run() {
+                            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                             Fragment Fragment = new CameraFragment(button);
                             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                             fragmentTransaction.replace(R.id.SurveyFragment, Fragment);
-                            fragmentTransaction.commit();
+                            fragmentTransaction.commitAllowingStateLoss();
                         }
                     }, 500);
                 }
@@ -3503,5 +3507,13 @@ public class SurveyActivity extends AppCompatActivity  implements form.OnFragmen
         Log.d("Prueba",parts[0]+"   Aquie debe haber un porcentaje : " + parts[1]);
 
         return result;
+    }
+
+    public void EnableButton(Button button){
+        try {
+            button.setEnabled(true);
+        }catch (Exception e){
+
+        }
     }
 }

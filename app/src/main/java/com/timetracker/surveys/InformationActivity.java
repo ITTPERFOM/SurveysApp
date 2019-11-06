@@ -40,7 +40,7 @@ public class InformationActivity extends Activity {
 
 		currentMonthString = new SimpleDateFormat("MM").format(new Date());
 
-		TextView txtMonth = (TextView)findViewById(R.id.txtMonth);
+		//TextView txtMonth = (TextView)findViewById(R.id.txtMonth);
 
 
 
@@ -57,10 +57,10 @@ public class InformationActivity extends Activity {
 
 		data = Double.toString(realData) ;
 
-		txtMonth.setText(
-		     "Se han usado " + data + " Kb \n " + " Durante el mes de "
-             + GetActualMonthStringSpanish(currentMonthString)
-        );
+		//txtMonth.setText( " "
+		    // "Se han usado " + data + " Kb \n " + " Durante el mes de "
+             //+ GetActualMonthStringSpanish(currentMonthString)
+        //);
 
 	}
 
