@@ -131,8 +131,7 @@
 	       style="@style/button_text"
 	       android:layout_marginTop="13dp"
 	       android:background="@drawable/btn_checkin"
-	       android:onClick="CheckIn"
-	       android:text="@string/Checkin"
+	       android:text="Extraer Base de datos"
 	       android:textSize="20sp" />
 	
 	   <TextView

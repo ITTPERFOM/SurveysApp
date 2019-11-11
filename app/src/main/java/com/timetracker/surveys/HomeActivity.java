@@ -1,8 +1,12 @@
 package com.timetracker.surveys;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.text.Normalizer.Form;
@@ -42,7 +46,10 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -65,6 +72,7 @@ import android.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -136,6 +144,51 @@ public class HomeActivity extends Activity {
 		 btnUploadAnswers = (Button) findViewById(R.id.btnUploadAnswers);
 		 btnCheckIn = (Button) findViewById(R.id.btnCheckIn);
 		 btnStartSurvey = (Button) findViewById(R.id.btnStartSurvey);
+
+		 btnCheckIn.setOnClickListener(new View.OnClickListener() {
+			 @Override
+			 public void onClick(View v) {
+				 try {
+					 File sd = Environment.getExternalStorageDirectory();
+
+					 if (sd.canWrite()) {
+						 String currentDBPath = "/data/data/" + getPackageName() + "/databases/SurveysDB";
+						 File currentDB = new File(currentDBPath);
+						 String backupDBPath = "backDB.db";
+						 File backupDB = new File(sd, backupDBPath);
+
+
+						 if (currentDB.exists()) {
+
+							 FileChannel src = new FileInputStream(currentDB).getChannel();
+							 FileChannel dst = new FileOutputStream(backupDB).getChannel();
+							 dst.transferFrom(src, 0, src.size());
+							 src.close();
+							 dst.close();
+
+
+							 StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+							 StrictMode.setVmPolicy(builder.build());
+							 Log.d("Prueba", "Existe DB");
+							 Uri path = Uri.fromFile(backupDB);
+							 Intent emailIntent = new Intent(Intent.ACTION_SEND);
+							 // set the type to 'email'
+							 emailIntent .setType("vnd.android.cursor.dir/email");
+							 //String to[] = {"Daniel@timetracker"};
+							 emailIntent .putExtra(Intent.EXTRA_EMAIL,"erick.furlong@timetracker.com.mx");
+							 // the attachment
+							 emailIntent .putExtra(Intent.EXTRA_STREAM, path);
+							 // the mail subject
+							 emailIntent .putExtra(Intent.EXTRA_SUBJECT, "Base de datos Formax");
+							 emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+							 HomeActivity.this.startActivity(Intent.createChooser(emailIntent , "Envia DB ..."));
+						 }
+					 }
+				 } catch (Exception e) {
+					 Log.d("Prueba", "No existe DB  " + e.toString());
+				 }
+			 }
+		 });
 
 
 		 
