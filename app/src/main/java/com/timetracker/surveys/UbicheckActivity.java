@@ -640,8 +640,6 @@ public class UbicheckActivity extends Activity {
 
 	protected void onPhotoTaken() {
 
-
-
 		new UbicheckImageRequest(BiometricID,decodeFile(_CameraImagePath)).execute();
 
 		//try {

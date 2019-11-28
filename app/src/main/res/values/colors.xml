@@ -6,6 +6,9 @@
     <color name="trueblue">#00467F</color>
     <color name="gray">#F0F0F0</color>
     <color name="white">#fff</color>
+    <color name="blackSportWorld">#222220</color>
+    <color name="greySportworld">#B5BABE</color>
+    <color name="RedSportworld">#c22223</color>
     <color name="black">#000</color>
     <color name="Neutra">#d1d1d1</color>
     <color name="bRed">#DC3545</color>

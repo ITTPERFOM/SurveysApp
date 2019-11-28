@@ -8,8 +8,8 @@ android {
         applicationId "com.timetracker.surveys"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 281
-        versionName "2.81"
+        versionCode 284
+        versionName "2.84"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
@@ -54,7 +54,7 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:3.5.0'
 
     // Animations
-    //implementation 'com.airbnb.android:lottie:3.0.6'
+    implementation 'com.airbnb.android:lottie:3.0.6'
 
     // UI
     implementation 'androidx.appcompat:appcompat:1.1.0'
