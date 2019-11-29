@@ -119,7 +119,7 @@ public class SelectBiometricActivity extends Activity {
 		EditText txtBiometric = (EditText) findViewById(R.id.txtBiometric);
 		String Name = "";
 		try{
-			Name = URLEncoder.encode(txtBiometric.getText().toString(), "utf-8");
+			Name = txtBiometric.getText().toString().trim();
 		}catch (Exception ex) {
 		}
 		lyButtons.removeAllViews();
