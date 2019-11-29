@@ -137,9 +137,6 @@ public class HomeActivity extends Activity {
 		 btnCheckIn = (Button) findViewById(R.id.btnCheckIn);
 		 btnStartSurvey = (Button) findViewById(R.id.btnStartSurvey);
 
-
-		 
-
 		GetLocation(fusedLocationProviderClient,this);
 		try
 		{
@@ -389,6 +386,16 @@ public class HomeActivity extends Activity {
 		}else{
 			buildAlertMessageNoOnline();
 		}
+	}
+
+
+	//================================================================================
+	// Vacation Request SportWorld Development
+	//================================================================================
+
+	public void VacationRequest(final View view){
+		Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.VacationActivity.class);
+		startActivity(intent);
 	}
 
 	//================================================================================

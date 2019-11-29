@@ -7,21 +7,6 @@
     tools:context=".PreviewActivity" 
     android:gravity="center">
 
-	<FrameLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:id="@+id/SurveyPhoto"
-		android:layout_alignTop="@+id/messages"
-		android:layout_alignEnd="@+id/scrollableContents"
-		android:layout_alignBottom="@+id/tr_options"
-		android:layout_alignParentStart="true"
-		android:layout_marginStart="0dp"
-		android:layout_marginTop="0dp"
-		android:layout_marginEnd="0dp"
-		android:layout_marginBottom="1dp">
-
-	</FrameLayout>
-
 	<RelativeLayout
       android:id="@+id/header"
       android:layout_width="match_parent"
@@ -134,6 +119,16 @@
 	       android:onClick="CheckIn"
 	       android:text="@string/Checkin"
 	       android:textSize="20sp" />
+
+		<Button
+			android:id="@+id/btnVacationRequest"
+			style="@style/button_text"
+			android:layout_marginTop="13dp"
+			android:background="@drawable/btn_checkin"
+			android:onClick="VacationRequest"
+			android:text="@string/VacationRequest"
+			android:textSize="20sp"
+			android:visibility="gone" />
 	
 	   <TextView
 	       android:id="@+id/txtfooter"
