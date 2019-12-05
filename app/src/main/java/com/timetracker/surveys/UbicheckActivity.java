@@ -288,12 +288,7 @@ public class UbicheckActivity extends Activity {
 		AsyncUbicheck.execute("/Ubicheck");
 	}
 
-	public void DoUbicheckStatus() {
-		Devices Device = db.GetDevice();
-		UbicheckRequest UbicheckRequest = new UbicheckRequest(0, Device.DeviceID, lc.getLatitude(), lc.getLongitude(), new Date(), 0, BiometricID, GPSTracker.usesMockLocation);
-		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest, false);
-		AsyncUbicheck.execute("/Ubicheck");
-	}
+
 
 	public void DoUbicheckCheckOut() {
 		showSpinner("Registrando Salida");

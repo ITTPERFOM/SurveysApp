@@ -128,6 +128,7 @@
 			android:onClick="VacationRequest"
 			android:text="@string/VacationRequest"
 			android:textSize="20sp"
+<<<<<<< HEAD
 			android:visibility="visible" />
 
 		<Button
@@ -139,6 +140,9 @@
 			android:text="@string/BranchInformation"
 			android:textSize="20sp"
 			android:visibility="visible" />
+=======
+			android:visibility="gone" />
+>>>>>>> b7804469a86c56831badf77916c83f2c4228feb2
 	
 	   <TextView
 	       android:id="@+id/txtfooter"

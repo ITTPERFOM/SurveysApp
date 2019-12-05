@@ -395,7 +395,11 @@ public class HomeActivity extends Activity {
 
 
 	//================================================================================
+<<<<<<< HEAD
 	// Vacation Request
+=======
+	// Vacation Request SportWorld Development
+>>>>>>> b7804469a86c56831badf77916c83f2c4228feb2
 	//================================================================================
 
 	public void VacationRequest(final View view){

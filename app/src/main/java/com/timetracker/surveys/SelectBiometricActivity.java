@@ -119,9 +119,13 @@ public class SelectBiometricActivity extends Activity {
 		EditText txtBiometric = (EditText) findViewById(R.id.txtBiometric);
 		String Name = "";
 		try{
+<<<<<<< HEAD
 			Name = txtBiometric.getText().toString();
 			Name = Name.trim();
 			Name = URLEncoder.encode(Name, "utf-8");
+=======
+			Name = txtBiometric.getText().toString().trim();
+>>>>>>> b7804469a86c56831badf77916c83f2c4228feb2
 		}catch (Exception ex) {
 		}
 		lyButtons.removeAllViews();
