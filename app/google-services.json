@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1000903254135",
+    "firebase_url": "https://formax-d9f4a.firebaseio.com",
+    "project_id": "formax-d9f4a",
+    "storage_bucket": "formax-d9f4a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1000903254135:android:5815db5a2dc0ba36",
+        "android_client_info": {
+          "package_name": "com.timetracker.surveys"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1000903254135-9rd3m4msfbfvm19o59cups0q4a54mrjh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.timetracker.surveys",
+            "certificate_hash": "f318bb6651cb5871a96941d36b1492b38e3bfaf8"
+          }
+        },
+        {
+          "client_id": "1000903254135-kg0rnkkemo7u3qn93af7aa9miq0r88mv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoIWtCXQ1Yqxso0S1BW-6M4PFDwA8t0Ew"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1000903254135-kg0rnkkemo7u3qn93af7aa9miq0r88mv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

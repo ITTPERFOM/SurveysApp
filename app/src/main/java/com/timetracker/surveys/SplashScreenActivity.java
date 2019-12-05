@@ -3,7 +3,6 @@ package com.timetracker.surveys;
 import org.json.JSONObject;
 
 import com.timetracker.business.ConnectionMethods;
-import com.timetracker.business.LuxandInit;
 import com.timetracker.data.Devices;
 import com.timetracker.sqlite.MySQLiteHelper;
 
@@ -21,10 +20,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,6 @@ public class SplashScreenActivity extends Activity {
                 }
             }
         }, 1000);
-        LuxandInit.getInstance(getApplicationContext());
     }
 
     //================================================================================
@@ -239,8 +238,8 @@ public class SplashScreenActivity extends Activity {
             return ConnectionMethods.GET(SplashScreenActivity.this, urls[0]);
         }
         /* (non-Javadoc)
-      * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-      */
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
         @Override
         protected void onPostExecute(String result) {
             myHandler.sendEmptyMessage(5);

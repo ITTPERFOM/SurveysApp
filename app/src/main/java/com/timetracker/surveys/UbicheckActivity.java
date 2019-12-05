@@ -68,7 +68,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.luxand.FSDK;
+//import com.luxand.FSDK;
 
 import static com.timetracker.surveys.SurveyActivity.calculateInSampleSize;
 
@@ -650,91 +650,91 @@ public class UbicheckActivity extends Activity {
 	//	}
 	}
 
-	private class AsyncGetPicture extends AsyncTask<String, Void, String> {
-		@Override
-		protected String doInBackground(String... urls) {
-			return ConnectionMethods.GET(UbicheckActivity.this, urls[0]);
-		}
+//	private class AsyncGetPicture extends AsyncTask<String, Void, String> {
+//		@Override
+//		protected String doInBackground(String... urls) {
+//			return ConnectionMethods.GET(UbicheckActivity.this, urls[0]);
+//		}
+//
+//		@Override
+//		protected void onPostExecute(String result) {
+//			if (result != "") {
+//				try {
+//					Animation.setVisibility(View.VISIBLE);
+//					Ui.setVisibility(View.INVISIBLE);
+//					JSONArray jsonArray = new JSONArray(result);
+//					Img = new String[jsonArray.length()];
+//					for (int i = 0; i < jsonArray.length(); i++) {
+//						Img[i] = jsonArray.getString(i);
+//					}
+//					new AsyncComparePictures().execute();
+//				} catch (JSONException e) {
+//					e.printStackTrace();
+//				}
+//			} else {
+//				Toast.makeText(UbicheckActivity.this, " Usted no cuenta con Imagenes ", Toast.LENGTH_LONG).show();
+//				Log.d("PRUEBA", " La codificacion de imagenes no son correctas ");
+//			}
+//		}
+//	}
 
-		@Override
-		protected void onPostExecute(String result) {
-			if (result != "") {
-				try {
-					Animation.setVisibility(View.VISIBLE);
-					Ui.setVisibility(View.INVISIBLE);
-					JSONArray jsonArray = new JSONArray(result);
-					Img = new String[jsonArray.length()];
-					for (int i = 0; i < jsonArray.length(); i++) {
-						Img[i] = jsonArray.getString(i);
-					}
-					new AsyncComparePictures().execute();
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			} else {
-				Toast.makeText(UbicheckActivity.this, " Usted no cuenta con Imagenes ", Toast.LENGTH_LONG).show();
-				Log.d("PRUEBA", " La codificacion de imagenes no son correctas ");
-			}
-		}
-	}
 
-
-	private class AsyncComparePictures extends AsyncTask<Void, Void, Boolean> {
-		ArrayList<Bitmap> DataBaseBitmap = new ArrayList<Bitmap>();
-		float Similarity[] = new float[1];
-		float MatchingThreshold[] = new float[1];
-
-		@Override
-		protected Boolean doInBackground(Void... args) {
-			try {
-				for (int i = 0; i < Img.length; i++) {
-					DataBaseBitmap.add(BitmapFactory.decodeStream((InputStream) new URL(Img[i]).getContent()));
-				}
-			} catch (Exception e) {
-				Log.d("PRUEBA", " La codificacion de imagenes no son correctas ");
-			}
-			FSDK.HImage CameraImage = new FSDK.HImage();
-			FSDK.LoadImageFromFile(CameraImage, _CameraImagePath);
-			FSDK.FSDK_FaceTemplate template1 = new FSDK.FSDK_FaceTemplate();
-
-			FSDK.GetFaceTemplate(CameraImage, template1);
-
-			for (int i = 0; i < DataBaseBitmap.size(); i++) {
-				ImageMethods.CreateImageFile(DataBaseBitmap.get(i), _DataBaseImagePath);
-
-				FSDK.HImage DataBaseImage = new FSDK.HImage();
-
-				FSDK.LoadImageFromFile(DataBaseImage, _DataBaseImagePath);
-
-				FSDK.FSDK_FaceTemplate template2 = new FSDK.FSDK_FaceTemplate();
-
-				FSDK.GetFaceTemplate(DataBaseImage, template2);
-
-				FSDK.GetMatchingThresholdAtFAR((float) 0.42, MatchingThreshold);
-
-				FSDK.MatchFaces(template1, template2, Similarity);
-
-				if (Similarity[0] > MatchingThreshold[0]) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-			return false;
-		}
-
-		@Override
-		protected void onPostExecute(Boolean result) {
-			if (result) {
-				FaceDoUbicheck(UbicheckOption);
-			} else {
-				Intent intent = new Intent(getBaseContext(), com.timetracker.surveys.HomeActivity.class);
-				startActivity(intent);
-				finish();
-			}
-
-		}
-	}
+//	private class AsyncComparePictures extends AsyncTask<Void, Void, Boolean> {
+//		ArrayList<Bitmap> DataBaseBitmap = new ArrayList<Bitmap>();
+//		float Similarity[] = new float[1];
+//		float MatchingThreshold[] = new float[1];
+//
+//		@Override
+//		protected Boolean doInBackground(Void... args) {
+//			try {
+//				for (int i = 0; i < Img.length; i++) {
+//					DataBaseBitmap.add(BitmapFactory.decodeStream((InputStream) new URL(Img[i]).getContent()));
+//				}
+//			} catch (Exception e) {
+//				Log.d("PRUEBA", " La codificacion de imagenes no son correctas ");
+//			}
+//			FSDK.HImage CameraImage = new FSDK.HImage();
+//			FSDK.LoadImageFromFile(CameraImage, _CameraImagePath);
+//			FSDK.FSDK_FaceTemplate template1 = new FSDK.FSDK_FaceTemplate();
+//
+//			FSDK.GetFaceTemplate(CameraImage, template1);
+//
+//			for (int i = 0; i < DataBaseBitmap.size(); i++) {
+//				ImageMethods.CreateImageFile(DataBaseBitmap.get(i), _DataBaseImagePath);
+//
+//				FSDK.HImage DataBaseImage = new FSDK.HImage();
+//
+//				FSDK.LoadImageFromFile(DataBaseImage, _DataBaseImagePath);
+//
+//				FSDK.FSDK_FaceTemplate template2 = new FSDK.FSDK_FaceTemplate();
+//
+//				FSDK.GetFaceTemplate(DataBaseImage, template2);
+//
+//				FSDK.GetMatchingThresholdAtFAR((float) 0.42, MatchingThreshold);
+//
+//				FSDK.MatchFaces(template1, template2, Similarity);
+//
+//				if (Similarity[0] > MatchingThreshold[0]) {
+//					return true;
+//				} else {
+//					return false;
+//				}
+//			}
+//			return false;
+//		}
+//
+//		@Override
+//		protected void onPostExecute(Boolean result) {
+//			if (result) {
+//				FaceDoUbicheck(UbicheckOption);
+//			} else {
+//				Intent intent = new Intent(getBaseContext(), com.timetracker.surveys.HomeActivity.class);
+//				startActivity(intent);
+//				finish();
+//			}
+//
+//		}
+//	}
 
 	//================================================================================
 	// Menu Options
