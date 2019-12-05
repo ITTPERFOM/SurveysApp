@@ -119,13 +119,9 @@ public class SelectBiometricActivity extends Activity {
 		EditText txtBiometric = (EditText) findViewById(R.id.txtBiometric);
 		String Name = "";
 		try{
-<<<<<<< HEAD
 			Name = txtBiometric.getText().toString();
 			Name = Name.trim();
 			Name = URLEncoder.encode(Name, "utf-8");
-=======
-			Name = txtBiometric.getText().toString().trim();
->>>>>>> b7804469a86c56831badf77916c83f2c4228feb2
 		}catch (Exception ex) {
 		}
 		lyButtons.removeAllViews();
@@ -155,8 +151,13 @@ public class SelectBiometricActivity extends Activity {
 						   final int BiometricID = JO.getInt("BiometricID");
 						   final String Name = JO.getString("Name");
 						   final int FaceRegister = JO.getInt("FaceRegister");
+						   final String payrollNumber = JO.getString("PayrollNumber");
 						   Button newButton = new Button(SelectBiometricActivity.this);
-						   newButton.setText(Name);
+						   if(payrollNumber.equals("null")){
+							   newButton.setText(Name);
+						   }else {
+							   newButton.setText(Name + "\n"+ "Número de nómina: " + payrollNumber);
+						   }
 						   newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_start));
 						   newButton.setTextAppearance(getApplicationContext(), R.style.button_text);
 						   LinearLayout.LayoutParams tdf = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);

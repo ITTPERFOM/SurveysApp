@@ -127,9 +127,7 @@
 			android:background="@drawable/btn_checkin"
 			android:onClick="VacationRequest"
 			android:text="@string/VacationRequest"
-			android:textSize="20sp"
-<<<<<<< HEAD
-			android:visibility="visible" />
+			android:textSize="20sp" />
 
 		<Button
 			android:id="@+id/btnBranchInformation"
@@ -140,11 +138,7 @@
 			android:text="@string/BranchInformation"
 			android:textSize="20sp"
 			android:visibility="visible" />
-=======
-			android:visibility="gone" />
->>>>>>> b7804469a86c56831badf77916c83f2c4228feb2
-	
-	   <TextView
+		<TextView
 	       android:id="@+id/txtfooter"
 	       android:layout_width="wrap_content"
 	       android:layout_height="wrap_content"

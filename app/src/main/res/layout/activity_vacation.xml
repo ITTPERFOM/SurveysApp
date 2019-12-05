@@ -22,7 +22,7 @@
         android:id="@+id/textView3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="54dp"
+        android:layout_marginTop="32dp"
         android:gravity="center"
         android:text="@string/VacationRequest"
         android:textAlignment="center"
@@ -38,15 +38,8 @@
         android:id="@+id/txtName"
         android:layout_width="0dp"
         android:layout_height="48dp"
-<<<<<<< HEAD
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="80dp"
-        android:layout_marginBottom="8dp"
-=======
         android:layout_marginStart="40dp"
         android:layout_marginEnd="80dp"
->>>>>>> b7804469a86c56831badf77916c83f2c4228feb2
         android:background="@drawable/input_rounded"
         android:ems="10"
         android:gravity="center"
@@ -56,19 +49,11 @@
         android:textColor="@color/blackSportWorld"
         android:textColorHint="@color/greySportworld"
         android:textSize="24sp"
-<<<<<<< HEAD
         app:layout_constraintBottom_toTopOf="@+id/scrollView2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
         app:layout_constraintVertical_bias="0.0" />
-=======
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:layout_constraintVertical_bias="0.07999998" />
->>>>>>> b7804469a86c56831badf77916c83f2c4228feb2
 
     <ImageButton
         android:id="@+id/search_user"
@@ -84,7 +69,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/txtName"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
-        app:layout_constraintVertical_bias="0.07999998"
+        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/search" />
 
 
