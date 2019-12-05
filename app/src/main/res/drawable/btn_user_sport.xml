@@ -45,13 +45,6 @@
                         android:bottom="10dp" />
                 </shape>
             </item>
-            <item
-                android:width="64dp"
-                android:height="64dp">
-                <bitmap
-                    android:gravity="fill_horizontal|fill_vertical"
-                    android:src="@drawable/waterbottle" />
-            </item>
         </layer-list>
     </item>
     <item android:state_enabled="false">

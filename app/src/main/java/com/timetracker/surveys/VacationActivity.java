@@ -137,46 +137,14 @@ public class VacationActivity extends AppCompatActivity {
                             JSONObject JO = (JSONObject)JR.getJSONObject(i);
                             final int ID = JO.getInt("BiometricID");
                             final String Name = JO.getString("Name");
+                            final String payrollNumber = JO.getString("PayrollNumber");
                             Button newButton = new Button(VacationActivity.this);
-                            newButton.setText(Name);
-                            switch(x) {
-                                case 0:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_user_sport));
-                                    break;
-                                case 1:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_tennis));
-                                    break;
-                                case 2:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_training));
-                                    break;
-                                case 3:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_swimming));
-                                    break;
-                                case 4:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_running));
-                                    break;
-                                case 5:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_medal));
-                                    break;
-                                case 6:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_karate));
-                                    break;
-                                case 7:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_cycling));
-                                    break;
-                                case 8:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_swimmingtwo));
-                                    break;
-                                case 9:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_runningtwo));
-                                    break;
-                                default:
-                                    newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_user_sport));
+                            if(payrollNumber.equals("null")){
+                                newButton.setText(Name);
+                            }else {
+                                newButton.setText(Name + "\n"+ "Número de nómina: " + payrollNumber);
                             }
-                            x++;
-                            if(x >= 10){
-                                x=0;
-                            }
+                            newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_user_sport));
                             newButton.setTextColor(getResources().getColor(R.color.blackSportWorld));
                             LinearLayout.LayoutParams tdf = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                             tdf.setMargins(0, 10, 0, 10);
@@ -198,6 +166,43 @@ public class VacationActivity extends AppCompatActivity {
                     DialogMethods.showErrorDialog(VacationActivity.this, "Ocurrio un error al momento de utilizar Ubicheck. Info: " + ex.toString(),"Activity:UbicheckNew | Method:AsyncSearchClient | Error:" + ex.toString());
                 }
             }
+        }
+    }
+
+    public void addRandomImage(Button newButton,int Option){
+        switch(Option) {
+            case 0:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_user_sport));
+                break;
+            case 1:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_tennis));
+                break;
+            case 2:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_training));
+                break;
+            case 3:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_swimming));
+                break;
+            case 4:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_running));
+                break;
+            case 5:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_medal));
+                break;
+            case 6:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_karate));
+                break;
+            case 7:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_cycling));
+                break;
+            case 8:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_swimmingtwo));
+                break;
+            case 9:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_runningtwo));
+                break;
+            default:
+                newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_user_sport));
         }
     }
 

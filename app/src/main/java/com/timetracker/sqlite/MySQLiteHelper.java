@@ -39,7 +39,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     // Global Variables
     //================================================================================
 	
-    private static final int DATABASE_VERSION = 49;
+    private static final int DATABASE_VERSION = 50;
     private static final String DATABASE_NAME = "SurveysDB";
     private final Context mContext;
  
@@ -69,7 +69,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             "KioskBranchID INTEGER, " +
     		"ImageWareRegister INTEGER, " +
     		"BiometricID INTEGER, " +
-    		"Account TEXT)";
+    		"Account TEXT," +
+			"Level TEXT)";
 
 		String CREATE_ActualUbicheck= "CREATE TABLE ActualUbicheck ( " +
 				"UbicheckID INTEGER )";
@@ -216,9 +217,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+		if(newVersion >= 50){
+			db.execSQL("ALTER TABLE Devices ADD Level INTEGER");
+		}
+
     	if(newVersion >= 48){
-			db.execSQL("ALTER TABLE questions  ADD PostProcedureID INTEGER");
-			db.execSQL("ALTER TABLE Answers  ADD PostProcedureID INTEGER");
+			//db.execSQL("ALTER TABLE questions  ADD PostProcedureID INTEGER");
+			//db.execSQL("ALTER TABLE Answers  ADD PostProcedureID INTEGER");
 		}
 
     	if(!tableExists(db,"ActualUbicheck")){
@@ -406,13 +411,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     //================================================================================
     
     public Devices GetDevice() {
-        String query = "SELECT Name,Code,DeviceTypeID,DeviceID,Status,UsesFormSelection,UsesFormWithUbicheck,UsesClientValidation,UsesCreateBranch,UsesUbicheckDetails,UsesBiometric,UsesKioskMode,KioskBranchID,ImageWareRegister,BiometricID,Account FROM Devices";
+        String query = "SELECT Name,Code,DeviceTypeID,DeviceID,Status,UsesFormSelection,UsesFormWithUbicheck,UsesClientValidation,UsesCreateBranch,UsesUbicheckDetails,UsesBiometric,UsesKioskMode,KioskBranchID,ImageWareRegister,BiometricID,Account,Level FROM Devices";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         Devices Device = null;
         if (cursor.moveToFirst()) {
             do {
-            	Device = new Devices(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getInt(3),cursor.getInt(4),cursor.getInt(5),cursor.getInt(6),cursor.getInt(7),cursor.getInt(8),cursor.getInt(9),cursor.getInt(10),cursor.getInt(11),cursor.getInt(12),cursor.getInt(13),cursor.getInt(14),cursor.getString(15));
+            	Device = new Devices(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getInt(3),cursor.getInt(4),cursor.getInt(5),cursor.getInt(6),cursor.getInt(7),cursor.getInt(8),cursor.getInt(9),cursor.getInt(10),cursor.getInt(11),cursor.getInt(12),cursor.getInt(13),cursor.getInt(14),cursor.getString(15),cursor.getInt(16));
             } while (cursor.moveToNext());
         }
         if(cursor != null){
@@ -441,6 +446,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 		values.put("ImageWareRegister", Device.ImageWareRegister);
 		values.put("BiometricID", Device.BiometricID);
 		values.put("Account", Device.Account);
+		values.put("Level", Device.Level);
         int i = db.update("Devices", values, "DeviceID"+" = ?",new String[] { String.valueOf(Device.DeviceID) });
         db.close();
         return i;

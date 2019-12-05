@@ -17,7 +17,8 @@ public class Devices {
 	public int ImageWareRegister;
 	public int BiometricID;
 	public String Account;
-	public Devices(String Name, String Code,String DeviceTypeID,int DeviceID,int Status,int UsesFormSelection, int UsesFormWithUbicheck, int UsesClientValidation, int UsesCreateBranch, int UsesUbicheckDetails,int UsesBiometric,int UsesKioskMode,int KioskBranchID,int ImageWareRegister, int BiometricID,String Account){
+	public int Level;
+	public Devices(String Name, String Code,String DeviceTypeID,int DeviceID,int Status,int UsesFormSelection, int UsesFormWithUbicheck, int UsesClientValidation, int UsesCreateBranch, int UsesUbicheckDetails,int UsesBiometric,int UsesKioskMode,int KioskBranchID,int ImageWareRegister, int BiometricID,String Account,int Level){
 	    this.Name = Name;
 	    this.Code = Code;
 	    this.DeviceTypeID = DeviceTypeID;
@@ -34,5 +35,6 @@ public class Devices {
 	    this.ImageWareRegister = ImageWareRegister;
 	    this.BiometricID = BiometricID;
 	    this.Account = Account;
+	    this.Level = Level;
 	}
 }
