@@ -65,6 +65,7 @@ import android.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -165,6 +166,10 @@ public class HomeActivity extends Activity {
 			}else {
 				btnStartSurvey.setEnabled(false);
 			}
+
+			HideBranchInformationtButton(Device);
+			HideVacationRequestButton(Device);
+
 		}
 		catch(Exception ex){
 			DialogMethods.showErrorDialog(HomeActivity.this, "Ocurrio un error al momento de iniciar aplicacion. Info: " + ex.toString(),"Activity:Home | Method:onCreate | Error:" + ex.toString());
@@ -390,11 +395,25 @@ public class HomeActivity extends Activity {
 
 
 	//================================================================================
+<<<<<<< HEAD
+	// Vacation Request
+=======
 	// Vacation Request SportWorld Development
+>>>>>>> b7804469a86c56831badf77916c83f2c4228feb2
 	//================================================================================
 
 	public void VacationRequest(final View view){
 		Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.VacationActivity.class);
+		startActivity(intent);
+	}
+
+
+	//================================================================================
+	// BranchInformation
+	//================================================================================
+
+	public void BranchInformation(final View view){
+		Intent intent = new Intent(getBaseContext(),com.timetracker.surveys.BranchInformationActivity.class);
 		startActivity(intent);
 	}
 
@@ -660,6 +679,9 @@ public class HomeActivity extends Activity {
 							Device.UsesKioskMode = 1;
 						}else{
 							Device.UsesKioskMode = 0;
+						}
+						if(!(JO.getString("Level").equals("null"))){
+							Device.Level = JO.getInt("Level");
 						}
 						Device.KioskBranchID = JO.getInt("KioskBranchID");
 						Device.Account = JO.getString("Account");
@@ -1250,6 +1272,18 @@ public class HomeActivity extends Activity {
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	public void HideVacationRequestButton(Devices device){
+		if(!(device.Account.equals("Sports World"))){
+			findViewById(R.id.btnVacationRequest).setVisibility(View.GONE);
+		}
+	}
+
+	public void HideBranchInformationtButton(Devices device){
+		if(!(device.Account.equals("Maulec3")) ){
+			findViewById(R.id.btnBranchInformation).setVisibility(View.GONE);
 		}
 	}
 }

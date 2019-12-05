@@ -81,7 +81,7 @@ public class RegisterActivity extends Activity {
 					}
 				}
 			}
-			lblDeviceNameInfo.setText(" Dispositivo: " + Device.Name + "\n\n Codigo: " + Device.Code + "\n\n Cuenta: " + Device.Account + "\n\n Estatus: " + Estatus + EstatusBiometric);
+			lblDeviceNameInfo.setText(" Dispositivo: " + Device.Name + "\n\n Codigo: " + Device.Code + "\n\n Cuenta: " + Device.Account + "\n\n Estatus: " + Estatus + EstatusBiometric +"\n\n Nivel: " + Device.Level);
 			TableRow trButtonReset = (TableRow) findViewById(R.id.trButtonReset);
 			trButtonReset.setVisibility(View.VISIBLE);
 		}else{
@@ -144,7 +144,7 @@ public class RegisterActivity extends Activity {
 			    		   }
 			    		   String OSVersion = Build.VERSION.RELEASE;
 			    		   String Model = getDeviceName();
-			    		   Devices DeviceVar = new Devices(sNombre,sCodigo,String.valueOf(Type),0,1,1,0,0,0,0,0,0,0,0,0,"");
+			    		   Devices DeviceVar = new Devices(sNombre,sCodigo,String.valueOf(Type),0,1,1,0,0,0,0,0,0,0,0,0,"",0);
 			    		   Button btnCheckIn = (Button) findViewById(R.id.btnCheckIn);
 			    		   btnCheckIn.setEnabled(false);
 			    		   HttpAsyncTask httpAsyncTask = new HttpAsyncTask(DeviceVar,pInfo.versionName,Model,OSVersion);

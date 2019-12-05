@@ -119,7 +119,13 @@ public class SelectBiometricActivity extends Activity {
 		EditText txtBiometric = (EditText) findViewById(R.id.txtBiometric);
 		String Name = "";
 		try{
+<<<<<<< HEAD
+			Name = txtBiometric.getText().toString();
+			Name = Name.trim();
+			Name = URLEncoder.encode(Name, "utf-8");
+=======
 			Name = txtBiometric.getText().toString().trim();
+>>>>>>> b7804469a86c56831badf77916c83f2c4228feb2
 		}catch (Exception ex) {
 		}
 		lyButtons.removeAllViews();
@@ -127,15 +133,17 @@ public class SelectBiometricActivity extends Activity {
 	}
 	
 	private class AsyncSearchClient extends AsyncTask<String, Void, String> {
+		String url;
 	   @Override
 	   	protected String doInBackground(String... urls) {
+	   		url = urls[0];
 		   return ConnectionMethods.GET(SelectBiometricActivity.this, urls[0]);
 	   }
 	   @SuppressWarnings("deprecation")
 	   @Override
 	   	protected void onPostExecute(String result) {
 		   if(result.startsWith("Error:")){
-			   DialogMethods.showInformationDialog(SelectBiometricActivity.this, "Ocurrio un Error", result,null);
+			   DialogMethods.showInformationDialog(SelectBiometricActivity.this, "Ocurrio un Error", result + "\n URL:" + url,null);
 		   }else{
 			   try 
 	            {
