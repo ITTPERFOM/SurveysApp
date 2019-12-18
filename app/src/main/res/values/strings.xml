@@ -29,7 +29,7 @@
     <string name="Register">Registrar Dispositivo</string>
     <string name="Checkin">Enviar Posicion</string>
     <string name="VacationRequest">Solicitud de Vacaciones</string>
-    <string name="BranchInformation">Informacion de Cadena</string>
+    <string name="BranchInformation">Informacion de local</string>
     <string name="CheckStatus">Revisar Estatus</string>
     <string name="title_activity_home">Time Tracker</string>
     <string name="check_conectivity">Check Conectivity</string>

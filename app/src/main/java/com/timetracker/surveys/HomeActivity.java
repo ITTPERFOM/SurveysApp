@@ -418,7 +418,6 @@ public class HomeActivity extends Activity {
 	//================================================================================
 
 	public void CheckIn(final View view){
-		//db.Data(140);
 		CheckIn.setText("Enviando Ubicacion");
 		CheckIn.setBackgroundColor(ContextCompat.getColor(this, R.color.Neutra));
 		if(lc == null){
@@ -1278,7 +1277,7 @@ public class HomeActivity extends Activity {
 	}
 
 	public void HideBranchInformationtButton(Devices device){
-		if(!(device.Account.equals("Maulec3")) ){
+		if( device.KioskBranchID > 0  ){
 			findViewById(R.id.btnBranchInformation).setVisibility(View.GONE);
 		}
 	}
