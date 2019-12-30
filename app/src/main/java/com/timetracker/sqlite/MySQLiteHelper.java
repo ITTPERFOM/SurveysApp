@@ -217,6 +217,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+		//if(newVersion >= 51){
+		//	db.execSQL("DROP TABLE Devices");
+		//	db.execSQL("DROP TABLE Devices");
+		//}
+
 		if(newVersion >= 50){
 			db.execSQL("ALTER TABLE Devices ADD Level INTEGER");
 		}

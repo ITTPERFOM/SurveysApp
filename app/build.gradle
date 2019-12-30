@@ -11,8 +11,8 @@ android {
         applicationId "com.timetracker.surveys"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 286
-        versionName "2.86"
+        versionCode 288
+        versionName "2.88"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {

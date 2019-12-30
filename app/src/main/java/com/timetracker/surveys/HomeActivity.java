@@ -1277,7 +1277,7 @@ public class HomeActivity extends Activity {
 	}
 
 	public void HideBranchInformationtButton(Devices device){
-		if( device.KioskBranchID > 0  ){
+		if(  device.UsesCreateBranch ==  0){
 			findViewById(R.id.btnBranchInformation).setVisibility(View.GONE);
 		}
 	}

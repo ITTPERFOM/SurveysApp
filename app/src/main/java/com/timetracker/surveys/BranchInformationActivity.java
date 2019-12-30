@@ -113,7 +113,7 @@ public class BranchInformationActivity extends AppCompatActivity {
 
                 if(branchItem.BranchID != 0 && !Name.isEmpty() ) {
                     AsynUpdateBranch asynUpdateBranch = new AsynUpdateBranch(BranchInformationActivity.this);
-                    asynUpdateBranch.execute("/Branches?BranchID="+branchItem.Name+"&Name="+Name+"&DistributionChanne="+DistributionChanne+"&Identifier="+Identifier+"&ContactName="+ContactName+"&ModifiedUser="+ModifiedUser);
+                    asynUpdateBranch.execute("/Branches?BranchID="+branchItem.BranchID+"&Name="+Name+"&DistributionChanne="+DistributionChanne+"&Identifier="+Identifier+"&ContactName="+ContactName+"&ModifiedUser="+ModifiedUser);
                 }
             }
         });

@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public class form extends Fragment {
 
     String[] rows;
-    int option = 0;
+    int option;
 
     private OnFragmentInteractionListener mListener;
 

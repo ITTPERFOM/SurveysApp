@@ -3214,8 +3214,6 @@ public class SurveyActivity extends AppCompatActivity  implements form.OnFragmen
 
                         findViewById(R.id.FragmentReport).setVisibility(View.VISIBLE);
 
-
-
                         //result = result.substring(1, result.length()-1);
 
                         String[] Rows = result.split(Pattern.quote("\\r\\n"));
@@ -3224,6 +3222,7 @@ public class SurveyActivity extends AppCompatActivity  implements form.OnFragmen
 
                         switch(hardcodedEquations[0]) {
                             case "Producto Maulec":
+                            case "LAY OUT GLOBAL 3.0":
                                 Fragment Fragment = new form( Rows , 1 );
                                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                                 fragmentTransaction.replace(R.id.FragmentReport, Fragment);
