@@ -3,9 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/Desktop-SurveysApp-app.iml" filepath="$PROJECT_DIR$/app/Desktop-SurveysApp-app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/StudioProjects-SurveysApp.iml" filepath="$PROJECT_DIR$/StudioProjects-SurveysApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/StudioProjects-SurveysApp.iml" filepath="$PROJECT_DIR$/StudioProjects-SurveysApp.iml" group="SurveysApp" />
       <module fileurl="file://$PROJECT_DIR$/.idea/SurveysApp.iml" filepath="$PROJECT_DIR$/.idea/SurveysApp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/SurveysApp-app.iml" filepath="$PROJECT_DIR$/app/SurveysApp-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/SurveysApp-app.iml" filepath="$PROJECT_DIR$/app/SurveysApp-app.iml" group="SurveysApp/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
