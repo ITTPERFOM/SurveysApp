@@ -2653,7 +2653,7 @@ public class SurveyActivity extends AppCompatActivity  implements form.OnFragmen
                     scanContent += "-" + Device.DeviceID;
                 }
 
-                new AsyncGetTable(Question.QuestionID).execute("/Procedures?value=" + URLEncoder.encode(String.valueOf(Question.QuestionID) + "|" + scanContent));
+                    new AsyncGetTable(Question.QuestionID).execute("/Procedures?value=" + URLEncoder.encode(String.valueOf(Question.QuestionID) + "|" + scanContent));
             }else{
                 Toast.makeText(getApplicationContext(), "Dispositivo no conectado a internet",Toast.LENGTH_LONG).show();
             }
@@ -3222,7 +3222,7 @@ public class SurveyActivity extends AppCompatActivity  implements form.OnFragmen
 
                         switch(hardcodedEquations[0]) {
                             case "Producto Maulec":
-                            case "LAY OUT GLOBAL 3.0":
+                            case "LAY OUT GLOBAL 4.0":
                                 Fragment Fragment = new form( Rows , 1 );
                                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                                 fragmentTransaction.replace(R.id.FragmentReport, Fragment);
@@ -3248,6 +3248,8 @@ public class SurveyActivity extends AppCompatActivity  implements form.OnFragmen
             }
         }
     }
+
+
 
     private int getIndex(Spinner spinner, String myString){
         int index = 0;

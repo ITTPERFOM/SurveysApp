@@ -6,18 +6,25 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -30,6 +37,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.timetracker.business.ConnectionMethods;
 import com.timetracker.business.DialogMethods;
 import com.timetracker.business.GPSTracker;
+import com.timetracker.business.TableMainLayout;
 import com.timetracker.data.BranchItem;
 import com.timetracker.data.Devices;
 import com.timetracker.data.UbicheckRequest;
@@ -46,7 +54,7 @@ import java.util.List;
 
 public class BranchInformationActivity extends AppCompatActivity {
     int branchID;
-    TextInputEditText txtName, txtCardID, txtResponsableName, txtbusiness;
+    TextInputEditText txtName, txtCardID, txtResponsableName, txtbusiness,txtEmail,txtPhone;
     ImageView back;
     Button save;
     // New GPS
@@ -57,8 +65,9 @@ public class BranchInformationActivity extends AppCompatActivity {
     private Location lc;
     private GPSTracker GPSTracker;
     private int BiometricID = 0;
+    RelativeLayout relative;
     BranchItem branchItem;
-
+    String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +99,12 @@ public class BranchInformationActivity extends AppCompatActivity {
 
         txtbusiness = findViewById(R.id.txtbusiness);
 
+        txtEmail = findViewById(R.id.txtEmail);
+
+        txtPhone = findViewById(R.id.txtPhone);
+
+        relative = findViewById(R.id.Table_branch);
+
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,22 +124,119 @@ public class BranchInformationActivity extends AppCompatActivity {
 
                 String ContactName = txtResponsableName.getText().toString();
 
+                String Email = txtEmail.getText().toString();
+
+                String Phone = txtPhone.getText().toString();
+
                 String ModifiedUser = Device.Name;
 
                 if(branchItem.BranchID != 0 && !Name.isEmpty() ) {
                     AsynUpdateBranch asynUpdateBranch = new AsynUpdateBranch(BranchInformationActivity.this);
-                    asynUpdateBranch.execute("/Branches?BranchID="+branchItem.BranchID+"&Name="+Name+"&DistributionChanne="+DistributionChanne+"&Identifier="+Identifier+"&ContactName="+ContactName+"&ModifiedUser="+ModifiedUser);
+                    asynUpdateBranch.execute("/Branches?BranchID="+
+                            branchItem.BranchID+
+                            "&Name="+Name+
+                            "&DistributionChanne="+DistributionChanne+
+                            "&Identifier="+Identifier+
+                            "&ContactName="+ContactName+
+                            "&Email="+Email+
+                            "&Phone="+Phone+
+                            "&ModifiedUser="+ModifiedUser);
                 }
             }
         });
 
-        UbicheckRequest UbicheckRequest = new UbicheckRequest(0, Device.DeviceID, GPSTracker.getLatitude(), GPSTracker.getLongitude(), new Date(), 0, BiometricID, GPSTracker.usesMockLocation);
-        AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest, false);
-        AsyncUbicheck.execute("/Ubicheck");
+
+
+         txtEmail.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) {
+
+                if (txtEmail.getText().toString().trim().matches(emailPattern) && s.length() > 0)
+                {
+                    Toast.makeText(getApplicationContext(),"Email Valido",Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+
+                }
+            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+        });
+
+        if(isOnline()){
+            UbicheckRequest UbicheckRequest = new UbicheckRequest(0, Device.DeviceID, GPSTracker.getLatitude(), GPSTracker.getLongitude(), new Date(), 0, BiometricID, GPSTracker.usesMockLocation);
+            AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest, false);
+            AsyncUbicheck.execute("/Ubicheck");
+        }else {
+            buildAlertnobranch(" Usted no tiene Internet ");
+        }
     }
 
 
-    private static class AsynUpdateBranch extends AsyncTask<String, Void, String> {
+
+    private class AsyncSuperAki extends AsyncTask<String, Void, String> {
+        int identifier;
+        Context context;
+        public AsyncSuperAki(int identifier,Context context) {
+            this.identifier = identifier;
+            this.context = context;
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            String resultado = "0";
+            try {
+                JSONObject item = new JSONObject();
+                item.put("identifier",identifier);
+                resultado =  ConnectionMethods.Post(context, item.toString(), params[0], true);
+            } catch (Exception e) {
+                return "Error: " + e.toString();
+            }
+            return resultado;
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            try {
+                relative.removeAllViews();
+                JSONArray c = new JSONArray(result);
+                int arrayLength = c.length();
+                String[] rows = new String[arrayLength + 1];
+
+                rows[0] =
+                        "Sucursal,"+
+                        "Empresa,"+
+                        "VentaSemanal,"+
+                        "Sucursal,"+
+                        "Tendencia,"+
+                        "Venta Al Mes Año Anterior,"+
+                        "Venta Al Mes Año Actual,"+
+                        "Diferencia Entre Años";
+
+                for (int i = 0; i < arrayLength; i++) {
+                    JSONObject obj = c.getJSONObject(i);
+                    String row =
+                            obj.getString("Sucursal")+","+
+                            obj.getString("Empresa")+","+
+                            obj.getString("VentaSemanal")+","+
+                            obj.getString("Tendencia")+","+
+                            obj.getString("VentaMensual")+","+
+                            obj.getString("VentaAlMesAnoAnterior")+","+
+                            obj.getString("VentaAlMesAnoActual")+","+
+                            obj.getString("DiferenciaEntreAnos");
+                    rows[i+1] = row;
+                }
+                relative.addView(new TableMainLayout(context,rows,0));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private class AsynUpdateBranch extends AsyncTask<String, Void, String> {
         Context context;
         public AsynUpdateBranch(Context context) {
             this.context = context;
@@ -144,6 +256,10 @@ public class BranchInformationActivity extends AppCompatActivity {
             if(result.equals("\"Success\"")) {
                 Toast toas1t = Toast.makeText(context, "Datos Guardados", Toast.LENGTH_SHORT);
                 toas1t.show();
+                if(!branchItem.Identifier.isEmpty()){
+                    AsyncSuperAki asyncSuperAki= new AsyncSuperAki(Integer.parseInt(branchItem.Identifier),BranchInformationActivity.this);
+                    asyncSuperAki.execute("/SuperAkiSync?identifier="+branchItem.Identifier);
+                }
             }
             else {
                 Toast toas1t = Toast.makeText(context, "Los Datos no se pudieron Guardar ", Toast.LENGTH_SHORT);
@@ -188,67 +304,86 @@ public class BranchInformationActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             try {
                 final JSONObject JO = new JSONObject(result);
-                if(JO.getInt("Status") > 1){
-                    Toast toas1t = Toast.makeText(getApplicationContext(), "Usted no puede modificar local mientras tiene Ubicheck Abierto", Toast.LENGTH_LONG);
-                    toas1t.show();
-                    finish();
+                if(JO.getString("Message").equals("No se encontraron Sucursales")){
+                    buildAlertnobranch("         Sucursales no encontradas");
                 }else {
-                    JSONArray c = JO.getJSONArray("Branches");
-                    List<BranchItem> Branches = new ArrayList<BranchItem>();
-
-                    for (int i = 0 ; i < c.length(); i++) {
-                        JSONObject obj = c.getJSONObject(i);
-                        Branches.add(new BranchItem(
-                                obj.getInt("BranchID"),
-                                obj.getString("Name"),
-                                obj.getDouble("Latitude"),
-                                obj.getDouble("Longitude"),
-                                obj.getString("Identifier"),
-                                obj.getString("ContactName"),
-                                obj.getString("DistributionChannel")));
-                    }
-                    if(Branches.size()== 0) {
-                        Toast toas1t = Toast.makeText(getApplicationContext(), "No cuenta con ninguna Sucursal cerca", Toast.LENGTH_SHORT);
+                    if (JO.getInt("Status") > 1) {
+                        Toast toas1t = Toast.makeText(getApplicationContext(), "Usted no puede modificar local mientras tiene Ubicheck Abierto", Toast.LENGTH_LONG);
                         toas1t.show();
                         finish();
-                    }
-                    if(Branches.size() == 1){
+                    } else {
+                        JSONArray c = JO.getJSONArray("Branches");
+                        List<BranchItem> Branches = new ArrayList<BranchItem>();
 
-                        branchItem =  Branches.get(0);
-
-                        if(!branchItem.Name.equals("null")){
-                            txtName.setText( branchItem.Name );
+                        for (int i = 0; i < c.length(); i++) {
+                            JSONObject obj = c.getJSONObject(i);
+                            Branches.add(new BranchItem(
+                                    obj.getInt("BranchID"),
+                                    obj.getString("Name"),
+                                    obj.getDouble("Latitude"),
+                                    obj.getDouble("Longitude"),
+                                    obj.getString("Identifier"),
+                                    obj.getString("ContactName"),
+                                    obj.getString("DistributionChannel"),
+                                    obj.getString("Email"),
+                                    obj.getString("Phone")));
                         }
-                        if(!branchItem.BussinessType.equals("null")){
-                            txtbusiness.setText( branchItem.BussinessType );
+                        if (Branches.size() == 0) {
+                            Toast toas1t = Toast.makeText(getApplicationContext(), "No cuenta con ninguna Sucursal cerca", Toast.LENGTH_SHORT);
+                            toas1t.show();
+                            finish();
                         }
+                        if (Branches.size() == 1) {
 
-                        if(!branchItem.Identifier.equals("null")){
-                            txtCardID.setText(branchItem.Identifier);
+                            branchItem = Branches.get(0);
+
+                            if (!branchItem.Name.equals("null")) {
+                                txtName.setText(branchItem.Name);
+                            }
+                            if (!branchItem.BussinessType.equals("null")) {
+                                txtbusiness.setText(branchItem.BussinessType);
+                            }
+
+                            if (!branchItem.Identifier.equals("null")) {
+                                txtCardID.setText(branchItem.Identifier);
+                            }
+
+                            if (!branchItem.TitularName.equals("null")) {
+                                txtResponsableName.setText(branchItem.TitularName);
+                            }
+                            if (!branchItem.Phone.equals("null")) {
+                                txtPhone.setText(branchItem.Phone);
+                            }
+                            if (!branchItem.Email.equals("null")) {
+                                txtEmail.setText(branchItem.Email);
+                            }
+                        } else {
+
+                            branchItem = NearBranch(Branches, GPSTracker.getLatitude(), GPSTracker.getLongitude());
+
+                            if (!branchItem.Name.equals("null")) {
+                                txtName.setText(branchItem.Name);
+                            }
+                            if (!branchItem.BussinessType.equals("null")) {
+                                txtbusiness.setText(branchItem.BussinessType);
+                            }
+
+                            if (!branchItem.Identifier.equals("null")) {
+                                txtCardID.setText(branchItem.Identifier);
+                                AsyncSuperAki asyncSuperAki= new AsyncSuperAki(Integer.parseInt(branchItem.Identifier),BranchInformationActivity.this);
+                                asyncSuperAki.execute("/SuperAkiSync?identifier="+branchItem.Identifier);
+                            }
+
+                            if (!branchItem.TitularName.equals("null")) {
+                                txtResponsableName.setText(branchItem.TitularName);
+                            }
+                            if (!branchItem.Phone.equals("null")) {
+                                txtPhone.setText(branchItem.Phone);
+                            }
+                            if (!branchItem.Email.equals("null")) {
+                                txtEmail.setText(branchItem.Email);
+                            }
                         }
-
-                        if(!branchItem.TitularName.equals("null")){
-                            txtResponsableName.setText(branchItem.TitularName);
-                        }
-                    }else {
-
-                        branchItem =  NearBranch(Branches,GPSTracker.getLatitude(), GPSTracker.getLongitude());
-
-                        if(!branchItem.Name.equals("null")){
-                            txtName.setText( branchItem.Name );
-                        }
-                        if(!branchItem.BussinessType.equals("null")){
-                            txtbusiness.setText( branchItem.BussinessType );
-                        }
-
-                        if(!branchItem.Identifier.equals("null")){
-                            txtCardID.setText(branchItem.Identifier);
-                        }
-
-                        if(!branchItem.TitularName.equals("null")){
-                            txtResponsableName.setText(branchItem.TitularName);
-                        }
-
                     }
                 }
             } catch (JSONException e) {
@@ -350,5 +485,31 @@ public class BranchInformationActivity extends AppCompatActivity {
             }
         };
         return locationCallback;
+    }
+
+    private void buildAlertnobranch(String mensaje) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(mensaje)
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+
+
+
+    protected boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        @SuppressLint("MissingPermission") NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

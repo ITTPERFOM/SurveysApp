@@ -494,7 +494,7 @@ public class TableMainLayout extends RelativeLayout {
                 }
             }
         }catch (Exception e){
-            Log.d("Tabla error","Fallo");
+
         }
     }
 
@@ -509,7 +509,7 @@ public class TableMainLayout extends RelativeLayout {
                 rowText.setTextColor(Color.WHITE);
             }
         }catch (Exception e){
-            Log.d("Tabla error","Fallo");
+
         }
     }
 }
