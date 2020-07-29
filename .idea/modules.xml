@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Desktop-SurveysApp.iml" filepath="$PROJECT_DIR$/Desktop-SurveysApp.iml" group="SurveysApp" />
       <module fileurl="file://$PROJECT_DIR$/app/Desktop-SurveysApp-app.iml" filepath="$PROJECT_DIR$/app/Desktop-SurveysApp-app.iml" />
       <module fileurl="file://$PROJECT_DIR$/StudioProjects-SurveysApp.iml" filepath="$PROJECT_DIR$/StudioProjects-SurveysApp.iml" group="SurveysApp" />
       <module fileurl="file://$PROJECT_DIR$/.idea/SurveysApp.iml" filepath="$PROJECT_DIR$/.idea/SurveysApp.iml" />

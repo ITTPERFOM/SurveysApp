@@ -31,6 +31,7 @@ public class ConnectionMethods {
 
 
     public static final String WebServiceURL  = "https://formaxws.com/api";
+	//private static final String WebServiceURL = "http://192.168.1.68/api"; // Erick
 	//public static final String WebServiceURL  = "http://61a92187e7d34e979136e269e9067b8f.cloudapp.net/"; // Stage
 	//public static final String WebServiceURL  = "http://192.168.2.138/api"; // Erick
     //public static final String WebServiceURL  = "http://192.168.2.119/api"; //Alex

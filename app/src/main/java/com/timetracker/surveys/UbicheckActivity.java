@@ -288,12 +288,20 @@ public class UbicheckActivity extends Activity {
 		AsyncUbicheck.execute("/Ubicheck");
 	}
 
+	public void DoUbicheckCheckIn(int OrganizationBranchID) {
+		showSpinner("Registrando Entrada");
+		Devices Device = db.GetDevice();
+		UbicheckRequest UbicheckRequest = new UbicheckRequest(1, Device.DeviceID, lc.getLatitude(), lc.getLongitude(), new Date(), 0,  BiometricID, GPSTracker.usesMockLocation,OrganizationBranchID);
+		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest, true);
+		AsyncUbicheck.execute("/Ubicheck");
+	}
+
 
 
 	public void DoUbicheckCheckOut() {
 		showSpinner("Registrando Salida");
 		Devices Device = db.GetDevice();
-		UbicheckRequest UbicheckRequest = new UbicheckRequest(2, Device.DeviceID, lc.getLatitude(), lc.getLongitude(), new Date(), 0, BiometricID, GPSTracker.usesMockLocation);
+		UbicheckRequest UbicheckRequest = new UbicheckRequest(2, Device.DeviceID, lc.getLatitude(), lc.getLongitude(), new Date(), 0,  BiometricID, GPSTracker.usesMockLocation);
 		AsyncUbicheck AsyncUbicheck = new AsyncUbicheck(UbicheckRequest, false);
 		AsyncUbicheck.execute("/Ubicheck");
 	}
@@ -347,6 +355,9 @@ public class UbicheckActivity extends Activity {
 				item.put("BranchID", UbicheckRequest.BranchID);
 				item.put("BiometricID", UbicheckRequest.BiometricID);
 				item.put("IsMock", UbicheckRequest.IsMock);
+				if(UbicheckRequest.OrganizationBranchID > 0 ){
+					item.put("OrganizationBranchID", UbicheckRequest.OrganizationBranchID);
+				}
 				resultado = ConnectionMethods.Post(UbicheckActivity.this, item.toString(), params[0], false);
 			} catch (Exception e) {
 				resultado = "";
@@ -416,6 +427,7 @@ public class UbicheckActivity extends Activity {
 						}
 					} else if (Status == 1) {
 						JSONArray jBranches = JO.getJSONArray("Branches");
+						JSONArray jOrganizations = JO.getJSONArray("OrganizationBranches");
 						if (UsesKioskMode) {
 							boolean containsKioskBranch = false;
 							if (jBranches.length() > 0) {
@@ -475,6 +487,39 @@ public class UbicheckActivity extends Activity {
 								linLayout.addView(newButton);
 								lyButtons.addView(linLayout);
 							}
+							for (int j = 0; j < jOrganizations.length(); j++) {
+								JSONObject jBranch = jOrganizations.getJSONObject(j);
+								Button newButton = new Button(UbicheckActivity.this);
+								newButton.setText(jBranch.getString("Name"));
+								newButton.setId(jBranch.getInt("OrganizationBranchID"));
+								newButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_checkin));
+								newButton.setTextAppearance(getApplicationContext(), R.style.button_text);
+								LinearLayout.LayoutParams tdf = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+								tdf.setMargins(0, 10, 0, 10);
+								newButton.setLayoutParams(tdf);
+								newButton.setOnClickListener(new View.OnClickListener() {
+									@Override
+									public void onClick(View v) {
+										if (isOnline()) {
+											CheckInBranchID = ((Button) v).getId();
+											if (UsesBiometric) {
+												UbicheckOption = 1;
+												showSpinner("Registrando Entrada");
+												AuthenticateUser(BiometricID);
+											} else {
+												DoUbicheckCheckIn(CheckInBranchID);
+											}
+										} else {
+											buildAlertMessageNoOnline();
+										}
+									}
+								});
+								LinearLayout linLayout = new LinearLayout(UbicheckActivity.this);
+								linLayout.addView(newButton);
+								lyButtons.addView(linLayout);
+							}
+
+
 							lyButtons.setVisibility(View.VISIBLE);
 						}
 
